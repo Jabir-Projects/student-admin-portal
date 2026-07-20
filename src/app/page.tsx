@@ -1,107 +1,87 @@
+import { Bell, FileCheck2, ShieldCheck, Waypoints } from "lucide-react";
+
+import { SiteHeader } from "@/components/layout/site-header";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const services = [
+  {
+    title: "Submit clearly",
+    description:
+      "Choose an administrative service and send a structured request.",
+    icon: FileCheck2,
+  },
+  {
+    title: "Track every step",
+    description:
+      "Follow progress through a transparent, time-stamped request history.",
+    icon: Waypoints,
+  },
+  {
+    title: "Stay informed",
+    description:
+      "Receive focused updates when the administration takes action.",
+    icon: Bell,
+  },
+] as const;
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+    <div className="via-background min-h-screen bg-linear-to-b from-blue-50/80 to-emerald-50/50">
+      <SiteHeader />
+      <main>
+        <section className="mx-auto grid max-w-7xl gap-14 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-28">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">
-              Student Admin Portal
+            <Badge variant="success">
+              <ShieldCheck aria-hidden="true" />
+              Secure student services
+            </Badge>
+            <h1 className="text-foreground mt-6 max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-6xl">
+              Administration requests, without the uncertainty.
             </h1>
-            <p className="text-sm text-slate-500">
-              Student Services Platform
+            <p className="text-muted-foreground mt-6 max-w-2xl text-lg leading-8">
+              One clear place for students to submit requests, follow progress,
+              and receive official updates from university administration.
             </p>
+            <div className="mt-8 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+              Portal access will be enabled when secure authentication is added
+              in Phase 2.
+            </div>
           </div>
 
-          <a
-            href="/login"
-            className="rounded-lg bg-blue-700 px-5 py-2.5 font-medium text-white transition hover:bg-blue-800"
-          >
-            Login
-          </a>
-        </div>
-      </header>
+          <Card className="overflow-hidden shadow-xl shadow-blue-950/8">
+            <CardHeader className="bg-muted/40 border-b">
+              <p className="text-primary text-sm font-semibold">How it works</p>
+              <CardTitle>Simple from request to completion</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3 pt-6">
+              {services.map((service, index) => {
+                const Icon = service.icon;
 
-      <section className="mx-auto grid min-h-[calc(100vh-85px)] max-w-6xl items-center gap-12 px-6 py-16 lg:grid-cols-2">
-        <div>
-          <span className="inline-block rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
-            Simple • Fast • Secure
-          </span>
-
-          <h2 className="mt-6 text-4xl font-bold leading-tight text-slate-900 sm:text-5xl">
-            Manage your student requests easily
-          </h2>
-
-          <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-            Submit administrative document requests, follow their progress and
-            receive updates from the administration—all from one platform.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-            <a
-              href="/login"
-              className="rounded-lg bg-blue-700 px-6 py-3 text-center font-semibold text-white transition hover:bg-blue-800"
-            >
-              Student Login
-            </a>
-
-            <a
-              href="/admin/login"
-              className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-center font-semibold text-slate-800 transition hover:bg-slate-100"
-            >
-              Administration Login
-            </a>
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/60">
-          <h3 className="text-2xl font-bold text-slate-900">
-            Available services
-          </h3>
-
-          <div className="mt-6 space-y-4">
-            <ServiceCard
-              number="01"
-              title="Submit a request"
-              description="Request certificates, transcripts and other administrative documents."
-            />
-
-            <ServiceCard
-              number="02"
-              title="Track progress"
-              description="Check whether your request is pending, approved or completed."
-            />
-
-            <ServiceCard
-              number="03"
-              title="Receive updates"
-              description="View important notifications from the administration."
-            />
-          </div>
-        </div>
-      </section>
-    </main>
-  );
-}
-
-function ServiceCard({
-  number,
-  title,
-  description,
-}: {
-  number: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="flex gap-4 rounded-2xl border border-slate-200 p-5">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-100 font-bold text-blue-700">
-        {number}
-      </div>
-
-      <div>
-        <h4 className="font-semibold text-slate-900">{title}</h4>
-        <p className="mt-1 text-sm leading-6 text-slate-600">{description}</p>
-      </div>
+                return (
+                  <article
+                    className="bg-card flex gap-4 rounded-xl border p-4"
+                    key={service.title}
+                  >
+                    <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-lg">
+                      <Icon aria-hidden="true" className="size-5" />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs font-bold tracking-widest">
+                        0{index + 1}
+                      </p>
+                      <h2 className="mt-1 font-semibold">{service.title}</h2>
+                      <p className="text-muted-foreground mt-1 text-sm leading-6">
+                        {service.description}
+                      </p>
+                    </div>
+                  </article>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </section>
+      </main>
     </div>
   );
 }
