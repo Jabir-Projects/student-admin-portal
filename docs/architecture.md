@@ -3,8 +3,9 @@
 ## Scope
 
 The Student Administration Portal is a single Next.js App Router application.
-Phase 1 contains only the frontend and engineering foundation. Database,
-authentication, authorization, and business workflows begin in later phases.
+Phase 2 contains the frontend foundation and the Neon PostgreSQL persistence
+foundation. Authentication, authorization, and business workflows begin in later
+phases.
 
 ## Runtime boundaries
 
@@ -15,6 +16,8 @@ authentication, authorization, and business workflows begin in later phases.
 - Business rules belong in feature services, not page components.
 - Server-only data access will live under `src/server` and must never be imported
   by Client Components.
+- Prisma uses `@prisma/adapter-pg` only in the standard Next.js Node.js runtime.
+  It must not be imported by Edge runtime code, middleware, or Client Components.
 
 ## Source structure
 
@@ -29,9 +32,10 @@ src/
 tests/e2e/      Browser-level user journeys
 ```
 
-Feature folders will be introduced only when their phase starts. Planned
-features include authentication, student profiles, requests, notifications,
-categories, administration, exports, and audit logging.
+Feature folders will be introduced only when their phase starts. Phase 2 defines
+the persistence model for users, student profiles, requests, notifications,
+categories, messages, status history, and audit logging without exposing feature
+workflows. Authentication, administration, and exports remain planned.
 
 ## Security invariants
 
@@ -52,9 +56,15 @@ Normal transitions are `SUBMITTED -> UNDER_REVIEW`, `SUBMITTED -> CANCELLED`,
 
 ## Data and deployment
 
-Later phases will use PostgreSQL on Neon through Prisma migrations, Auth.js for
-sessions, and Vercel for deployment. Production schema changes must use checked-in
-Prisma migrations; `prisma db push` is not a production migration strategy.
+PostgreSQL on Neon is accessed through Prisma 7 and `@prisma/adapter-pg`.
+`DATABASE_URL` is reserved for pooled application runtime access, while
+`DIRECT_URL` is reserved for Prisma CLI and migrations. Both are loaded from the
+ignored project-root `.env.local` and must never be exposed to client bundles.
+
+Request references use a PostgreSQL sequence rather than row counts. Status
+history and audit logs are protected from updates and deletes by database
+triggers. Production schema changes use checked-in Prisma migrations;
+`prisma db push` is not a production migration strategy.
 
 ## Verification
 

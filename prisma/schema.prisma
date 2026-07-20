@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum RequestStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum DeliveryMethod {
+  CAMPUS_PICKUP
+  DIGITAL_DELIVERY
+}
+
+enum MessageVisibility {
+  PUBLIC
+  INTERNAL
+}
+
+enum PreferredLanguage {
+  ENGLISH
+  FRENCH
+  ARABIC
+}
+
+model User {
+  id                String                 @id @default(uuid()) @db.Uuid
+  email             String                 @unique @db.VarChar(320)
+  displayName       String                 @db.VarChar(200)
+  passwordHash      String
+  role              UserRole
+  preferredLanguage PreferredLanguage      @default(ENGLISH)
+  createdAt         DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime               @updatedAt @db.Timestamptz(3)
+  studentProfile    StudentProfile?
+  statusChanges     RequestStatusHistory[] @relation("StatusChangedBy")
+  messages          RequestMessage[]       @relation("MessageAuthor")
+  notifications     Notification[]
+  auditLogs         AuditLog[]             @relation("AuditActor")
+
+  @@index([role, createdAt])
+}
+
+model StudentProfile {
+  id            String            @id @default(uuid()) @db.Uuid
+  userId        String            @unique @db.Uuid
+  studentNumber String            @unique @db.VarChar(50)
+  program       String            @db.VarChar(200)
+  academicYear  Int
+  createdAt     DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime          @updatedAt @db.Timestamptz(3)
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requests      DocumentRequest[]
+
+  @@index([program, academicYear])
+}
+
+model RequestCategory {
+  id          String            @id @default(uuid()) @db.Uuid
+  name        String            @unique @db.VarChar(120)
+  slug        String            @unique @db.VarChar(120)
+  description String?
+  isActive    Boolean           @default(true)
+  createdAt   DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime          @updatedAt @db.Timestamptz(3)
+  requests    DocumentRequest[]
+
+  @@index([isActive, name])
+}
+
+model DocumentRequest {
+  id              String                 @id @default(uuid()) @db.Uuid
+  referenceNumber String                 @unique @default(dbgenerated("('REQ-'::text || lpad((nextval('document_request_reference_seq'::regclass))::text, 8, '0'::text))")) @db.VarChar(32)
+  studentId       String                 @db.Uuid
+  categoryId      String                 @db.Uuid
+  status          RequestStatus          @default(SUBMITTED)
+  deliveryMethod  DeliveryMethod
+  copyCount       Int                    @default(1)
+  details         String?
+  createdAt       DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime               @updatedAt @db.Timestamptz(3)
+  student         StudentProfile         @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  category        RequestCategory        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  statusHistory   RequestStatusHistory[]
+  messages        RequestMessage[]
+  notifications   Notification[]
+
+  @@index([studentId, status, createdAt])
+  @@index([categoryId, status, createdAt])
+  @@index([status, createdAt])
+}
+
+model RequestStatusHistory {
+  id          String          @id @default(uuid()) @db.Uuid
+  requestId   String          @db.Uuid
+  fromStatus  RequestStatus?
+  toStatus    RequestStatus
+  changedById String?         @db.Uuid
+  note        String?
+  createdAt   DateTime        @default(now()) @db.Timestamptz(3)
+  request     DocumentRequest @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  changedBy   User?           @relation("StatusChangedBy", fields: [changedById], references: [id], onDelete: Restrict)
+
+  @@index([requestId, createdAt])
+  @@index([changedById, createdAt])
+}
+
+model RequestMessage {
+  id         String            @id @default(uuid()) @db.Uuid
+  requestId  String            @db.Uuid
+  authorId   String?           @db.Uuid
+  visibility MessageVisibility @default(PUBLIC)
+  body       String
+  createdAt  DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime          @updatedAt @db.Timestamptz(3)
+  request    DocumentRequest   @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  author     User?             @relation("MessageAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([requestId, visibility, createdAt])
+  @@index([authorId, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  requestId String?          @db.Uuid
+  title     String           @db.VarChar(200)
+  body      String
+  readAt    DateTime?        @db.Timestamptz(3)
+  createdAt DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime         @updatedAt @db.Timestamptz(3)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  request   DocumentRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  @@index([userId, readAt, createdAt])
+  @@index([requestId, createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String?  @db.Uuid
+  action     String   @db.VarChar(120)
+  entityType String   @db.VarChar(120)
+  entityId   String?  @db.VarChar(120)
+  metadata   Json     @default("{}") @db.JsonB
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId, createdAt])
+  @@index([actorId, createdAt])
+}
