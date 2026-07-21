@@ -1,94 +1,12 @@
 import Link from "next/link";
 
-export default function StudentLoginPage() {
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-6 py-12">
-      <div className="w-full max-w-md">
-        <Link
-          href="/"
-          className="mb-6 inline-block text-sm font-medium text-blue-700 hover:text-blue-800"
-        >
-          ← Back to home
-        </Link>
+import { loginAction } from "@/app/login/actions";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/60">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900">
-              Student Login
-            </h1>
+const inputClass = "h-11 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
-            <p className="mt-2 text-slate-600">
-              Access your student administration portal
-            </p>
-          </div>
-
-          <form className="mt-8 space-y-5">
-            <div>
-              <label
-                htmlFor="studentId"
-                className="mb-2 block text-sm font-semibold text-slate-700"
-              >
-                Student ID or Email
-              </label>
-
-              <input
-                id="studentId"
-                name="studentId"
-                type="text"
-                placeholder="Enter your student ID"
-                required
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-semibold text-slate-700"
-              >
-                Password
-              </label>
-
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter your password"
-                required
-                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm text-slate-600">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-slate-300"
-                />
-                Remember me
-              </label>
-
-              <Link
-                href="/forgot-password"
-                className="text-sm font-medium text-blue-700 hover:text-blue-800"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-blue-700 px-5 py-3 font-semibold text-white transition hover:bg-blue-800"
-            >
-              Sign in
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-slate-500">
-            Having trouble signing in? Contact the administration.
-          </p>
-        </div>
-      </div>
-    </main>
-  );
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const { error } = await searchParams;
+  return <main className="mx-auto max-w-md px-4 py-16"><Card><CardHeader><CardTitle>SIST portal sign in</CardTitle><p className="text-sm text-muted-foreground">Use your registered email address and password.</p></CardHeader><CardContent><form action={loginAction} className="space-y-5"><label className="block space-y-2 text-sm font-medium">Email<input className={inputClass} name="email" type="email" autoComplete="email" maxLength={320} required /></label><label className="block space-y-2 text-sm font-medium">Password<input className={inputClass} name="password" type="password" autoComplete="current-password" maxLength={128} required /></label>{error ? <p className="text-sm text-destructive" role="alert">{error === "disabled" ? "This account is disabled. Please contact administration." : "The email address or password is incorrect."}</p> : null}<Button className="w-full" type="submit">Sign in</Button><p className="text-center text-sm text-muted-foreground">Need a student account? <Link className="font-medium text-primary hover:underline" href="/register">Register</Link></p></form></CardContent></Card></main>;
 }

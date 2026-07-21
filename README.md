@@ -50,3 +50,7 @@ npm run build
 See [`docs/architecture.md`](docs/architecture.md) for boundaries, security
 requirements, and the planned feature structure. See
 [`docs/database.md`](docs/database.md) for the database model and operating rules.
+Authentication, registration, and manual approval are documented in
+[`docs/authentication.md`](docs/authentication.md). Public registrations create
+pending student accounts; submitted Student Numbers are not institutionally
+verified in Phase 3.

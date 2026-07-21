@@ -1,9 +1,3 @@
-import { PrismaPg } from "@prisma/adapter-pg";
+import "server-only";
 
-import { PrismaClient } from "@/generated/prisma/client";
-
-export function createPrismaClient(connectionString: string): PrismaClient {
-  const adapter = new PrismaPg({ connectionString });
-
-  return new PrismaClient({ adapter });
-}
+export { createPrismaClient } from "@/server/db/factory.node";

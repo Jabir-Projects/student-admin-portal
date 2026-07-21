@@ -87,10 +87,11 @@ The seed is repeatable. Mutable fixtures use deterministic IDs and intentional
 upserts. Immutable status-history fixtures use deterministic IDs with
 `createMany({ skipDuplicates: true })`, so reruns never update or delete them.
 
-Seed users contain the literal marker
-`PHASE_2_NON_AUTHENTICATING_PLACEHOLDER_HASH_REPLACE_IN_PHASE_3`. It is not a
-password hash and cannot authenticate anyone. Phase 3 must replace all placeholder
-values when authentication and password hashing are implemented.
+Phase 3 renames `User.displayName` to `fullName`, adds account status and approval
+tracking, and converts academic years to a controlled enum. The migration checks
+for unsupported academic years and normalized identifier collisions before any
+conversion. Development seed passwords must come from the documented environment
+variables and are stored only as Argon2id hashes.
 
 ## Testing
 

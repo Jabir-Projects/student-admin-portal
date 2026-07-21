@@ -38,13 +38,33 @@ enum PreferredLanguage {
   ARABIC
 }
 
+enum AccountStatus {
+  PENDING_APPROVAL
+  ACTIVE
+  DISABLED
+}
+
+enum AcademicYear {
+  FOUNDATION
+  YEAR_1
+  YEAR_2
+  YEAR_3
+  MASTER_1
+  MASTER_2
+}
+
 model User {
   id                String                 @id @default(uuid()) @db.Uuid
   email             String                 @unique @db.VarChar(320)
-  displayName       String                 @db.VarChar(200)
+  fullName          String                 @db.VarChar(200)
   passwordHash      String
   role              UserRole
+  status            AccountStatus          @default(PENDING_APPROVAL)
   preferredLanguage PreferredLanguage      @default(ENGLISH)
+  approvedAt        DateTime?              @db.Timestamptz(3)
+  approvedById      String?                @db.Uuid
+  disabledAt        DateTime?              @db.Timestamptz(3)
+  disabledById      String?                @db.Uuid
   createdAt         DateTime               @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime               @updatedAt @db.Timestamptz(3)
   studentProfile    StudentProfile?
@@ -52,8 +72,15 @@ model User {
   messages          RequestMessage[]       @relation("MessageAuthor")
   notifications     Notification[]
   auditLogs         AuditLog[]             @relation("AuditActor")
+  approvedBy        User?                  @relation("AccountApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
+  disabledBy        User?                  @relation("AccountDisabledBy", fields: [disabledById], references: [id], onDelete: Restrict)
+  accountsApproved  User[]                 @relation("AccountApprovedBy")
+  accountsDisabled  User[]                 @relation("AccountDisabledBy")
 
   @@index([role, createdAt])
+  @@index([status, role, createdAt])
+  @@index([approvedById, approvedAt])
+  @@index([disabledById, disabledAt])
 }
 
 model StudentProfile {
@@ -61,7 +88,7 @@ model StudentProfile {
   userId        String            @unique @db.Uuid
   studentNumber String            @unique @db.VarChar(50)
   program       String            @db.VarChar(200)
-  academicYear  Int
+  academicYear  AcademicYear
   createdAt     DateTime          @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime          @updatedAt @db.Timestamptz(3)
   user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)

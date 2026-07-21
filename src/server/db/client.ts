@@ -1,3 +1,5 @@
+import "server-only";
+
 import { databaseEnv } from "@/server/db/env";
 import { createPrismaClient } from "@/server/db/factory";
 

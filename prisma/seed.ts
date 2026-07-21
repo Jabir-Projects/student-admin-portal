@@ -1,12 +1,15 @@
-import { createPrismaClient } from "../src/server/db/factory";
-import { databaseEnv } from "../src/server/db/env";
+import { createPrismaClient } from "../src/server/db/factory.node";
+import { databaseEnv } from "../src/server/db/env.node";
 import {
+  AcademicYear,
+  AccountStatus,
   DeliveryMethod,
   MessageVisibility,
   PreferredLanguage,
   RequestStatus,
   UserRole,
 } from "../src/generated/prisma/enums";
+import { hashPassword, verifyPassword } from "../src/server/auth/password.node";
 
 const ids = {
   admin: "10000000-0000-4000-8000-000000000001",
@@ -28,8 +31,6 @@ const ids = {
   notificationTwo: "70000000-0000-4000-8000-000000000002",
 } as const;
 
-const placeholderHash =
-  "PHASE_2_NON_AUTHENTICATING_PLACEHOLDER_HASH_REPLACE_IN_PHASE_3";
 const seededAt = new Date("2026-01-15T09:00:00.000Z");
 
 if (process.env.NODE_ENV === "production") {
@@ -38,30 +39,65 @@ if (process.env.NODE_ENV === "production") {
 
 const prisma = createPrismaClient(databaseEnv.DATABASE_URL);
 
+function requireSeedPassword(name: string): string {
+  const value = process.env[name];
+  if (!value || value.length < 12 || value.length > 128) {
+    throw new Error(
+      `Missing or invalid development seed configuration: ${name}`,
+    );
+  }
+  return value;
+}
+
+async function reusablePasswordHash(
+  userId: string,
+  password: string,
+): Promise<string> {
+  const existing = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { passwordHash: true },
+  });
+  if (existing && (await verifyPassword(existing.passwordHash, password)))
+    return existing.passwordHash;
+  return hashPassword(password);
+}
+
 async function seed(): Promise<void> {
+  const adminPassword = requireSeedPassword("SEED_ADMIN_PASSWORD");
+  const studentOnePassword = requireSeedPassword("SEED_STUDENT_ONE_PASSWORD");
+  const studentTwoPassword = requireSeedPassword("SEED_STUDENT_TWO_PASSWORD");
   const users = [
     {
       id: ids.admin,
       email: "admin.dev@example.invalid",
-      displayName: "Development Administrator",
-      passwordHash: placeholderHash,
+      fullName: "Development Administrator",
+      passwordHash: await reusablePasswordHash(ids.admin, adminPassword),
       role: UserRole.ADMIN,
+      status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.ENGLISH,
     },
     {
       id: ids.studentOne,
       email: "student.one.dev@example.invalid",
-      displayName: "Development Student One",
-      passwordHash: placeholderHash,
+      fullName: "Development Student One",
+      passwordHash: await reusablePasswordHash(
+        ids.studentOne,
+        studentOnePassword,
+      ),
       role: UserRole.STUDENT,
+      status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.FRENCH,
     },
     {
       id: ids.studentTwo,
       email: "student.two.dev@example.invalid",
-      displayName: "Development Student Two",
-      passwordHash: placeholderHash,
+      fullName: "Development Student Two",
+      passwordHash: await reusablePasswordHash(
+        ids.studentTwo,
+        studentTwoPassword,
+      ),
       role: UserRole.STUDENT,
+      status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.ARABIC,
     },
   ] as const;
@@ -79,15 +115,15 @@ async function seed(): Promise<void> {
       id: ids.profileOne,
       userId: ids.studentOne,
       studentNumber: "DEV-STUDENT-001",
-      program: "Computer Science",
-      academicYear: 2,
+      program: "BAC+3 Software Engineering",
+      academicYear: AcademicYear.YEAR_2,
     },
     {
       id: ids.profileTwo,
       userId: ids.studentTwo,
       studentNumber: "DEV-STUDENT-002",
-      program: "Business Administration",
-      academicYear: 3,
+      program: "BAC+5 Business Administration",
+      academicYear: AcademicYear.YEAR_3,
     },
   ] as const;
 

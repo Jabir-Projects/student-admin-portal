@@ -71,3 +71,11 @@ triggers. Production schema changes use checked-in Prisma migrations;
 Vitest covers isolated logic and components. Playwright covers critical browser
 journeys. ESLint, strict TypeScript, Prettier, tests, and `next build` are required
 before a phase is considered complete.
+
+## Authentication boundary
+
+Auth.js Credentials uses eight-hour JWT sessions. `src/proxy.ts` performs only
+optimistic cookie checks. Server pages and actions enforce role and status, and
+the server-only DAL re-reads PostgreSQL for every sensitive operation. JWT claims
+are never the final authorization source. Durable distributed rate limiting is
+required before production deployment.
