@@ -53,29 +53,40 @@ enum AcademicYear {
   MASTER_2
 }
 
+enum StudentRegistryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum StudentRegistrySource {
+  DEVELOPMENT_DEMO
+  OFFICIAL_IMPORT
+}
+
 model User {
-  id                String                 @id @default(uuid()) @db.Uuid
-  email             String                 @unique @db.VarChar(320)
-  fullName          String                 @db.VarChar(200)
-  passwordHash      String
-  role              UserRole
-  status            AccountStatus          @default(PENDING_APPROVAL)
-  preferredLanguage PreferredLanguage      @default(ENGLISH)
-  approvedAt        DateTime?              @db.Timestamptz(3)
-  approvedById      String?                @db.Uuid
-  disabledAt        DateTime?              @db.Timestamptz(3)
-  disabledById      String?                @db.Uuid
-  createdAt         DateTime               @default(now()) @db.Timestamptz(3)
-  updatedAt         DateTime               @updatedAt @db.Timestamptz(3)
-  studentProfile    StudentProfile?
-  statusChanges     RequestStatusHistory[] @relation("StatusChangedBy")
-  messages          RequestMessage[]       @relation("MessageAuthor")
-  notifications     Notification[]
-  auditLogs         AuditLog[]             @relation("AuditActor")
-  approvedBy        User?                  @relation("AccountApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
-  disabledBy        User?                  @relation("AccountDisabledBy", fields: [disabledById], references: [id], onDelete: Restrict)
-  accountsApproved  User[]                 @relation("AccountApprovedBy")
-  accountsDisabled  User[]                 @relation("AccountDisabledBy")
+  id                    String                 @id @default(uuid()) @db.Uuid
+  email                 String                 @unique @db.VarChar(320)
+  fullName              String                 @db.VarChar(200)
+  passwordHash          String
+  role                  UserRole
+  status                AccountStatus          @default(PENDING_APPROVAL)
+  preferredLanguage     PreferredLanguage      @default(ENGLISH)
+  approvedAt            DateTime?              @db.Timestamptz(3)
+  approvedById          String?                @db.Uuid
+  disabledAt            DateTime?              @db.Timestamptz(3)
+  disabledById          String?                @db.Uuid
+  createdAt             DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime               @updatedAt @db.Timestamptz(3)
+  studentProfile        StudentProfile?
+  statusChanges         RequestStatusHistory[] @relation("StatusChangedBy")
+  messages              RequestMessage[]       @relation("MessageAuthor")
+  notifications         Notification[]
+  auditLogs             AuditLog[]             @relation("AuditActor")
+  approvedBy            User?                  @relation("AccountApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
+  disabledBy            User?                  @relation("AccountDisabledBy", fields: [disabledById], references: [id], onDelete: Restrict)
+  accountsApproved      User[]                 @relation("AccountApprovedBy")
+  accountsDisabled      User[]                 @relation("AccountDisabledBy")
+  studentRegistryRecord StudentRegistry?       @relation("StudentRegistryRegistration")
 
   @@index([role, createdAt])
   @@index([status, role, createdAt])
@@ -95,6 +106,23 @@ model StudentProfile {
   requests      DocumentRequest[]
 
   @@index([program, academicYear])
+}
+
+model StudentRegistry {
+  id                 String                @id @default(uuid()) @db.Uuid
+  studentNumber      String                @unique @db.VarChar(50)
+  fullName           String                @db.VarChar(200)
+  normalizedFullName String                @db.VarChar(200)
+  email              String                @unique @db.VarChar(320)
+  program            String                @db.VarChar(200)
+  academicYear       AcademicYear
+  status             StudentRegistryStatus @default(ACTIVE)
+  source             StudentRegistrySource
+  registeredUserId   String?               @unique @db.Uuid
+  registeredAt       DateTime?             @db.Timestamptz(3)
+  createdAt          DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime              @updatedAt @db.Timestamptz(3)
+  registeredUser     User?                 @relation("StudentRegistryRegistration", fields: [registeredUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 }
 
 model RequestCategory {

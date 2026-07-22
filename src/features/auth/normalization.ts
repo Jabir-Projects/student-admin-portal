@@ -7,5 +7,9 @@ export function normalizeStudentNumber(value: string): string {
 }
 
 export function normalizeFullName(value: string): string {
-  return value.trim().replace(/\s+/gu, " ");
+  return value.normalize("NFC").trim().replace(/\s+/gu, " ");
+}
+
+export function normalizeFullNameComparisonKey(value: string): string {
+  return normalizeFullName(value).toLowerCase();
 }
