@@ -29,6 +29,10 @@ const isolatedDb = hasDistinctIsolatedDatabase
   ? createPrismaClient(testDatabaseUrl!)
   : undefined;
 const administratorId = randomUUID();
+const manualRegistrationOptions = {
+  verificationMode: "MANUAL_APPROVAL",
+  runtime: "test",
+} as const;
 
 function registration(overrides: Partial<Record<string, string>> = {}) {
   const unique = randomUUID();
@@ -70,7 +74,11 @@ describe.skipIf(!isolatedDb)(
         studentNumber: ` test-${randomUUID()} `,
       });
       await expect(
-        registerStudentWithDatabase(input, isolatedDb!),
+        registerStudentWithDatabase(
+          input,
+          isolatedDb!,
+          manualRegistrationOptions,
+        ),
       ).resolves.toEqual({
         ok: true,
       });
@@ -107,7 +115,13 @@ describe.skipIf(!isolatedDb)(
     it("maps normalized duplicates safely and rolls back a failed profile create", async () => {
       const original = registration();
       expect(
-        (await registerStudentWithDatabase(original, isolatedDb!)).ok,
+        (
+          await registerStudentWithDatabase(
+            original,
+            isolatedDb!,
+            manualRegistrationOptions,
+          )
+        ).ok,
       ).toBe(true);
       expect(
         (
@@ -117,6 +131,7 @@ describe.skipIf(!isolatedDb)(
               email: ` ${original.email.toUpperCase()} `,
             },
             isolatedDb!,
+            manualRegistrationOptions,
           )
         ).ok,
       ).toBe(false);
@@ -131,6 +146,7 @@ describe.skipIf(!isolatedDb)(
               studentNumber: original.studentNumber.toLowerCase(),
             },
             isolatedDb!,
+            manualRegistrationOptions,
           )
         ).ok,
       ).toBe(false);
@@ -141,7 +157,11 @@ describe.skipIf(!isolatedDb)(
 
     it("approves once and records the transition atomically", async () => {
       const input = registration();
-      await registerStudentWithDatabase(input, isolatedDb!);
+      await registerStudentWithDatabase(
+        input,
+        isolatedDb!,
+        manualRegistrationOptions,
+      );
       const target = await isolatedDb!.user.findUniqueOrThrow({
         where: { email: input.email },
       });
@@ -174,7 +194,11 @@ describe.skipIf(!isolatedDb)(
 
     it("supports pending and approved disable transitions and rejects stale JWT identity", async () => {
       const pendingInput = registration();
-      await registerStudentWithDatabase(pendingInput, isolatedDb!);
+      await registerStudentWithDatabase(
+        pendingInput,
+        isolatedDb!,
+        manualRegistrationOptions,
+      );
       const pending = await isolatedDb!.user.findUniqueOrThrow({
         where: { email: pendingInput.email },
       });
@@ -184,7 +208,11 @@ describe.skipIf(!isolatedDb)(
       ).toBe(true);
 
       const activeInput = registration();
-      await registerStudentWithDatabase(activeInput, isolatedDb!);
+      await registerStudentWithDatabase(
+        activeInput,
+        isolatedDb!,
+        manualRegistrationOptions,
+      );
       const active = await isolatedDb!.user.findUniqueOrThrow({
         where: { email: activeInput.email },
       });
@@ -220,8 +248,16 @@ describe.skipIf(!isolatedDb)(
     it("enforces ownership in the database predicate", async () => {
       const ownerInput = registration();
       const otherInput = registration();
-      await registerStudentWithDatabase(ownerInput, isolatedDb!);
-      await registerStudentWithDatabase(otherInput, isolatedDb!);
+      await registerStudentWithDatabase(
+        ownerInput,
+        isolatedDb!,
+        manualRegistrationOptions,
+      );
+      await registerStudentWithDatabase(
+        otherInput,
+        isolatedDb!,
+        manualRegistrationOptions,
+      );
       const owner = await isolatedDb!.user.findUniqueOrThrow({
         where: { email: ownerInput.email },
         include: { studentProfile: true },
