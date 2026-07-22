@@ -1,23 +1,36 @@
 @import "tailwindcss";
 
 :root {
+  --paper: #fbfcfb;
+  --paper-secondary: #f1f3ef;
+  --ink: #141b22;
+  --slate: #5b6470;
+  --sist-navy: #12385c;
+  --sist-navy-dark: #0b2540;
+  --sist-navy-soft: #e8eef3;
+  --sist-olive: #6e8c3a;
+  --sist-olive-dark: #506b26;
+  --sist-olive-light: #eaf0df;
+  --border: #e1e5e1;
+  --border-strong: #cbd2cb;
+  --surface: #ffffff;
+  --focus-ring: #12385c;
   --radius: 0.75rem;
-  --background: oklch(0.99 0.003 247);
-  --foreground: oklch(0.2 0.025 257);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.025 257);
-  --primary: oklch(0.48 0.18 256);
-  --primary-foreground: oklch(0.99 0.003 247);
-  --secondary: oklch(0.94 0.025 250);
-  --secondary-foreground: oklch(0.27 0.07 255);
-  --muted: oklch(0.96 0.01 247);
-  --muted-foreground: oklch(0.49 0.035 257);
-  --accent: oklch(0.94 0.045 157);
-  --accent-foreground: oklch(0.3 0.08 157);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --primary: var(--sist-navy);
+  --primary-foreground: var(--surface);
+  --secondary: var(--sist-navy-soft);
+  --secondary-foreground: var(--sist-navy-dark);
+  --muted: var(--paper-secondary);
+  --muted-foreground: var(--slate);
+  --accent: var(--sist-olive-light);
+  --accent-foreground: var(--sist-olive-dark);
   --destructive: oklch(0.58 0.22 27);
-  --border: oklch(0.9 0.015 250);
-  --input: oklch(0.9 0.015 250);
-  --ring: oklch(0.55 0.17 256);
+  --input: var(--border-strong);
+  --ring: var(--focus-ring);
 }
 
 @theme inline {
@@ -41,8 +54,22 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: "Segoe UI", Arial, sans-serif;
-  --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  --color-paper: var(--paper);
+  --color-paper-secondary: var(--paper-secondary);
+  --color-ink: var(--ink);
+  --color-slate: var(--slate);
+  --color-sist-navy: var(--sist-navy);
+  --color-sist-navy-dark: var(--sist-navy-dark);
+  --color-sist-navy-soft: var(--sist-navy-soft);
+  --color-sist-olive: var(--sist-olive);
+  --color-sist-olive-dark: var(--sist-olive-dark);
+  --color-sist-olive-light: var(--sist-olive-light);
+  --color-border-strong: var(--border-strong);
+  --color-surface: var(--surface);
+  --font-sans: var(--font-inter), "Segoe UI", Arial, sans-serif;
+  --font-mono:
+    var(--font-ibm-plex-mono), "Cascadia Code", "SFMono-Regular", Consolas,
+    monospace;
 }
 
 @layer base {
@@ -55,10 +82,26 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
 
   ::selection {
     @apply bg-primary/20 text-foreground;
+  }
+
+  :where(a, button, input, select, textarea):focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

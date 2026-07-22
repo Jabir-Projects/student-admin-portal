@@ -1,85 +1,138 @@
-import { Bell, FileCheck2, ShieldCheck, Waypoints } from "lucide-react";
+import { Info, LockKeyhole } from "lucide-react";
+import Link from "next/link";
 
 import { SiteHeader } from "@/components/layout/site-header";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const services = [
   {
-    title: "Submit clearly",
-    description:
-      "Choose an administrative service and send a structured request.",
-    icon: FileCheck2,
+    title: "Register or sign in",
+    description: "Create an account or sign in with approved access.",
   },
   {
-    title: "Track every step",
-    description:
-      "Follow progress through a transparent, time-stamped request history.",
-    icon: Waypoints,
+    title: "Submit your request",
+    description: "Choose a service and provide the required request details.",
   },
   {
-    title: "Stay informed",
+    title: "Track its progress",
     description:
-      "Receive focused updates when the administration takes action.",
-    icon: Bell,
+      "Follow updates as administration reviews and processes your request.",
   },
 ] as const;
 
 export default function Home() {
   return (
-    <div className="via-background min-h-screen bg-linear-to-b from-blue-50/80 to-emerald-50/50">
+    <div className="bg-paper min-h-screen">
       <SiteHeader />
       <main>
-        <section className="mx-auto grid max-w-7xl gap-14 px-6 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-28">
-          <div>
-            <Badge variant="success">
-              <ShieldCheck aria-hidden="true" />
-              Secure student services
-            </Badge>
-            <h1 className="text-foreground mt-6 max-w-3xl text-4xl font-bold tracking-tight text-balance sm:text-6xl">
-              Administration requests, without the uncertainty.
-            </h1>
-            <p className="text-muted-foreground mt-6 max-w-2xl text-lg leading-8">
-              One clear place for students to submit requests, follow progress,
-              and receive official updates from university administration.
-            </p>
-            <div className="mt-8 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
-              Portal access will be enabled when secure authentication is added
-              in Phase 2.
+        <section className="mx-auto max-w-[75rem] px-5 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
+          <div className="grid items-center gap-9 min-[860px]:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)] min-[860px]:gap-12">
+            <div className="min-w-0">
+              <p className="text-sist-olive-dark font-mono text-xs font-semibold tracking-[0.14em] uppercase">
+                SIST Student Services
+              </p>
+              <h1 className="text-sist-navy-dark mt-4 max-w-2xl text-[2.25rem] leading-[1.12] font-bold tracking-[-0.025em] text-balance sm:text-[2.75rem] lg:text-[3.25rem]">
+                Student Administration Portal
+              </h1>
+              <p className="text-slate mt-5 max-w-xl text-base leading-7 sm:text-lg">
+                Submit requests, track progress, and receive official updates in
+                one secure place.
+              </p>
             </div>
+
+            <aside
+              aria-labelledby="access-heading"
+              className="border-border bg-surface rounded-lg border p-5 shadow-sm sm:p-6"
+            >
+              <div className="flex items-start gap-3">
+                <span className="bg-sist-navy-soft text-sist-navy flex size-10 shrink-0 items-center justify-center rounded-md">
+                  <LockKeyhole aria-hidden="true" className="size-5" />
+                </span>
+                <div>
+                  <h2
+                    className="text-sist-navy-dark text-lg font-semibold"
+                    id="access-heading"
+                  >
+                    Access the portal
+                  </h2>
+                  <p className="text-slate mt-1 text-sm leading-6">
+                    Sign in to continue, or create a student account.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-5 flex flex-col gap-3 min-[860px]:flex-col min-[1120px]:flex-row sm:flex-row">
+                <Link
+                  className="bg-sist-navy text-surface hover:bg-sist-navy-dark inline-flex min-h-11 flex-1 items-center justify-center rounded-md px-4 text-sm font-semibold whitespace-nowrap transition-colors"
+                  href="/login"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  className="border-sist-navy text-sist-navy hover:bg-sist-navy-soft inline-flex min-h-11 flex-1 items-center justify-center rounded-md border px-4 text-sm font-semibold whitespace-nowrap transition-colors"
+                  href="/register"
+                >
+                  Create account
+                </Link>
+              </div>
+            </aside>
           </div>
 
-          <Card className="overflow-hidden shadow-xl shadow-blue-950/8">
-            <CardHeader className="bg-muted/40 border-b">
-              <p className="text-primary text-sm font-semibold">How it works</p>
-              <CardTitle>Simple from request to completion</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-3 pt-6">
+          <div
+            className="border-sist-olive bg-sist-olive-light text-ink mt-8 flex items-start gap-3 rounded-md border-l-4 px-4 py-3 text-sm leading-6 min-[860px]:items-center"
+            role="note"
+          >
+            <Info
+              aria-hidden="true"
+              className="text-sist-olive-dark mt-0.5 size-4 shrink-0 min-[860px]:mt-0"
+            />
+            <p>
+              New student accounts require administrative approval before portal
+              access.
+            </p>
+          </div>
+        </section>
+
+        <section className="border-border bg-surface border-y">
+          <div className="mx-auto max-w-[75rem] px-5 py-10 sm:px-8 sm:py-12 lg:px-12">
+            <h2
+              className="text-sist-navy-dark text-2xl font-bold tracking-tight"
+              id="process-heading"
+            >
+              How it works
+            </h2>
+            <ol
+              aria-label="Student administration request process"
+              className="mt-7 grid gap-6 min-[860px]:grid-cols-3 min-[860px]:gap-8"
+            >
               {services.map((service, index) => {
-                const Icon = service.icon;
+                const isLast = index === services.length - 1;
 
                 return (
-                  <article
-                    className="bg-card flex gap-4 rounded-xl border p-4"
+                  <li
+                    className="relative grid min-w-0 grid-cols-[2.5rem_1fr] gap-4 min-[860px]:block"
                     key={service.title}
                   >
-                    <div className="bg-primary/10 text-primary flex size-11 shrink-0 items-center justify-center rounded-lg">
-                      <Icon aria-hidden="true" className="size-5" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs font-bold tracking-widest">
-                        0{index + 1}
-                      </p>
-                      <h2 className="mt-1 font-semibold">{service.title}</h2>
-                      <p className="text-muted-foreground mt-1 text-sm leading-6">
+                    <span className="border-sist-navy bg-surface text-sist-navy relative z-10 flex size-10 items-center justify-center rounded-full border font-mono text-xs font-semibold">
+                      0{index + 1}
+                    </span>
+                    {!isLast ? (
+                      <span
+                        aria-hidden="true"
+                        className="bg-border-strong absolute top-10 bottom-[-1.5rem] left-5 w-px min-[860px]:top-5 min-[860px]:right-[-2rem] min-[860px]:bottom-auto min-[860px]:left-10 min-[860px]:h-px min-[860px]:w-auto"
+                      />
+                    ) : null}
+                    <div className="min-w-0 pt-0.5 min-[860px]:mt-4 min-[860px]:pt-0">
+                      <h3 className="text-sist-navy text-base font-semibold">
+                        {service.title}
+                      </h3>
+                      <p className="text-slate mt-1.5 max-w-xs text-sm leading-6">
                         {service.description}
                       </p>
                     </div>
-                  </article>
+                  </li>
                 );
               })}
-            </CardContent>
-          </Card>
+            </ol>
+          </div>
         </section>
       </main>
     </div>
