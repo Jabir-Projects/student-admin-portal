@@ -10,6 +10,7 @@ import {
   UserRole,
 } from "../src/generated/prisma/enums";
 import { hashPassword, verifyPassword } from "../src/server/auth/password.node";
+import { reconcileStudentRegistryDemo } from "./student-registry-demo";
 
 const ids = {
   admin: "10000000-0000-4000-8000-000000000001",
@@ -282,6 +283,8 @@ async function seed(): Promise<void> {
       update: notification,
     });
   }
+
+  await reconcileStudentRegistryDemo(prisma, process.env.NODE_ENV);
 }
 
 try {
