@@ -22,6 +22,7 @@ describe("server-only architecture", () => {
     "src/server/auth/registration.ts",
     "src/server/auth/registration.node.ts",
     "src/server/auth/verification.ts",
+    "src/server/auth/verification.node.ts",
     "src/server/auth/account-management.ts",
     "src/server/auth/account-management.node.ts",
     "src/server/auth/dal.ts",
@@ -50,6 +51,22 @@ describe("server-only architecture", () => {
       );
     for (const file of clientFiles) {
       expect(fs.readFileSync(file, "utf8")).not.toMatch(/@\/server/u);
+    }
+  });
+
+  it("keeps the registry verification implementation out of App Router entry points", () => {
+    const appFiles = fs
+      .readdirSync(path.resolve(root, "src/app"), { recursive: true })
+      .filter(
+        (entry): entry is string =>
+          typeof entry === "string" && /\.(?:ts|tsx)$/u.test(entry),
+      )
+      .map((entry) => path.resolve(root, "src/app", entry));
+
+    for (const file of appFiles) {
+      expect(fs.readFileSync(file, "utf8")).not.toMatch(
+        /@\/server\/auth\/verification(?:\.node)?/u,
+      );
     }
   });
 });
