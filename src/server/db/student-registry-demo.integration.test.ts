@@ -3,10 +3,23 @@
 import path from "node:path";
 
 import dotenv from "dotenv";
-import { afterAll, afterEach, beforeEach, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
 
 import { StudentRegistryStatus } from "@/generated/prisma/client";
-import { createPrismaClient } from "@/server/db/factory.node";
+import {
+  hasIsolatedTestDatabaseConfiguration,
+  openVerifiedIsolatedTestDatabase,
+  type VerifiedIsolatedTestDatabase,
+  type VerifiedTestDatabaseClient,
+} from "@/test/isolated-database.node";
 import {
   reconcileStudentRegistryDemo,
   studentRegistryDemoFixtures,
@@ -14,29 +27,32 @@ import {
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
 
-const testDatabaseUrl = process.env.TEST_DATABASE_URL;
-const developmentDatabaseUrl = process.env.DATABASE_URL;
-const hasSafeIsolatedDatabase = Boolean(
-  process.env.NODE_ENV === "test" &&
-  testDatabaseUrl &&
-  developmentDatabaseUrl &&
-  testDatabaseUrl !== developmentDatabaseUrl,
+const hasSafeIsolatedDatabase = hasIsolatedTestDatabaseConfiguration(
+  process.env,
 );
-const isolatedDb = hasSafeIsolatedDatabase
-  ? createPrismaClient(testDatabaseUrl!)
-  : undefined;
+let verifiedDatabase: VerifiedIsolatedTestDatabase | undefined;
+let isolatedDb: VerifiedTestDatabaseClient | undefined;
 const reservedFixtureIds = [
   "90000000-0000-4000-8000-000000000001",
   "90000000-0000-4000-8000-000000000002",
   "90000000-0000-4000-8000-000000000003",
 ] as const;
 const fixtureIds = [...reservedFixtureIds];
+const linkedUserId = "93000000-0000-4000-8000-000000000001";
+const linkedUserEmail = "sist-test-demo-linked@example.test";
 
 async function cleanupReservedFixtures(): Promise<void> {
   if (!isolatedDb) return;
-  await isolatedDb.studentRegistry.deleteMany({
-    where: { id: { in: [...reservedFixtureIds] } },
-  });
+  try {
+    await isolatedDb.studentRegistry.deleteMany({
+      where: { id: { in: [...reservedFixtureIds] } },
+    });
+    await isolatedDb.user.deleteMany({
+      where: { id: linkedUserId, email: linkedUserEmail },
+    });
+  } catch {
+    throw new Error("Student Registry demo test cleanup failed.");
+  }
 }
 
 async function nonRegistryCounts() {
@@ -52,15 +68,56 @@ async function nonRegistryCounts() {
   ]);
 }
 
-beforeEach(cleanupReservedFixtures);
-afterEach(cleanupReservedFixtures);
-afterAll(async () => {
-  await isolatedDb?.$disconnect();
-});
+async function registryIdentitySnapshot(registryId: string) {
+  return isolatedDb!.studentRegistry.findUniqueOrThrow({
+    where: { id: registryId },
+    select: {
+      studentNumber: true,
+      fullName: true,
+      normalizedFullName: true,
+      email: true,
+      program: true,
+      academicYear: true,
+      status: true,
+      source: true,
+    },
+  });
+}
 
-describe.skipIf(!isolatedDb)(
+function registryIdentityIsUnchanged(
+  before: Awaited<ReturnType<typeof registryIdentitySnapshot>>,
+  after: Awaited<ReturnType<typeof registryIdentitySnapshot>>,
+): boolean {
+  return (
+    before.studentNumber === after.studentNumber &&
+    before.fullName === after.fullName &&
+    before.normalizedFullName === after.normalizedFullName &&
+    before.email === after.email &&
+    before.program === after.program &&
+    before.academicYear === after.academicYear &&
+    before.status === after.status &&
+    before.source === after.source
+  );
+}
+
+describe.skipIf(!hasSafeIsolatedDatabase)(
   "Student Registry demo reconciliation (requires a distinct, prepared TEST_DATABASE_URL)",
   () => {
+    beforeAll(async () => {
+      verifiedDatabase = await openVerifiedIsolatedTestDatabase(process.env);
+      isolatedDb = verifiedDatabase.database;
+    });
+
+    beforeEach(cleanupReservedFixtures);
+    afterEach(cleanupReservedFixtures);
+    afterAll(async () => {
+      try {
+        await cleanupReservedFixtures();
+      } finally {
+        await verifiedDatabase?.close();
+      }
+    });
+
     it("inserts exactly three rows on the first call", async () => {
       await expect(
         reconcileStudentRegistryDemo(isolatedDb!, "test"),
@@ -90,36 +147,53 @@ describe.skipIf(!isolatedDb)(
       ).resolves.toBe(3);
     });
 
-    it("preserves an exact linked fixture", async ({ skip }) => {
-      const existingUser = await isolatedDb!.user.findFirst({
-        select: { id: true },
+    it("preserves an exact linked fixture", async () => {
+      await isolatedDb!.user.create({
+        data: {
+          id: linkedUserId,
+          email: linkedUserEmail,
+          fullName: "SIST Test Demo Linked User",
+          passwordHash: "integration-test-non-authenticating-value",
+          role: "STUDENT",
+          status: "PENDING_APPROVAL",
+        },
       });
-      if (!existingUser) {
-        return skip(
-          "An existing isolated-test User is required for the foreign-key linkage test.",
-        );
-      }
+      const userCountBeforeReconciliation = await isolatedDb!.user.count();
 
       await reconcileStudentRegistryDemo(isolatedDb!, "test");
       const linkedAt = new Date("2026-07-22T18:00:00.000Z");
       const linkedFixtureId = fixtureIds[0]!;
+      const beforeLink = await registryIdentitySnapshot(linkedFixtureId);
       await isolatedDb!.studentRegistry.update({
         where: { id: linkedFixtureId },
-        data: { registeredUserId: existingUser.id, registeredAt: linkedAt },
+        data: { registeredUserId: linkedUserId, registeredAt: linkedAt },
       });
 
       await expect(
         reconcileStudentRegistryDemo(isolatedDb!, "test"),
       ).resolves.toMatchObject({ preservedLinked: 1, inserted: 0 });
+      const afterLink = await registryIdentitySnapshot(linkedFixtureId);
+      expect(registryIdentityIsUnchanged(beforeLink, afterLink)).toBe(true);
       await expect(
         isolatedDb!.studentRegistry.findUniqueOrThrow({
           where: { id: linkedFixtureId },
-          select: { registeredUserId: true, registeredAt: true },
+          select: {
+            registeredUserId: true,
+            registeredAt: true,
+          },
         }),
       ).resolves.toStrictEqual({
-        registeredUserId: existingUser.id,
+        registeredUserId: linkedUserId,
         registeredAt: linkedAt,
       });
+      await expect(isolatedDb!.user.count()).resolves.toBe(
+        userCountBeforeReconciliation,
+      );
+      await expect(
+        isolatedDb!.user.count({
+          where: { id: linkedUserId, email: linkedUserEmail },
+        }),
+      ).resolves.toBe(1);
     });
 
     it("preserves an exact inactive fixture", async () => {

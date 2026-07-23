@@ -47,10 +47,7 @@ const normalizedStudent = {
   academicYear: ACADEMIC_YEARS[0].value,
 };
 
-const normalizedRegistryIdentity = {
-  ...normalizedStudent,
-  normalizedFullName: "student applicant",
-};
+const rawRegistryIdentity = { ...normalizedStudent };
 
 const manualOptions = {
   verificationMode: "MANUAL_APPROVAL",
@@ -63,6 +60,8 @@ const internalOptions = {
 } as const;
 
 function createDatabase(events: string[] = []) {
+  const findFirst = vi.fn(async () => ({ id: "registry-id" }));
+  const updateMany = vi.fn(async () => ({ count: 1 }));
   const userCreate = vi.fn(async () => {
     events.push("user");
     return { id: "created-user-id" };
@@ -73,6 +72,7 @@ function createDatabase(events: string[] = []) {
   });
   const transaction = {
     user: { create: userCreate },
+    studentRegistry: { updateMany },
     auditLog: { create: auditCreate },
   };
   const transactionRunner = vi.fn(
@@ -82,14 +82,17 @@ function createDatabase(events: string[] = []) {
     },
   );
   const database = {
+    studentRegistry: { findFirst },
     $transaction: transactionRunner,
   } as unknown as Parameters<typeof registerStudentWithDatabase>[1];
 
   return {
     auditCreate,
     database,
+    findFirst,
     transaction,
     transactionRunner,
+    updateMany,
     userCreate,
   };
 }
@@ -164,7 +167,7 @@ describe("MANUAL_APPROVAL registration", () => {
 });
 
 describe("INTERNAL_REGISTRY pre-check", () => {
-  it("pre-checks the normalized identity before hashing", async () => {
+  it("pre-checks the raw five-field identity before hashing", async () => {
     const events: string[] = [];
     const { database } = createDatabase(events);
     serviceMocks.findAvailableStudentRegistryEntry.mockImplementation(
@@ -183,11 +186,103 @@ describe("INTERNAL_REGISTRY pre-check", () => {
     ).resolves.toEqual({ ok: true });
     expect(serviceMocks.findAvailableStudentRegistryEntry).toHaveBeenCalledWith(
       database,
-      normalizedRegistryIdentity,
+      rawRegistryIdentity,
       "test",
     );
+    expect(
+      serviceMocks.findAvailableStudentRegistryEntry.mock.calls[0]?.[1],
+    ).not.toHaveProperty("normalizedFullName");
     expect(events.indexOf("precheck")).toBeLessThan(events.indexOf("hash"));
     expect(events.indexOf("hash")).toBeLessThan(events.indexOf("transaction"));
+  });
+
+  it("passes raw identity through the real strict lookup and claim boundaries", async () => {
+    const actualVerification = await vi.importActual<
+      typeof import("@/server/auth/verification")
+    >("@/server/auth/verification");
+    const { database, findFirst, transactionRunner, updateMany } =
+      createDatabase();
+    serviceMocks.findAvailableStudentRegistryEntry.mockImplementation(
+      actualVerification.findAvailableStudentRegistryEntry,
+    );
+    serviceMocks.claimStudentRegistryEntry.mockImplementation(
+      actualVerification.claimStudentRegistryEntry,
+    );
+
+    await expect(
+      registerStudentWithDatabase(validRegistration, database, internalOptions),
+    ).resolves.toEqual({ ok: true });
+
+    const canonicalPredicate = {
+      studentNumber: "SIST/123",
+      status: "ACTIVE",
+      source: { in: ["DEVELOPMENT_DEMO", "OFFICIAL_IMPORT"] },
+      email: "student.applicant@example.com",
+      normalizedFullName: "student applicant",
+      program: PROGRAMS[0],
+      academicYear: ACADEMIC_YEARS[0].value,
+      registeredUserId: null,
+      registeredAt: null,
+    };
+    expect(findFirst).toHaveBeenCalledExactlyOnceWith({
+      where: canonicalPredicate,
+      select: { id: true },
+    });
+    expect(updateMany).toHaveBeenCalledExactlyOnceWith({
+      where: { id: "registry-id", ...canonicalPredicate },
+      data: {
+        registeredUserId: "created-user-id",
+        registeredAt: expect.any(Date),
+      },
+    });
+    expect(serviceMocks.hashPassword).toHaveBeenCalledExactlyOnceWith(
+      validRegistration.password,
+    );
+    expect(transactionRunner).toHaveBeenCalledTimes(1);
+  });
+
+  it("maps strict registry identity rejection to the generic result", async () => {
+    const actualVerification = await vi.importActual<
+      typeof import("@/server/auth/verification")
+    >("@/server/auth/verification");
+    const { auditCreate, database, findFirst, transactionRunner, userCreate } =
+      createDatabase();
+    serviceMocks.findAvailableStudentRegistryEntry.mockImplementation(
+      actualVerification.findAvailableStudentRegistryEntry,
+    );
+
+    const result = await registerStudentWithDatabase(
+      { ...validRegistration, studentNumber: "SIST!123" },
+      database,
+      internalOptions,
+    );
+
+    expect(result).toStrictEqual(genericFailure);
+    expect(Object.keys(result)).toStrictEqual(["ok", "message"]);
+    expect(findFirst).not.toHaveBeenCalled();
+    expect(serviceMocks.hashPassword).not.toHaveBeenCalled();
+    expect(transactionRunner).not.toHaveBeenCalled();
+    expect(userCreate).not.toHaveBeenCalled();
+    expect(serviceMocks.claimStudentRegistryEntry).not.toHaveBeenCalled();
+    expect(auditCreate).not.toHaveBeenCalled();
+  });
+
+  it("propagates an unexpected registry pre-check error", async () => {
+    const unexpectedError = new Error("Unexpected registry pre-check failure.");
+    const { auditCreate, database, transactionRunner, userCreate } =
+      createDatabase();
+    serviceMocks.findAvailableStudentRegistryEntry.mockRejectedValue(
+      unexpectedError,
+    );
+
+    await expect(
+      registerStudentWithDatabase(validRegistration, database, internalOptions),
+    ).rejects.toBe(unexpectedError);
+    expect(serviceMocks.hashPassword).not.toHaveBeenCalled();
+    expect(transactionRunner).not.toHaveBeenCalled();
+    expect(userCreate).not.toHaveBeenCalled();
+    expect(serviceMocks.claimStudentRegistryEntry).not.toHaveBeenCalled();
+    expect(auditCreate).not.toHaveBeenCalled();
   });
 
   it("returns generically without hashing or starting a transaction when no match exists", async () => {
@@ -215,7 +310,7 @@ describe("INTERNAL_REGISTRY pre-check", () => {
 
     expect(serviceMocks.findAvailableStudentRegistryEntry).toHaveBeenCalledWith(
       database,
-      normalizedRegistryIdentity,
+      rawRegistryIdentity,
       "production",
     );
   });
@@ -273,7 +368,7 @@ describe("INTERNAL_REGISTRY transaction", () => {
     expect(claimClient).toBe(transaction);
     expect(claimInput).toMatchObject({
       registryId: "registry-id",
-      identity: normalizedRegistryIdentity,
+      identity: rawRegistryIdentity,
       runtime: "test",
       userId: "created-user-id",
       claimedAt: expect.any(Date),
@@ -337,6 +432,7 @@ describe("strict public registration payload", () => {
     ["status", "ACTIVE"],
     ["registeredUserId", "user-id"],
     ["registeredAt", new Date()],
+    ["normalizedFullName", "attacker controlled"],
     ["unexpected", "value"],
   ])(
     "rejects %s before password, registry, or transaction work",
