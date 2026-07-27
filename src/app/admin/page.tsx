@@ -3,7 +3,7 @@ import { requireActiveUser } from "@/server/auth/dal";
 import { LogoutButton } from "@/components/auth/logout-button";
 
 export default async function AdminPage() {
-  await requireActiveUser("ADMIN");
+  await requireActiveUser(["STAFF", "ADMIN"]);
   return (
     <main className="mx-auto max-w-4xl px-4 py-12">
       <div className="flex items-center justify-between">

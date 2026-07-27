@@ -6,24 +6,39 @@ import { auth } from "@/auth";
 import type { UserRoleValue } from "@/features/auth/constants";
 import {
   findOwnedStudentProfile,
-  getActiveUserById,
+  getSessionUserByClaims,
   type AuthorizedUser,
 } from "@/server/auth/dal.node";
 import { db } from "@/server/db";
 
 export async function getActiveUser(): Promise<AuthorizedUser | null> {
   const session = await auth();
-  if (!session?.user.id) return null;
-  return getActiveUserById(session.user.id, db);
+  const result = await getSessionUserByClaims(
+    {
+      actorId: session?.user.id,
+      claimedSessionVersion: session?.user.sessionVersion,
+    },
+    db,
+  );
+  return result.ok ? result.user : null;
 }
 
 export async function requireActiveUser(
-  role: UserRoleValue,
+  roles: UserRoleValue | readonly UserRoleValue[],
 ): Promise<AuthorizedUser> {
-  const user = await getActiveUser();
-  if (!user) redirect("/login");
-  if (user.role !== role) redirect("/unauthorized");
-  return user;
+  const session = await auth();
+  const result = await getSessionUserByClaims(
+    {
+      actorId: session?.user.id,
+      claimedSessionVersion: session?.user.sessionVersion,
+    },
+    db,
+  );
+  if (!result.ok) redirect("/login");
+  const allowedRoles = Array.isArray(roles) ? roles : [roles];
+  if (!allowedRoles.some((role) => role === result.user.role))
+    redirect("/unauthorized");
+  return result.user;
 }
 
 export async function requireOwnedStudentProfile(

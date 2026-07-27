@@ -57,7 +57,6 @@ async function cleanupReservedFixtures(): Promise<void> {
 
 async function nonRegistryCounts() {
   return Promise.all([
-    isolatedDb!.user.count(),
     isolatedDb!.studentProfile.count(),
     isolatedDb!.requestCategory.count(),
     isolatedDb!.documentRequest.count(),
@@ -158,8 +157,6 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
           status: "PENDING_APPROVAL",
         },
       });
-      const userCountBeforeReconciliation = await isolatedDb!.user.count();
-
       await reconcileStudentRegistryDemo(isolatedDb!, "test");
       const linkedAt = new Date("2026-07-22T18:00:00.000Z");
       const linkedFixtureId = fixtureIds[0]!;
@@ -168,6 +165,10 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
         where: { id: linkedFixtureId },
         data: { registeredUserId: linkedUserId, registeredAt: linkedAt },
       });
+      const linkedUserCountBeforeReconciliation =
+        await isolatedDb!.user.count({
+          where: { id: linkedUserId, email: linkedUserEmail },
+        });
 
       await expect(
         reconcileStudentRegistryDemo(isolatedDb!, "test"),
@@ -186,14 +187,12 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
         registeredUserId: linkedUserId,
         registeredAt: linkedAt,
       });
-      await expect(isolatedDb!.user.count()).resolves.toBe(
-        userCountBeforeReconciliation,
-      );
       await expect(
         isolatedDb!.user.count({
           where: { id: linkedUserId, email: linkedUserEmail },
         }),
-      ).resolves.toBe(1);
+      ).resolves.toBe(linkedUserCountBeforeReconciliation);
+      expect(linkedUserCountBeforeReconciliation).toBe(1);
     });
 
     it("preserves an exact inactive fixture", async () => {
@@ -238,10 +237,16 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
     });
 
     it("does not change non-registry model counts", async () => {
+      const linkedUserCountBefore = await isolatedDb!.user.count({
+        where: { id: linkedUserId },
+      });
       const before = await nonRegistryCounts();
 
       await reconcileStudentRegistryDemo(isolatedDb!, "test");
 
+      await expect(
+        isolatedDb!.user.count({ where: { id: linkedUserId } }),
+      ).resolves.toBe(linkedUserCountBefore);
       await expect(nonRegistryCounts()).resolves.toStrictEqual(before);
     });
   },

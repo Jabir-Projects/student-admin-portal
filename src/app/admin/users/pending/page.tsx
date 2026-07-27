@@ -4,8 +4,8 @@ import {
   disableAction,
 } from "@/app/admin/users/pending/actions";
 import { Button } from "@/components/ui/button";
+import { requireCapability } from "@/server/auth/capabilities";
 import { db } from "@/server/db";
-import { requireActiveUser } from "@/server/auth/dal";
 
 const resultMessages = {
   approved: "The student account was approved.",
@@ -19,7 +19,7 @@ export default async function PendingUsersPage({
 }: {
   searchParams: Promise<{ result?: string }>;
 }) {
-  await requireActiveUser("ADMIN");
+  await requireCapability("MANAGE_STUDENT_ACCOUNTS");
   const { result } = await searchParams;
   const resultMessage =
     result && result in resultMessages

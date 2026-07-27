@@ -77,7 +77,7 @@ export function isProxyAuthorized(
   if (!isStudentRoute && !isAdminRoute) return true;
   if (!session || session.user.status !== "ACTIVE") return false;
   if (isStudentRoute) return session.user.role === "STUDENT";
-  return session.user.role === "ADMIN";
+  return session.user.role === "STAFF" || session.user.role === "ADMIN";
 }
 
 export const authConfig = {

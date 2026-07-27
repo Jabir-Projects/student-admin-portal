@@ -36,6 +36,12 @@ describe("Proxy authorization", () => {
     expect(isProxyAuthorized("/student", administrator)).toBe(false);
     expect(isProxyAuthorized("/student/requests", administrator)).toBe(false);
   });
+  it("allows active staff through the coarse admin route boundary", () => {
+    const staff = session("STAFF", "ACTIVE");
+    expect(isProxyAuthorized("/admin", staff)).toBe(true);
+    expect(isProxyAuthorized("/admin/users/pending", staff)).toBe(true);
+    expect(isProxyAuthorized("/student", staff)).toBe(false);
+  });
   it.each(["PENDING_APPROVAL", "DISABLED"] as const)(
     "rejects %s accounts",
     (status) => {

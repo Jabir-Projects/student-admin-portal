@@ -12,6 +12,7 @@ import {
   describe,
   expect,
   it,
+  type TestContext,
 } from "vitest";
 
 import { Prisma, type PrismaClient } from "@/generated/prisma/client";
@@ -19,26 +20,29 @@ import { PROGRAMS } from "@/features/auth/constants";
 import {
   approvePendingStudentAsActor,
   disableStudentAsActor,
+  reactivateDisabledStudentAsActor,
 } from "@/server/auth/account-management.node";
 import {
   findOwnedStudentProfile,
   getActiveUserById,
+  getSessionUserByClaims,
 } from "@/server/auth/dal.node";
 import { registerStudentWithDatabase } from "@/server/auth/registration.node";
 import {
-  hasIsolatedTestDatabaseConfiguration,
-  openVerifiedIsolatedTestDatabase,
-  type VerifiedIsolatedTestDatabase,
-  type VerifiedTestDatabaseClient,
-} from "@/test/isolated-database.node";
+  hasPackageBTestDatabaseConfiguration,
+  tryOpenPackageBTestDatabase,
+  type VerifiedPackageBTestDatabase,
+  type VerifiedPackageBTestDatabaseClient,
+} from "@/test/package-b-test-database.node";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
 
-const hasSafeIsolatedDatabase = hasIsolatedTestDatabaseConfiguration(
-  process.env,
-);
 const administratorId = "95000000-0000-4000-8000-000000000001";
 const administratorEmail = "sist-test-phase3-admin@example.test";
+const administratorClaims = {
+  actorId: administratorId,
+  claimedSessionVersion: 0,
+} as const;
 const scenarioUserIds = [
   "95100000-0000-4000-8000-000000000001",
   "95100000-0000-4000-8000-000000000002",
@@ -68,8 +72,8 @@ type AuditBaseline = {
   ids: Set<string>;
 };
 
-let verifiedDatabase: VerifiedIsolatedTestDatabase | undefined;
-let isolatedDb: VerifiedTestDatabaseClient | undefined;
+let verifiedDatabase: VerifiedPackageBTestDatabase | undefined;
+let isolatedDb: VerifiedPackageBTestDatabaseClient | undefined;
 
 function registration(
   suffix: string,
@@ -137,6 +141,14 @@ function databaseWithDeterministicUserId(
 async function cleanupScenarioUsers(): Promise<void> {
   if (!isolatedDb) return;
   try {
+    await isolatedDb.userCapabilityAssignment.deleteMany({
+      where: {
+        OR: [
+          { userId: { in: [...scenarioUserIds] } },
+          { grantedById: { in: [...scenarioUserIds] } },
+        ],
+      },
+    });
     await isolatedDb.user.deleteMany({
       where: { id: { in: [...scenarioUserIds] } },
     });
@@ -153,6 +165,7 @@ async function ensureAdministrator(): Promise<void> {
       fullName: true,
       role: true,
       status: true,
+      sessionVersion: true,
     },
   });
 
@@ -162,19 +175,35 @@ async function ensureAdministrator(): Promise<void> {
       fullName: "SIST Test Phase 3 Administrator",
       role: "ADMIN",
       status: "ACTIVE",
+      sessionVersion: 0,
     });
-    return;
+  } else {
+    await isolatedDb!.user.create({
+      data: {
+        id: administratorId,
+        email: administratorEmail,
+        fullName: "SIST Test Phase 3 Administrator",
+        passwordHash: "integration-test-non-authenticating-value",
+        role: "ADMIN",
+        status: "ACTIVE",
+      },
+    });
   }
 
-  await isolatedDb!.user.create({
-    data: {
-      id: administratorId,
-      email: administratorEmail,
-      fullName: "SIST Test Phase 3 Administrator",
-      passwordHash: "integration-test-non-authenticating-value",
-      role: "ADMIN",
-      status: "ACTIVE",
-    },
+  await isolatedDb!.userCapabilityAssignment.createMany({
+    data: [
+      {
+        userId: administratorId,
+        capability: "MANAGE_STUDENT_ACCOUNTS",
+        grantedById: null,
+      },
+      {
+        userId: administratorId,
+        capability: "REACTIVATE_STUDENT_ACCOUNTS",
+        grantedById: null,
+      },
+    ],
+    skipDuplicates: true,
   });
 }
 
@@ -197,12 +226,15 @@ async function newAuditsSince(baseline: AuditBaseline) {
   return rows.filter(({ id }) => !baseline.ids.has(id));
 }
 
-describe.skipIf(!hasSafeIsolatedDatabase)(
+describe.sequential(
   "Phase 3 isolated mutations (requires a strongly verified TEST_DATABASE_URL)",
   () => {
     beforeAll(async () => {
-      verifiedDatabase = await openVerifiedIsolatedTestDatabase(process.env);
-      isolatedDb = verifiedDatabase.database;
+      if (!hasPackageBTestDatabaseConfiguration(process.env)) return;
+      const readiness = await tryOpenPackageBTestDatabase(process.env);
+      if (!readiness.ready) return;
+      verifiedDatabase = readiness.verified;
+      isolatedDb = readiness.verified.database;
       try {
         await ensureAdministrator();
       } catch (error) {
@@ -213,7 +245,15 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
       }
     });
 
-    beforeEach(cleanupScenarioUsers);
+    beforeEach(async (context: TestContext) => {
+      if (!isolatedDb) {
+        context.skip(
+          "Phase 3 PostgreSQL integration not run: isolated TEST_DATABASE_URL was not approved and verified.",
+        );
+        return;
+      }
+      await cleanupScenarioUsers();
+    });
     afterEach(cleanupScenarioUsers);
 
     afterAll(async () => {
@@ -348,12 +388,16 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
         manualRegistrationOptions,
       );
       await expect(
-        approvePendingStudentAsActor(administratorId, targetId, isolatedDb!),
+        approvePendingStudentAsActor(
+          administratorClaims,
+          targetId,
+          isolatedDb!,
+        ),
       ).resolves.toEqual({ ok: true });
       expect(
         (
           await approvePendingStudentAsActor(
-            administratorId,
+            administratorClaims,
             targetId,
             isolatedDb!,
           )
@@ -377,7 +421,7 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
       expect((await newAuditsSince(approvalBaseline)).length).toBe(1);
     });
 
-    it("supports pending and approved disable transitions and rejects stale JWT identity", async () => {
+    it("supports pending and approved disable transitions", async () => {
       const pendingId = scenarioUserIds[5];
       const activeId = scenarioUserIds[6];
       const pendingInput = registration("0006");
@@ -409,8 +453,13 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
         manualRegistrationOptions,
       );
       expect(
-        (await disableStudentAsActor(administratorId, pendingId, isolatedDb!))
-          .ok,
+        (
+          await disableStudentAsActor(
+            administratorClaims,
+            pendingId,
+            isolatedDb!,
+          )
+        ).ok,
       ).toBe(true);
 
       await registerStudentWithDatabase(
@@ -419,7 +468,7 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
         manualRegistrationOptions,
       );
       await approvePendingStudentAsActor(
-        administratorId,
+        administratorClaims,
         activeId,
         isolatedDb!,
       );
@@ -427,7 +476,7 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
         where: { id: activeId },
         select: { approvedAt: true, approvedById: true },
       });
-      await disableStudentAsActor(administratorId, activeId, isolatedDb!);
+      await disableStudentAsActor(administratorClaims, activeId, isolatedDb!);
       const disabled = await isolatedDb!.user.findUniqueOrThrow({
         where: { id: activeId },
         select: {
@@ -456,6 +505,131 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
       ]) {
         expect((await newAuditsSince(baseline)).length).toBe(1);
       }
+    });
+
+    it("rejects an outdated claimed sessionVersion before protected read or mutation", async () => {
+      const actorId = scenarioUserIds[7];
+      const targetId = scenarioUserIds[8];
+      const approvalBaseline = await captureAuditBaseline(
+        "ACCOUNT_APPROVED",
+        targetId,
+      );
+      await isolatedDb!.user.create({
+        data: {
+          id: actorId,
+          email: "sist-test-phase3-stale-actor@example.test",
+          fullName: "SIST Test Phase 3 Stale Actor",
+          passwordHash: "integration-test-non-authenticating-value",
+          role: "STAFF",
+          status: "ACTIVE",
+          capabilityAssignments: {
+            create: {
+              capability: "MANAGE_STUDENT_ACCOUNTS",
+              grantedById: null,
+            },
+          },
+        },
+      });
+      await registerStudentWithDatabase(
+        registration("stale-target"),
+        databaseWithDeterministicUserId(isolatedDb!, targetId),
+        manualRegistrationOptions,
+      );
+      const currentActor = await isolatedDb!.user.findUniqueOrThrow({
+        where: { id: actorId },
+        select: { sessionVersion: true },
+      });
+      const oldClaims = {
+        actorId,
+        claimedSessionVersion: currentActor.sessionVersion,
+      };
+
+      await isolatedDb!.user.update({
+        where: { id: actorId },
+        data: { sessionVersion: { increment: 1 } },
+      });
+
+      await expect(
+        getSessionUserByClaims(oldClaims, isolatedDb!),
+      ).resolves.toEqual({ ok: false, reason: "STALE_SESSION" });
+      await expect(
+        approvePendingStudentAsActor(oldClaims, targetId, isolatedDb!),
+      ).resolves.toEqual({
+        ok: false,
+        message: "The account transition could not be completed.",
+      });
+      await expect(
+        isolatedDb!.user.findUniqueOrThrow({
+          where: { id: targetId },
+          select: { status: true, sessionVersion: true },
+        }),
+      ).resolves.toEqual({
+        status: "PENDING_APPROVAL",
+        sessionVersion: 0,
+      });
+      expect(await newAuditsSince(approvalBaseline)).toHaveLength(0);
+    });
+
+    it("reactivates a disabled student, clears current disable fields, and invalidates the disabled session", async () => {
+      const targetId = scenarioUserIds[5];
+      const input = registration("0010");
+      const reactivationBaseline = await captureAuditBaseline(
+        "ACCOUNT_REACTIVATED",
+        targetId,
+      );
+
+      await registerStudentWithDatabase(
+        input,
+        databaseWithDeterministicUserId(isolatedDb!, targetId),
+        manualRegistrationOptions,
+      );
+      await approvePendingStudentAsActor(
+        administratorClaims,
+        targetId,
+        isolatedDb!,
+      );
+      await disableStudentAsActor(administratorClaims, targetId, isolatedDb!);
+      const disabled = await isolatedDb!.user.findUniqueOrThrow({
+        where: { id: targetId },
+        select: {
+          approvedAt: true,
+          approvedById: true,
+          disabledAt: true,
+          disabledById: true,
+          sessionVersion: true,
+        },
+      });
+      expect(disabled.disabledAt).not.toBeNull();
+      expect(disabled.disabledById).toBe(administratorId);
+
+      await expect(
+        reactivateDisabledStudentAsActor(
+          administratorClaims,
+          targetId,
+          isolatedDb!,
+        ),
+      ).resolves.toEqual({ ok: true });
+
+      const reactivated = await isolatedDb!.user.findUniqueOrThrow({
+        where: { id: targetId },
+        select: {
+          status: true,
+          approvedAt: true,
+          approvedById: true,
+          disabledAt: true,
+          disabledById: true,
+          sessionVersion: true,
+        },
+      });
+      expect(reactivated).toMatchObject({
+        status: "ACTIVE",
+        approvedAt: disabled.approvedAt,
+        approvedById: disabled.approvedById,
+        disabledAt: null,
+        disabledById: null,
+        sessionVersion: disabled.sessionVersion + 1,
+      });
+      expect((await newAuditsSince(reactivationBaseline)).length).toBe(1);
     });
 
     it("enforces ownership in the database predicate", async () => {
