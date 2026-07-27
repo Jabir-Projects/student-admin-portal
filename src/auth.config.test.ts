@@ -13,7 +13,7 @@ import type {
 function session(role: UserRoleValue, status: AccountStatusValue) {
   return {
     expires: "2099-01-01T00:00:00.000Z",
-    user: { id: "user-id", role, status },
+    user: { id: "user-id", role, status, sessionVersion: 0 },
   };
 }
 
@@ -60,31 +60,78 @@ describe("minimal Auth.js claims", () => {
         picture: "not-retained",
         passwordHash: "not-retained",
         studentProfile: { private: true },
+        capabilities: ["MANAGE_STAFF_CAPABILITIES"],
       },
-      { id: "user-id", role: "STUDENT", status: "ACTIVE" },
+      {
+        id: "user-id",
+        role: "STAFF",
+        status: "ACTIVE",
+        sessionVersion: 7,
+      },
     );
     expect(token).toEqual({
       sub: "user-id",
       iat: 1,
       exp: 2,
       jti: "token-id",
-      role: "STUDENT",
+      role: "STAFF",
       status: "ACTIVE",
+      sessionVersion: 7,
     });
   });
-  it("constructs a session user containing only ID, role, and status", () => {
+  it("constructs a session user containing only approved identity claims", () => {
     const result = createMinimalSession("expiry", {
       sub: "user-id",
       role: "ADMIN",
       status: "ACTIVE",
+      sessionVersion: 3,
       email: "not-retained@example.invalid",
       name: "Not retained",
       picture: "not-retained",
+      capabilities: ["MANAGE_STAFF_CAPABILITIES"],
     });
     expect(result).toEqual({
       expires: "expiry",
-      user: { id: "user-id", role: "ADMIN", status: "ACTIVE" },
+      user: {
+        id: "user-id",
+        role: "ADMIN",
+        status: "ACTIVE",
+        sessionVersion: 3,
+      },
     });
-    expect(Object.keys(result.user)).toEqual(["id", "role", "status"]);
+    expect(Object.keys(result.user)).toEqual([
+      "id",
+      "role",
+      "status",
+      "sessionVersion",
+    ]);
+  });
+  it.each([undefined, -1, 1.5, Number.MAX_SAFE_INTEGER + 1])(
+    "rejects invalid sessionVersion %s",
+    (sessionVersion) => {
+      expect(() =>
+        createMinimalSession("expiry", {
+          sub: "user-id",
+          role: "STAFF",
+          status: "ACTIVE",
+          sessionVersion,
+        }),
+      ).toThrow("Invalid authenticated session claims.");
+    },
+  );
+  it("retains a valid sessionVersion when refreshing an existing JWT", () => {
+    expect(
+      createMinimalJwt({
+        sub: "user-id",
+        role: "STAFF",
+        status: "ACTIVE",
+        sessionVersion: 11,
+      }),
+    ).toEqual({
+      sub: "user-id",
+      role: "STAFF",
+      status: "ACTIVE",
+      sessionVersion: 11,
+    });
   });
 });

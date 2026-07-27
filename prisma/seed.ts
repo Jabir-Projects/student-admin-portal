@@ -37,6 +37,9 @@ const seededAt = new Date("2026-01-15T09:00:00.000Z");
 if (process.env.NODE_ENV === "production") {
   throw new Error("Development seed is disabled in production.");
 }
+if (process.env.ALLOW_DEVELOPMENT_SEED !== "true") {
+  throw new Error("Development seed requires explicit opt-in.");
+}
 
 const prisma = createPrismaClient(databaseEnv.DATABASE_URL);
 

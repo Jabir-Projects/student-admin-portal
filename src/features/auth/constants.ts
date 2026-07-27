@@ -23,12 +23,33 @@ export const ACADEMIC_YEARS = [
   { value: "MASTER_2", label: "Master 2" },
 ] as const;
 
-export const USER_ROLES = ["STUDENT", "ADMIN"] as const;
+export const USER_ROLES = ["STUDENT", "STAFF", "ADMIN"] as const;
 export const ACCOUNT_STATUSES = [
   "PENDING_APPROVAL",
   "ACTIVE",
   "DISABLED",
 ] as const;
+export const CAPABILITIES = [
+  "MANAGE_STUDENT_ACCOUNTS",
+  "REACTIVATE_STUDENT_ACCOUNTS",
+  "MANAGE_STAFF_ACCOUNTS",
+  "MANAGE_STAFF_CAPABILITIES",
+  "PROCESS_REQUESTS",
+  "MANAGE_REQUEST_CATEGORIES",
+  "GENERATE_DOCUMENTS",
+  "RELEASE_DOCUMENTS",
+  "REVOKE_DOCUMENTS",
+  "REGISTRY_IMPORT_UPLOAD",
+  "REGISTRY_IMPORT_APPROVE",
+  "FINANCE_IMPORT_UPLOAD",
+  "FINANCE_IMPORT_APPROVE",
+  "VIEW_FINANCE",
+  "VIEW_AUDIT_LOG",
+  "EXPORT_STUDENT_DATA",
+  "EXPORT_REQUEST_DATA",
+  "EXPORT_FINANCE_DATA",
+] as const;
 
 export type UserRoleValue = (typeof USER_ROLES)[number];
 export type AccountStatusValue = (typeof ACCOUNT_STATUSES)[number];
+export type CapabilityValue = (typeof CAPABILITIES)[number];

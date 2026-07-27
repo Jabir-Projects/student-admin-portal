@@ -43,6 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             passwordHash: true,
             role: true,
             status: true,
+            sessionVersion: true,
           },
         });
 
@@ -74,6 +75,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: user.id,
           role: user.role,
           status: user.status,
+          sessionVersion: user.sessionVersion,
         };
       },
     }),

@@ -9,7 +9,29 @@ datasource db {
 
 enum UserRole {
   STUDENT
+  STAFF
   ADMIN
+}
+
+enum Capability {
+  MANAGE_STUDENT_ACCOUNTS
+  REACTIVATE_STUDENT_ACCOUNTS
+  MANAGE_STAFF_ACCOUNTS
+  MANAGE_STAFF_CAPABILITIES
+  PROCESS_REQUESTS
+  MANAGE_REQUEST_CATEGORIES
+  GENERATE_DOCUMENTS
+  RELEASE_DOCUMENTS
+  REVOKE_DOCUMENTS
+  REGISTRY_IMPORT_UPLOAD
+  REGISTRY_IMPORT_APPROVE
+  FINANCE_IMPORT_UPLOAD
+  FINANCE_IMPORT_APPROVE
+  VIEW_FINANCE
+  VIEW_AUDIT_LOG
+  EXPORT_STUDENT_DATA
+  EXPORT_REQUEST_DATA
+  EXPORT_FINANCE_DATA
 }
 
 enum RequestStatus {
@@ -64,34 +86,50 @@ enum StudentRegistrySource {
 }
 
 model User {
-  id                    String                 @id @default(uuid()) @db.Uuid
-  email                 String                 @unique @db.VarChar(320)
-  fullName              String                 @db.VarChar(200)
+  id                    String                     @id @default(uuid()) @db.Uuid
+  email                 String                     @unique @db.VarChar(320)
+  fullName              String                     @db.VarChar(200)
   passwordHash          String
   role                  UserRole
-  status                AccountStatus          @default(PENDING_APPROVAL)
-  preferredLanguage     PreferredLanguage      @default(ENGLISH)
-  approvedAt            DateTime?              @db.Timestamptz(3)
-  approvedById          String?                @db.Uuid
-  disabledAt            DateTime?              @db.Timestamptz(3)
-  disabledById          String?                @db.Uuid
-  createdAt             DateTime               @default(now()) @db.Timestamptz(3)
-  updatedAt             DateTime               @updatedAt @db.Timestamptz(3)
+  status                AccountStatus              @default(PENDING_APPROVAL)
+  sessionVersion        Int                        @default(0)
+  preferredLanguage     PreferredLanguage          @default(ENGLISH)
+  approvedAt            DateTime?                  @db.Timestamptz(3)
+  approvedById          String?                    @db.Uuid
+  disabledAt            DateTime?                  @db.Timestamptz(3)
+  disabledById          String?                    @db.Uuid
+  createdAt             DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime                   @updatedAt @db.Timestamptz(3)
   studentProfile        StudentProfile?
-  statusChanges         RequestStatusHistory[] @relation("StatusChangedBy")
-  messages              RequestMessage[]       @relation("MessageAuthor")
+  statusChanges         RequestStatusHistory[]     @relation("StatusChangedBy")
+  messages              RequestMessage[]           @relation("MessageAuthor")
   notifications         Notification[]
-  auditLogs             AuditLog[]             @relation("AuditActor")
-  approvedBy            User?                  @relation("AccountApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
-  disabledBy            User?                  @relation("AccountDisabledBy", fields: [disabledById], references: [id], onDelete: Restrict)
-  accountsApproved      User[]                 @relation("AccountApprovedBy")
-  accountsDisabled      User[]                 @relation("AccountDisabledBy")
-  studentRegistryRecord StudentRegistry?       @relation("StudentRegistryRegistration")
+  auditLogs             AuditLog[]                 @relation("AuditActor")
+  approvedBy            User?                      @relation("AccountApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
+  disabledBy            User?                      @relation("AccountDisabledBy", fields: [disabledById], references: [id], onDelete: Restrict)
+  accountsApproved      User[]                     @relation("AccountApprovedBy")
+  accountsDisabled      User[]                     @relation("AccountDisabledBy")
+  studentRegistryRecord StudentRegistry?           @relation("StudentRegistryRegistration")
+  capabilityAssignments UserCapabilityAssignment[] @relation("CapabilitySubject")
+  capabilityGrants      UserCapabilityAssignment[] @relation("CapabilityGrantor")
 
   @@index([role, createdAt])
   @@index([status, role, createdAt])
   @@index([approvedById, approvedAt])
   @@index([disabledById, disabledAt])
+}
+
+model UserCapabilityAssignment {
+  userId      String     @db.Uuid
+  capability  Capability
+  grantedById String?    @db.Uuid
+  createdAt   DateTime   @default(now()) @db.Timestamptz(3)
+  user        User       @relation("CapabilitySubject", fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  grantedBy   User?      @relation("CapabilityGrantor", fields: [grantedById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([userId, capability])
+  @@index([capability, userId])
+  @@index([grantedById, createdAt])
 }
 
 model StudentProfile {

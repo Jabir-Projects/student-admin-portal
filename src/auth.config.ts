@@ -13,6 +13,7 @@ type ApprovedUserClaims = {
   id?: string;
   role: UserRoleValue;
   status: AccountStatusValue;
+  sessionVersion: number;
 };
 
 function isUserRole(value: unknown): value is UserRoleValue {
@@ -23,11 +24,16 @@ function isAccountStatus(value: unknown): value is AccountStatusValue {
   return ACCOUNT_STATUSES.some((status) => status === value);
 }
 
+function isSessionVersion(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+}
+
 export function createMinimalJwt(token: JWT, user?: ApprovedUserClaims): JWT {
   const minimalToken: JWT = {};
   const subject = user?.id ?? token.sub;
   const role = user?.role ?? token.role;
   const status = user?.status ?? token.status;
+  const sessionVersion = user?.sessionVersion ?? token.sessionVersion;
 
   if (subject) minimalToken.sub = subject;
   if (typeof token.iat === "number") minimalToken.iat = token.iat;
@@ -35,17 +41,29 @@ export function createMinimalJwt(token: JWT, user?: ApprovedUserClaims): JWT {
   if (typeof token.jti === "string") minimalToken.jti = token.jti;
   if (isUserRole(role)) minimalToken.role = role;
   if (isAccountStatus(status)) minimalToken.status = status;
+  if (isSessionVersion(sessionVersion))
+    minimalToken.sessionVersion = sessionVersion;
 
   return minimalToken;
 }
 
 export function createMinimalSession(expires: string, token: JWT): Session {
-  if (!token.sub || !isUserRole(token.role) || !isAccountStatus(token.status)) {
+  if (
+    !token.sub ||
+    !isUserRole(token.role) ||
+    !isAccountStatus(token.status) ||
+    !isSessionVersion(token.sessionVersion)
+  ) {
     throw new Error("Invalid authenticated session claims.");
   }
   return {
     expires,
-    user: { id: token.sub, role: token.role, status: token.status },
+    user: {
+      id: token.sub,
+      role: token.role,
+      status: token.status,
+      sessionVersion: token.sessionVersion,
+    },
   };
 }
 
