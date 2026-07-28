@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  authConfig,
   createMinimalJwt,
   createMinimalSession,
   getPostAuthenticationPath,
@@ -12,6 +13,10 @@ import type {
   AccountStatusValue,
   UserRoleValue,
 } from "@/features/auth/constants";
+import {
+  createSessionHistoryMarker,
+  SESSION_HISTORY_COOKIE_NAME,
+} from "@/features/auth/session-marker";
 
 function session(role: UserRoleValue, status: AccountStatusValue) {
   return {
@@ -39,11 +44,54 @@ describe("Proxy authorization", () => {
     expect(isProxyAuthorized("/admin", student)).toBe(false);
     expect(isProxyAuthorized("/admin/users/pending", student)).toBe(false);
   });
-  it("distinguishes missing authentication from wrong-role access", () => {
-    expect(getProxyAuthorizationOutcome("/staff", null)).toBe("LOGIN");
+  it("distinguishes first-time, ended-session, and wrong-role access", () => {
+    expect(getProxyAuthorizationOutcome("/staff", null, false)).toBe("LOGIN");
+    expect(getProxyAuthorizationOutcome("/staff", null, true)).toBe(
+      "SESSION_ENDED",
+    );
     expect(
       getProxyAuthorizationOutcome("/staff", session("STUDENT", "ACTIVE")),
     ).toBe("UNAUTHORIZED");
+  });
+  it("uses only verified server-managed evidence for ended-session UX", async () => {
+    const previousSecret = process.env.AUTH_SECRET;
+    const authenticationSecret = "test-authentication-secret-value-1234";
+    process.env.AUTH_SECRET = authenticationSecret;
+    const marker = await createSessionHistoryMarker(authenticationSecret);
+    const authorized = authConfig.callbacks.authorized;
+    const request = {
+      cookies: {
+        get: (name: string) =>
+          name === SESSION_HISTORY_COOKIE_NAME ? { value: marker } : undefined,
+      },
+      nextUrl: new URL("https://portal.sist.example/staff"),
+    };
+
+    try {
+      await expect(
+        authorized({ auth: null, request } as never),
+      ).resolves.toMatchObject({
+        status: 307,
+      });
+      const response = await authorized({ auth: null, request } as never);
+      expect(response).toBeInstanceOf(Response);
+      expect((response as Response).headers.get("location")).toBe(
+        "https://portal.sist.example/login?reason=session-ended",
+      );
+
+      request.cookies.get = () => ({ value: "browser-created-value" });
+      await expect(authorized({ auth: null, request } as never)).resolves.toBe(
+        false,
+      );
+
+      request.cookies.get = () => undefined;
+      await expect(authorized({ auth: null, request } as never)).resolves.toBe(
+        false,
+      );
+    } finally {
+      if (previousSecret === undefined) delete process.env.AUTH_SECRET;
+      else process.env.AUTH_SECRET = previousSecret;
+    }
   });
   it("enforces active administrator route boundaries", () => {
     const administrator = session("ADMIN", "ACTIVE");
@@ -94,24 +142,60 @@ describe("safe authentication callbacks", () => {
       "/student/requests?status=open",
       `${baseUrl}/student/requests?status=open`,
     ],
-    [`${baseUrl}/staff`, `${baseUrl}/staff`],
     ["/admin/users/pending", `${baseUrl}/admin/users/pending`],
+    ["/staff", `${baseUrl}/staff`],
   ])("accepts the internal portal callback %s", (url, expected) => {
     expect(getSafeCallbackUrl(url, baseUrl)).toBe(expected);
   });
 
   it.each([
+    " /staff",
+    "/staff ",
+    "\t/student",
+    "/student\r",
+    "/stu\ndent",
+    "/student\u0000",
+    "/student\u001f",
+    "/student\u007f",
+    "/student\\requests",
+    "/student%2frequests",
+    "/student%5crequests",
+    "/student/%252f..%252fadmin",
+    "/student/%255c..%255cadmin",
+    "/student/%2e%2e/admin",
+    "/student/%252e%252e/admin",
+    "/student/%",
+    "/student/%2",
+    `${baseUrl}/staff`,
     "https://attacker.example/staff",
+    "https://user@portal.sist.example/staff",
     "//attacker.example/staff",
     "\\\\attacker.example\\staff",
     "/%2f%2fattacker.example/staff",
     "/student%2f..%2fadmin",
+    "/student/../admin",
+    "/login",
+    "/login?callbackUrl=/staff",
+    "/auth/continue",
+    "/api/auth/signin",
+    "/api/auth/callback/credentials",
     "/api/auth/signout",
     "/unknown",
     "/staff#sensitive-fragment",
     "https%3A%2F%2Fattacker.example",
   ])("rejects the unsafe or unknown callback %s", (url) => {
     expect(getSafeCallbackUrl(url, baseUrl)).toBe(`${baseUrl}/auth/continue`);
+  });
+
+  it("does not let an accepted callback change role authorization", () => {
+    const callback = new URL(getSafeCallbackUrl("/admin", baseUrl));
+
+    expect(
+      getProxyAuthorizationOutcome(
+        callback.pathname,
+        session("STUDENT", "ACTIVE"),
+      ),
+    ).toBe("UNAUTHORIZED");
   });
 });
 

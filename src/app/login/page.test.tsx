@@ -44,4 +44,18 @@ describe("login session-state presentation", () => {
 
     expect(container.querySelector('input[name="callbackUrl"]')).toBeNull();
   });
+
+  it("replaces a suspicious bounded callback before form submission", async () => {
+    const { container } = render(
+      await LoginPage({
+        searchParams: Promise.resolve({
+          callbackUrl: " /staff",
+        }),
+      }),
+    );
+
+    expect(
+      container.querySelector('input[name="callbackUrl"]'),
+    ).toHaveAttribute("value", "/auth/continue");
+  });
 });

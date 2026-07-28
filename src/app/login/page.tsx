@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { loginAction } from "@/app/login/actions";
+import { getSafeCallbackPath } from "@/auth.config";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginPresentationMessage } from "@/features/auth/session-ux";
@@ -25,7 +26,9 @@ export default async function LoginPage({
     sessionMessage ??
     (error ? "The email address or password is incorrect." : undefined);
   const safeLengthCallbackUrl =
-    callbackUrl && callbackUrl.length <= 2048 ? callbackUrl : undefined;
+    callbackUrl && callbackUrl.length <= 2048
+      ? getSafeCallbackPath(callbackUrl)
+      : undefined;
 
   return (
     <main className="mx-auto max-w-md px-4 py-16">

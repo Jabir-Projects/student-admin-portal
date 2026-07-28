@@ -8,6 +8,10 @@ import {
   USER_ROLES,
   type UserRoleValue,
 } from "@/features/auth/constants";
+import {
+  isValidSessionHistoryMarker,
+  SESSION_HISTORY_COOKIE_NAME,
+} from "@/features/auth/session-marker";
 
 type ApprovedUserClaims = {
   id?: string;
@@ -80,13 +84,14 @@ export type ProxyAuthorizationOutcome =
 export function getProxyAuthorizationOutcome(
   pathname: string,
   session: Session | null,
+  hasPreviousAuthentication = false,
 ): ProxyAuthorizationOutcome {
   const isStudentRoute =
     pathname === "/student" || pathname.startsWith("/student/");
   const isStaffRoute = pathname === "/staff" || pathname.startsWith("/staff/");
   const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
   if (!isStudentRoute && !isStaffRoute && !isAdminRoute) return "ALLOW";
-  if (!session) return "LOGIN";
+  if (!session) return hasPreviousAuthentication ? "SESSION_ENDED" : "LOGIN";
   if (session.user.status !== "ACTIVE") return "SESSION_ENDED";
   if (isStudentRoute)
     return session.user.role === "STUDENT" ? "ALLOW" : "UNAUTHORIZED";
@@ -105,14 +110,50 @@ export function getPostAuthenticationPath(
 }
 
 const safeCallbackRoots = ["/student", "/staff", "/admin"] as const;
-const unsafeEncodedPath = /%(?:00|0a|0d|2f|5c)/iu;
+const asciiControlCharacter = /[\u0000-\u001f\u007f]/u;
+const unsafeEncodedValue = /%(?:25)*(?:0[0-9a-f]|1[0-9a-f]|2e|2f|5c|7f)/iu;
 const malformedPercentEncoding = /%(?![0-9a-f]{2})/iu;
+const rawTraversalSegment = /(?:^|\/)\.{1,2}(?:\/|$)/u;
 
 function isSafeCallbackPath(pathname: string): boolean {
-  if (pathname === "/auth/continue") return true;
   return safeCallbackRoots.some(
     (root) => pathname === root || pathname.startsWith(`${root}/`),
   );
+}
+
+export function getSafeCallbackPath(url: string): string {
+  const fallback = "/auth/continue";
+  const rawPath = url.split(/[?#]/u, 1)[0] ?? "";
+  if (
+    url.length === 0 ||
+    url.length > 2048 ||
+    url !== url.trim() ||
+    asciiControlCharacter.test(url) ||
+    url.includes("\\") ||
+    url.includes("#") ||
+    malformedPercentEncoding.test(url) ||
+    unsafeEncodedValue.test(url) ||
+    !url.startsWith("/") ||
+    url.startsWith("//") ||
+    rawTraversalSegment.test(rawPath)
+  ) {
+    return fallback;
+  }
+
+  let candidate: URL;
+  try {
+    candidate = new URL(url, "https://internal.invalid");
+  } catch {
+    return fallback;
+  }
+  if (
+    candidate.origin !== "https://internal.invalid" ||
+    candidate.hash ||
+    !isSafeCallbackPath(candidate.pathname)
+  ) {
+    return fallback;
+  }
+  return `${candidate.pathname}${candidate.search}`;
 }
 
 export function getSafeCallbackUrl(url: string, baseUrl: string): string {
@@ -122,35 +163,7 @@ export function getSafeCallbackUrl(url: string, baseUrl: string): string {
   } catch {
     return "/auth/continue";
   }
-  const fallback = new URL("/auth/continue", base).toString();
-  if (url.includes("\\") || malformedPercentEncoding.test(url)) return fallback;
-
-  let candidate: URL;
-  try {
-    candidate = new URL(url, base);
-  } catch {
-    return fallback;
-  }
-  const authorityEnd = candidate.href.indexOf(
-    "/",
-    candidate.protocol.length + 2,
-  );
-  const authority = candidate.href.slice(
-    candidate.protocol.length + 2,
-    authorityEnd,
-  );
-  if (
-    candidate.origin !== base.origin ||
-    candidate.username ||
-    authority.includes("@") ||
-    candidate.hash ||
-    unsafeEncodedPath.test(candidate.pathname) ||
-    !isSafeCallbackPath(candidate.pathname)
-  ) {
-    return fallback;
-  }
-  if (candidate.pathname === "/auth/continue") return fallback;
-  return new URL(`${candidate.pathname}${candidate.search}`, base).toString();
+  return new URL(getSafeCallbackPath(url), base).toString();
 }
 
 export const authConfig = {
@@ -164,10 +177,15 @@ export const authConfig = {
     session({ session, token }) {
       return createMinimalSession(session.expires, token);
     },
-    authorized({ auth, request }) {
+    async authorized({ auth, request }) {
+      const hasPreviousAuthentication = await isValidSessionHistoryMarker(
+        request.cookies.get(SESSION_HISTORY_COOKIE_NAME)?.value,
+        process.env.AUTH_SECRET,
+      );
       const outcome = getProxyAuthorizationOutcome(
         request.nextUrl.pathname,
         auth,
+        hasPreviousAuthentication,
       );
       if (outcome === "ALLOW") return true;
       if (outcome === "LOGIN") return false;
