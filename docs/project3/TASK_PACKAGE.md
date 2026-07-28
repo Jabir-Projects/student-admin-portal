@@ -1,4 +1,4 @@
-# Active Project 3 Task Package
+# Closed Project 3 Task Package
 
 ## Package
 
@@ -6,13 +6,13 @@
 | --- | --- |
 | ID | `CTRL-001` |
 | Name | Create Project 3 control documents |
-| Status | Active; awaiting ChatGPT and owner diff review |
+| Status | `CLOSED` |
 
-Only one control package may be active at a time. `CTRL-001` is the active control package.
+Only one control package may be active at a time. `CTRL-001` is closed, and no control package is currently active.
 
 ## Status lifecycle
 
-`CTRL-001` remains `ACTIVE` while correction, QA, Git approval, commit, push, synchronization verification, clean repository verification, closure recording, and closure verification are incomplete. File creation or successful QA alone does not close the package.
+Before closure, `CTRL-001` remained `ACTIVE` while correction, QA, Git approval, commit, push, synchronization verification, clean repository verification, closure recording, and closure verification were incomplete. File creation or successful QA alone did not close the package.
 
 After successful owner-approved commit and push, verified repository synchronization, clean repository verification, closure recording, and explicit package-closure approval, its status must be changed from `ACTIVE` to `CLOSED` through a separately authorized documentation update before another task package becomes active. Commit and push continue to require separate owner approval. Package C cannot become active until CTRL-001 is formally closed and a new package is separately approved.
 
@@ -67,7 +67,7 @@ These expectations were `VERIFIED` before file creation.
 - Security invariants are preserved.
 - No large section duplicates root `AGENTS.md`.
 - Only the six allowed paths appear in the diff.
-- CTRL-001 remains uncommitted pending review.
+- The initial six-file commit and push are owner-authorized, completed, and verified.
 
 ## Security requirements
 
@@ -107,5 +107,18 @@ Report repository state, six created files, one-sentence content summaries, exac
 ## Closure conditions
 
 CTRL-001 closes only after acceptance criteria and documentation QA pass, ChatGPT and owner approve the diff, authorized Git delivery completes, and synchronized clean state is verified. Do not begin the next package automatically.
+
+## Closure evidence
+
+- Scope completed: six approved control files only.
+- Documentation QA passed.
+- Owner-authorized initial commit completed: `ae9fbce48c05f077d8a8e5c01631f7b10d798009`.
+- Owner-authorized first push completed successfully.
+- Local and remote commits matched after the first push.
+- Ahead/behind was verified as `0/0`.
+- The index and working tree were clean after the first push.
+- CTRL-001 closure was explicitly authorized and recorded.
+
+CTRL-001 is `CLOSED`. No control package is currently active unless another package is separately approved. This closure does not activate V2-3 Package C. Package C still requires repository inspection, scope approval, Design Lock where applicable, and implementation approval.
 
 See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIONS.md](DECISIONS.md).

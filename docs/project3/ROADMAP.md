@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Maintain the stable high-level sequence for SIST Portal V2. Current execution state is summarized in [CURRENT_STATE.md](CURRENT_STATE.md); the only active package is defined in [TASK_PACKAGE.md](TASK_PACKAGE.md).
+Maintain the stable high-level sequence for SIST Portal V2. Current execution state is summarized in [CURRENT_STATE.md](CURRENT_STATE.md); control-package status is recorded in [TASK_PACKAGE.md](TASK_PACKAGE.md).
 
 ## Status vocabulary
 

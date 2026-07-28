@@ -39,7 +39,7 @@ Define risk-based evidence expectations. This matrix does not claim that future 
 
 ## CTRL-001 expected verification
 
-Status: Active; do not mark complete or passed before final review.
+Status: Closed after documentation QA, owner-authorized Git delivery, synchronization verification, and closure recording.
 
 - File inventory
 - Markdown structure review
