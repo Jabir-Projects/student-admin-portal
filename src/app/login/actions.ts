@@ -9,10 +9,17 @@ import { loginSchema } from "@/features/auth/schemas";
 export async function loginAction(formData: FormData): Promise<void> {
   const parsed = loginSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) redirect("/login?error=invalid");
+  const requestedCallbackUrl = formData.get("callbackUrl");
+  const redirectTo =
+    typeof requestedCallbackUrl === "string" &&
+    requestedCallbackUrl.length > 0 &&
+    requestedCallbackUrl.length <= 2048
+      ? requestedCallbackUrl
+      : "/auth/continue";
   try {
     await signIn("credentials", {
       ...parsed.data,
-      redirectTo: "/auth/continue",
+      redirectTo,
     });
   } catch (error) {
     if (error instanceof AuthError) {

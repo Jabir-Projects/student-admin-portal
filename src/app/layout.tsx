@@ -17,6 +17,21 @@ const ibmPlexMono = IBM_Plex_Mono({
   fallback: ["Cascadia Code", "Consolas", "monospace"],
 });
 
+const themeInitializationScript = `
+(function () {
+  try {
+    var storedTheme = localStorage.getItem("sist-color-theme");
+    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var theme =
+      storedTheme === "dark" || (storedTheme !== "light" && prefersDark)
+        ? "dark"
+        : "light";
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+  } catch (_) {}
+})();
+`;
+
 export const metadata: Metadata = {
   title: {
     default: "Student Administration Portal",
@@ -34,12 +49,19 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="light"
+      suppressHydrationWarning
       className={[
         inter.variable,
         ibmPlexMono.variable,
         "h-full antialiased",
       ].join(" ")}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: themeInitializationScript }}
+        />
+      </head>
       <body className="bg-background text-foreground flex min-h-full flex-col">
         {children}
       </body>

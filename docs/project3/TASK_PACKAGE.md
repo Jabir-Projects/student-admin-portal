@@ -1,12 +1,16 @@
 # Closed Project 3 Task Package
 
+This file preserves the historical CTRL-001 package record. Its Package C
+restrictions describe CTRL-001 scope and are not the current Package C status.
+See the current authorization addendum at the end of this file.
+
 ## Package
 
-| Field | Value |
-| --- | --- |
-| ID | `CTRL-001` |
-| Name | Create Project 3 control documents |
-| Status | `CLOSED` |
+| Field  | Value                              |
+| ------ | ---------------------------------- |
+| ID     | `CTRL-001`                         |
+| Name   | Create Project 3 control documents |
+| Status | `CLOSED`                           |
 
 Only one control package may be active at a time. `CTRL-001` is closed, and no control package is currently active.
 
@@ -82,19 +86,20 @@ Use the CTRL-001 checks in [VERIFICATION_MATRIX.md](VERIFICATION_MATRIX.md): fil
 
 ## Permissions
 
-| Action | Permission |
-| --- | --- |
-| Database connection | Prohibited |
-| Database mutation | Prohibited |
-| Migration execution | Prohibited |
-| Staging | Prohibited |
-| Commit | Prohibited |
-| Push | Prohibited |
+| Action                   | Permission |
+| ------------------------ | ---------- |
+| Database connection      | Prohibited |
+| Database mutation        | Prohibited |
+| Migration execution      | Prohibited |
+| Staging                  | Prohibited |
+| Commit                   | Prohibited |
+| Push                     | Prohibited |
 | Package C implementation | Prohibited |
 
 These are the default CTRL-001 permissions. The owner-authorized one-shot finalization task separately authorizes staging, the two specified commits, and their pushes only for these six control files. It does not authorize database, migration, deployment, production, or Package C actions.
 
-> V2-3 Package C — Staff Frontend has not been approved for implementation.
+> Historical CTRL-001 boundary: V2-3 Package C — Staff Frontend was not
+> approved by CTRL-001.
 
 ## Stop conditions
 
@@ -119,6 +124,28 @@ CTRL-001 closes only after acceptance criteria and documentation QA pass, ChatGP
 - The index and working tree were clean after the first push.
 - CTRL-001 closure was explicitly authorized and recorded.
 
-CTRL-001 is `CLOSED`. No control package is currently active unless another package is separately approved. This closure does not activate V2-3 Package C. Package C still requires repository inspection, scope approval, Design Lock where applicable, and implementation approval.
+CTRL-001 is `CLOSED`. Its closure did not itself activate V2-3 Package C.
+Subsequent Package C authorization and current status are recorded below.
 
 See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIONS.md](DECISIONS.md).
+
+## Current Package C authorization
+
+- CTRL-001 remains historically closed; its evidence above is unchanged.
+- Package C was subsequently owner-authorized and has started.
+- C1 — Repository and route readiness is complete.
+- C2 — Design requirements lock is complete.
+- C3 — Staff application shell implementation, focused corrections, and
+  focused QA are approved and complete.
+- C4 — STAFF Dashboard Presentation is approved and complete; independent QA
+  passed with non-blocking notes.
+- Authenticated browser, physical-device, and real screen-reader testing were
+  not performed during C4 independent QA because database access was prohibited.
+- Partial C5 — Compatibility and Authorization UX preparation passed focused
+  unit, component, authorization, build, and unauthenticated browser checks.
+- Authenticated role-state browser verification and C5 closure remain pending.
+- C6 — Package verification has not started.
+- Package C is not complete.
+- The current recovery package separately authorizes one verified baseline
+  commit and normal push; it does not authorize Package D, Package E, V2-4,
+  database access, migrations, or integration.

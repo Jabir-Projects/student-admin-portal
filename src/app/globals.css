@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --paper: #fbfcfb;
   --paper-secondary: #f1f3ef;
   --ink: #141b22;
@@ -31,6 +32,57 @@
   --destructive: oklch(0.58 0.22 27);
   --input: var(--border-strong);
   --ring: var(--focus-ring);
+  --staff-sidebar: #ffffff;
+  --staff-sidebar-foreground: #102f52;
+  --staff-sidebar-muted: #607086;
+  --staff-topbar: rgb(255 255 255 / 0.94);
+  --staff-panel: #ffffff;
+  --staff-panel-muted: #f5f7f8;
+  --staff-active: #e6f0df;
+  --staff-active-foreground: #244f1d;
+  --staff-overlay: rgb(8 29 51 / 0.58);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #061d31;
+  --paper-secondary: #0b2942;
+  --ink: #f3f7fb;
+  --slate: #aab8c8;
+  --sist-navy: #8ab6df;
+  --sist-navy-dark: #d7e8f7;
+  --sist-navy-soft: #123652;
+  --sist-olive: #95c750;
+  --sist-olive-dark: #bce77d;
+  --sist-olive-light: #193d2b;
+  --border: #24445e;
+  --border-strong: #365a75;
+  --surface: #0a243b;
+  --focus-ring: #b5df75;
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --primary: var(--sist-olive);
+  --primary-foreground: #10270c;
+  --secondary: var(--sist-navy-soft);
+  --secondary-foreground: #d7e8f7;
+  --muted: var(--paper-secondary);
+  --muted-foreground: var(--slate);
+  --accent: var(--sist-olive-light);
+  --accent-foreground: var(--sist-olive-dark);
+  --destructive: oklch(0.68 0.2 25);
+  --input: var(--border-strong);
+  --ring: var(--focus-ring);
+  --staff-sidebar: #04182b;
+  --staff-sidebar-foreground: #eef5fb;
+  --staff-sidebar-muted: #9eb0c2;
+  --staff-topbar: rgb(6 29 49 / 0.94);
+  --staff-panel: #09243b;
+  --staff-panel-muted: #0d2b45;
+  --staff-active: #1d4b25;
+  --staff-active-foreground: #e7f6d4;
+  --staff-overlay: rgb(1 10 18 / 0.78);
 }
 
 @theme inline {
@@ -66,6 +118,15 @@
   --color-sist-olive-light: var(--sist-olive-light);
   --color-border-strong: var(--border-strong);
   --color-surface: var(--surface);
+  --color-staff-sidebar: var(--staff-sidebar);
+  --color-staff-sidebar-foreground: var(--staff-sidebar-foreground);
+  --color-staff-sidebar-muted: var(--staff-sidebar-muted);
+  --color-staff-topbar: var(--staff-topbar);
+  --color-staff-panel: var(--staff-panel);
+  --color-staff-panel-muted: var(--staff-panel-muted);
+  --color-staff-active: var(--staff-active);
+  --color-staff-active-foreground: var(--staff-active-foreground);
+  --color-staff-overlay: var(--staff-overlay);
   --font-sans: var(--font-inter), "Segoe UI", Arial, sans-serif;
   --font-mono:
     var(--font-ibm-plex-mono), "Cascadia Code", "SFMono-Regular", Consolas,
@@ -89,10 +150,19 @@
     @apply bg-primary/20 text-foreground;
   }
 
-  :where(a, button, input, select, textarea):focus-visible {
+  :where(a, button, input, select, summary, textarea):focus-visible {
     outline: 3px solid var(--focus-ring);
     outline-offset: 3px;
   }
+}
+
+.theme-icon-light,
+[data-theme="dark"] .theme-icon-dark {
+  display: none;
+}
+
+[data-theme="dark"] .theme-icon-light {
+  display: block;
 }
 
 @media (prefers-reduced-motion: reduce) {

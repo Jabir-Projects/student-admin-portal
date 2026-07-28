@@ -3,7 +3,7 @@ import "server-only";
 import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
-import { authConfig } from "@/auth.config";
+import { authConfig, getSafeCallbackUrl } from "@/auth.config";
 import { loginSchema } from "@/features/auth/schemas";
 import { db } from "@/server/db";
 import { getAuthenticationSecret } from "@/server/auth/env";
@@ -83,14 +83,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     ...authConfig.callbacks,
     redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      try {
-        return new URL(url).origin === baseUrl
-          ? url
-          : `${baseUrl}/auth/continue`;
-      } catch {
-        return `${baseUrl}/auth/continue`;
-      }
+      return getSafeCallbackUrl(url, baseUrl);
     },
   },
 });

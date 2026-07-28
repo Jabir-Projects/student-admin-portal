@@ -3,6 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   createMinimalJwt,
   createMinimalSession,
+  getPostAuthenticationPath,
+  getProxyAuthorizationOutcome,
+  getSafeCallbackUrl,
   isProxyAuthorized,
 } from "@/auth.config";
 import type {
@@ -18,26 +21,42 @@ function session(role: UserRoleValue, status: AccountStatusValue) {
 }
 
 describe("Proxy authorization", () => {
-  it.each(["/student", "/student/requests", "/admin", "/admin/users/pending"])(
-    "rejects unauthenticated access to %s",
-    (pathname) => expect(isProxyAuthorized(pathname, null)).toBe(false),
+  it.each([
+    "/student",
+    "/student/requests",
+    "/staff",
+    "/staff/requests",
+    "/admin",
+    "/admin/users/pending",
+  ])("rejects unauthenticated access to %s", (pathname) =>
+    expect(isProxyAuthorized(pathname, null)).toBe(false),
   );
   it("enforces active student route boundaries", () => {
     const student = session("STUDENT", "ACTIVE");
     expect(isProxyAuthorized("/student", student)).toBe(true);
     expect(isProxyAuthorized("/student/requests", student)).toBe(true);
+    expect(isProxyAuthorized("/staff", student)).toBe(false);
     expect(isProxyAuthorized("/admin", student)).toBe(false);
     expect(isProxyAuthorized("/admin/users/pending", student)).toBe(false);
+  });
+  it("distinguishes missing authentication from wrong-role access", () => {
+    expect(getProxyAuthorizationOutcome("/staff", null)).toBe("LOGIN");
+    expect(
+      getProxyAuthorizationOutcome("/staff", session("STUDENT", "ACTIVE")),
+    ).toBe("UNAUTHORIZED");
   });
   it("enforces active administrator route boundaries", () => {
     const administrator = session("ADMIN", "ACTIVE");
     expect(isProxyAuthorized("/admin", administrator)).toBe(true);
     expect(isProxyAuthorized("/admin/users/pending", administrator)).toBe(true);
+    expect(isProxyAuthorized("/staff", administrator)).toBe(false);
     expect(isProxyAuthorized("/student", administrator)).toBe(false);
     expect(isProxyAuthorized("/student/requests", administrator)).toBe(false);
   });
   it("allows active staff through the coarse admin route boundary", () => {
     const staff = session("STAFF", "ACTIVE");
+    expect(isProxyAuthorized("/staff", staff)).toBe(true);
+    expect(isProxyAuthorized("/staff/requests", staff)).toBe(true);
     expect(isProxyAuthorized("/admin", staff)).toBe(true);
     expect(isProxyAuthorized("/admin/users/pending", staff)).toBe(true);
     expect(isProxyAuthorized("/student", staff)).toBe(false);
@@ -48,9 +67,52 @@ describe("Proxy authorization", () => {
       expect(isProxyAuthorized("/student", session("STUDENT", status))).toBe(
         false,
       );
+      expect(isProxyAuthorized("/staff", session("STAFF", status))).toBe(false);
       expect(isProxyAuthorized("/admin", session("ADMIN", status))).toBe(false);
+      expect(
+        getProxyAuthorizationOutcome("/admin", session("ADMIN", status)),
+      ).toBe("SESSION_ENDED");
     },
   );
+});
+
+describe("post-authentication routing", () => {
+  it.each([
+    ["STUDENT", "/student"],
+    ["STAFF", "/staff"],
+    ["ADMIN", "/admin"],
+  ] as const)("routes %s to %s", (role, expectedPath) => {
+    expect(getPostAuthenticationPath(role)).toBe(expectedPath);
+  });
+});
+
+describe("safe authentication callbacks", () => {
+  const baseUrl = "https://portal.sist.example";
+
+  it.each([
+    [
+      "/student/requests?status=open",
+      `${baseUrl}/student/requests?status=open`,
+    ],
+    [`${baseUrl}/staff`, `${baseUrl}/staff`],
+    ["/admin/users/pending", `${baseUrl}/admin/users/pending`],
+  ])("accepts the internal portal callback %s", (url, expected) => {
+    expect(getSafeCallbackUrl(url, baseUrl)).toBe(expected);
+  });
+
+  it.each([
+    "https://attacker.example/staff",
+    "//attacker.example/staff",
+    "\\\\attacker.example\\staff",
+    "/%2f%2fattacker.example/staff",
+    "/student%2f..%2fadmin",
+    "/api/auth/signout",
+    "/unknown",
+    "/staff#sensitive-fragment",
+    "https%3A%2F%2Fattacker.example",
+  ])("rejects the unsafe or unknown callback %s", (url) => {
+    expect(getSafeCallbackUrl(url, baseUrl)).toBe(`${baseUrl}/auth/continue`);
+  });
 });
 
 describe("minimal Auth.js claims", () => {

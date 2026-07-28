@@ -60,6 +60,8 @@ function authorizeReloadedActor(
   requiredCapability: CapabilityValue,
 ): CapabilityAuthorizationResult {
   if (!actor) return { ok: false, reason: "UNAUTHENTICATED" };
+  if (actor.status === "DISABLED")
+    return { ok: false, reason: "DISABLED_ACCOUNT" };
   if (actor.status !== "ACTIVE")
     return { ok: false, reason: "INACTIVE_ACCOUNT" };
   if (!isStaffCompatibleRole(actor.role))

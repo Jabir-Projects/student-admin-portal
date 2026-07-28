@@ -30,6 +30,7 @@ describe("server-only architecture", () => {
     "src/server/auth/capabilities.node.ts",
     "src/server/auth/dal.ts",
     "src/server/auth/dal.node.ts",
+    "src/server/auth/session-routing.ts",
     "src/test/package-b-test-database.node.ts",
   ])("marks %s as server-only", (relativePath) => {
     expect(source(relativePath)).toMatch(/^import "server-only";/u);
@@ -48,6 +49,12 @@ describe("server-only architecture", () => {
     )}`;
     expect(sessionSources).not.toMatch(
       /capabilities\s*[?:]|CapabilityValue|UserCapabilityAssignment/u,
+    );
+  });
+
+  it("keeps the pending-user compatibility route capability-protected", () => {
+    expect(source("src/app/admin/users/pending/page.tsx")).toMatch(
+      /await requireCapability\("MANAGE_STUDENT_ACCOUNTS"\)/u,
     );
   });
 

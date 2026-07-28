@@ -4,16 +4,18 @@ import { ShieldAlert } from "lucide-react";
 import { StatusPage } from "@/components/feedback/status-page";
 
 export const metadata: Metadata = {
-  title: "Unauthorized",
+  title: "Access denied",
 };
 
 export default function UnauthorizedPage() {
   return (
     <StatusPage
-      code="401"
-      description="You do not have permission to view this page. Sign in with an authorized account when portal access is available."
+      actionHref="/auth/continue"
+      actionLabel="Return to your portal"
+      code="403"
+      description="You do not have permission to access this area. Return to the portal available to your account."
       icon={ShieldAlert}
-      title="Access restricted"
+      title="Permission denied"
     />
   );
 }

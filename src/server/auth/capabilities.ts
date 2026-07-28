@@ -1,14 +1,14 @@
 import "server-only";
 
-import { redirect } from "next/navigation";
-
 import { auth } from "@/auth";
 import type {
   AccountStatusValue,
   CapabilityValue,
   UserRoleValue,
 } from "@/features/auth/constants";
+import type { AuthorizationPresentationFailure } from "@/features/auth/session-ux";
 import { loadCapabilityActor } from "@/server/auth/capabilities.node";
+import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
 
 export type ActorSessionClaims = {
@@ -24,12 +24,7 @@ export type CapabilityActor = {
   capabilities: readonly CapabilityValue[];
 };
 
-export type AuthorizationFailure =
-  | "UNAUTHENTICATED"
-  | "STALE_SESSION"
-  | "INACTIVE_ACCOUNT"
-  | "WRONG_ROLE"
-  | "MISSING_CAPABILITY";
+export type AuthorizationFailure = AuthorizationPresentationFailure;
 
 export type CapabilityAuthorizationResult =
   | { ok: true; actor: CapabilityActor }
@@ -52,12 +47,5 @@ export async function requireCapability(
     db,
   );
   if (result.ok) return result.actor;
-  if (
-    result.reason === "UNAUTHENTICATED" ||
-    result.reason === "STALE_SESSION" ||
-    result.reason === "INACTIVE_ACCOUNT"
-  ) {
-    redirect("/login");
-  }
-  redirect("/unauthorized");
+  redirectForAuthorizationFailure(result.reason);
 }

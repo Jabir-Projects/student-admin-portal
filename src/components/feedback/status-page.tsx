@@ -4,6 +4,8 @@ import { ArrowLeft, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type StatusPageProps = {
+  actionHref?: string;
+  actionLabel?: string;
   code: string;
   title: string;
   description: string;
@@ -11,6 +13,8 @@ type StatusPageProps = {
 };
 
 export function StatusPage({
+  actionHref = "/",
+  actionLabel = "Back to home",
   code,
   title,
   description,
@@ -28,9 +32,9 @@ export function StatusPage({
         <h1 className="mt-2 text-3xl font-bold tracking-tight">{title}</h1>
         <p className="text-muted-foreground mt-4 leading-7">{description}</p>
         <Button asChild className="mt-8">
-          <Link href="/">
+          <Link href={actionHref}>
             <ArrowLeft aria-hidden="true" />
-            Back to home
+            {actionLabel}
           </Link>
         </Button>
       </section>

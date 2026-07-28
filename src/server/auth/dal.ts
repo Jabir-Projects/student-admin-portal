@@ -7,8 +7,11 @@ import type { UserRoleValue } from "@/features/auth/constants";
 import {
   findOwnedStudentProfile,
   getSessionUserByClaims,
+  getStaffShellUserByClaims,
   type AuthorizedUser,
+  type StaffShellUser,
 } from "@/server/auth/dal.node";
+import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
 
 export async function getActiveUser(): Promise<AuthorizedUser | null> {
@@ -34,10 +37,23 @@ export async function requireActiveUser(
     },
     db,
   );
-  if (!result.ok) redirect("/login");
+  if (!result.ok) redirectForAuthorizationFailure(result.reason);
   const allowedRoles = Array.isArray(roles) ? roles : [roles];
   if (!allowedRoles.some((role) => role === result.user.role))
     redirect("/unauthorized");
+  return result.user;
+}
+
+export async function requireStaffShellUser(): Promise<StaffShellUser> {
+  const session = await auth();
+  const result = await getStaffShellUserByClaims(
+    {
+      actorId: session?.user.id,
+      claimedSessionVersion: session?.user.sessionVersion,
+    },
+    db,
+  );
+  if (!result.ok) redirectForAuthorizationFailure(result.reason);
   return result.user;
 }
 

@@ -6,12 +6,12 @@ Maintain the stable high-level sequence for SIST Portal V2. Current execution st
 
 ## Status vocabulary
 
-| Status | Meaning |
-| --- | --- |
-| Complete | Reported as finished; repository verification may still be package-specific. |
-| Active | Current phase containing the controlled work. |
-| Planned | Ordered future work; not authorized by this document. |
-| Not started | No implementation is authorized or claimed. |
+| Status      | Meaning                                                                      |
+| ----------- | ---------------------------------------------------------------------------- |
+| Complete    | Reported as finished; repository verification may still be package-specific. |
+| Active      | Current phase containing the controlled work.                                |
+| Planned     | Ordered future work; not authorized by this document.                        |
+| Not started | No implementation is authorized or claimed.                                  |
 
 ## Approved phase sequence
 
@@ -91,14 +91,20 @@ Status: `REPORTED COMPLETE`
 
 #### Package C — Staff frontend
 
-Status: `NOT STARTED — REPOSITORY VERIFICATION REQUIRED`
+Status: `ACTIVE — C3/C4 BASELINE VERIFIED; C5 PARTIAL; C6 NOT STARTED`
 
-- C1 Repository and route readiness
-- C2 Design requirements lock
-- C3 Staff application shell
-- C4 Staff dashboard
-- C5 Compatibility and authorization UX
-- C6 Package verification
+- C1 Repository and route readiness — Complete
+- C2 Design requirements lock — Complete
+- C3 Staff application shell — Implementation, focused corrections, and focused QA approved and complete
+- C4 STAFF Dashboard Presentation — Approved and complete; independent QA passed with non-blocking notes
+- C5 Compatibility and authorization UX — Partial implementation verified; authenticated role-state QA and closure remain pending
+- C6 Package verification — Not started
+
+Package C remains incomplete. The C3/C4 baseline and partial C5 preparation
+passed focused verification. Authenticated browser, physical-device, and real
+screen-reader testing were not performed because database access was
+prohibited. Remaining C5 role-state verification and all C6 package
+verification must be completed in the approved follow-up.
 
 #### Package D — Accounts and capability management
 

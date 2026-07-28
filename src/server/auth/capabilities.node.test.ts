@@ -114,19 +114,19 @@ describe("database-authoritative capability authorization", () => {
     ).resolves.toEqual({ ok: false, reason: "WRONG_ROLE" });
   });
 
-  it.each(["PENDING_APPROVAL", "DISABLED"] as const)(
-    "rejects a %s staff account",
-    async (status) => {
-      findUnique.mockResolvedValue(actor({ status }));
-      await expect(
-        loadCapabilityActor(
-          { actorId: "actor-id", claimedSessionVersion: 7 },
-          "MANAGE_STUDENT_ACCOUNTS",
-          database,
-        ),
-      ).resolves.toEqual({ ok: false, reason: "INACTIVE_ACCOUNT" });
-    },
-  );
+  it.each([
+    ["PENDING_APPROVAL", "INACTIVE_ACCOUNT"],
+    ["DISABLED", "DISABLED_ACCOUNT"],
+  ] as const)("rejects a %s staff account", async (status, reason) => {
+    findUnique.mockResolvedValue(actor({ status }));
+    await expect(
+      loadCapabilityActor(
+        { actorId: "actor-id", claimedSessionVersion: 7 },
+        "MANAGE_STUDENT_ACCOUNTS",
+        database,
+      ),
+    ).resolves.toEqual({ ok: false, reason });
+  });
 });
 
 describe("database-authoritative session users", () => {
