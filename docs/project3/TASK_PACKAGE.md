@@ -132,7 +132,8 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIO
 ## Current Package C authorization
 
 - CTRL-001 remains historically closed; its evidence above is unchanged.
-- Package C was subsequently owner-authorized and has started.
+- Package C — Custom STAFF Frontend was subsequently owner-authorized and is
+  approved and complete.
 - C1 — Repository and route readiness is complete.
 - C2 — Design requirements lock is complete.
 - C3 — Staff application shell implementation, focused corrections, and
@@ -141,11 +142,26 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIO
   passed with non-blocking notes.
 - Authenticated browser, physical-device, and real screen-reader testing were
   not performed during C4 independent QA because database access was prohibited.
-- Partial C5 — Compatibility and Authorization UX preparation passed focused
-  unit, component, authorization, build, and unauthenticated browser checks.
-- Authenticated role-state browser verification and C5 closure remain pending.
-- C6 — Package verification has not started.
-- Package C is not complete.
-- The current recovery package separately authorizes one verified baseline
-  commit and normal push; it does not authorize Package D, Package E, V2-4,
-  database access, migrations, or integration.
+- C5 — Compatibility and Authorization UX is approved and complete.
+- C5 final focused QA passed with no blockers.
+- C6 — Final Package C Verification and Closure is approved and complete;
+  final verification passed with no blockers.
+- C1 through C6 are approved and complete.
+- Final Package C evidence records:
+  - focused Package C verification: 16 files and 209 tests passed;
+  - full verification: 39 files and 439 tests passed;
+  - three database-integration files and 39 tests safely skipped;
+  - lint passed;
+  - typecheck passed;
+  - production build passed; and
+  - `git diff --check` passed.
+- Authenticated browser, physical-device, real screen-reader, and
+  database-integration verification remain documented non-blocking
+  limitations.
+- V2-3 remains the active phase.
+- Package D — Account and Capability Management is next and has not started.
+- Package E has not started.
+- The owner-authorized final Package C closure includes one six-file commit and
+  a normal push to the existing upstream branch.
+- Package C closure does not authorize Package D or Package E implementation,
+  V2-4 work, database access, migrations, integration execution, or deployment.

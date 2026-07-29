@@ -111,14 +111,34 @@ export function getPostAuthenticationPath(
 
 const safeCallbackRoots = ["/student", "/staff", "/admin"] as const;
 const asciiControlCharacter = /[\u0000-\u001f\u007f]/u;
-const unsafeEncodedValue = /%(?:25)*(?:0[0-9a-f]|1[0-9a-f]|2e|2f|5c|7f)/iu;
+const unsafeEncodedValue =
+  /%(?:25)*(?:0[0-9a-f]|1[0-9a-f]|20|2e|2f|5c|7f)/iu;
 const malformedPercentEncoding = /%(?![0-9a-f]{2})/iu;
+const percentEncodedOctet = /%[0-9a-f]{2}/iu;
 const rawTraversalSegment = /(?:^|\/)\.{1,2}(?:\/|$)/u;
+const maxCallbackDecodingPasses = 4;
 
 function isSafeCallbackPath(pathname: string): boolean {
   return safeCallbackRoots.some(
     (root) => pathname === root || pathname.startsWith(`${root}/`),
   );
+}
+
+function hasUnsafeCallbackEncoding(url: string): boolean {
+  let current = url;
+
+  for (let pass = 0; pass < maxCallbackDecodingPasses; pass += 1) {
+    if (unsafeEncodedValue.test(current)) return true;
+    if (!percentEncodedOctet.test(current)) return false;
+
+    try {
+      current = decodeURIComponent(current);
+    } catch {
+      return true;
+    }
+  }
+
+  return unsafeEncodedValue.test(current) || percentEncodedOctet.test(current);
 }
 
 export function getSafeCallbackPath(url: string): string {
@@ -132,7 +152,7 @@ export function getSafeCallbackPath(url: string): string {
     url.includes("\\") ||
     url.includes("#") ||
     malformedPercentEncoding.test(url) ||
-    unsafeEncodedValue.test(url) ||
+    hasUnsafeCallbackEncoding(url) ||
     !url.startsWith("/") ||
     url.startsWith("//") ||
     rawTraversalSegment.test(rawPath)

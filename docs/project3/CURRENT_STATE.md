@@ -1,6 +1,6 @@
 # Project 3 Current State
 
-Last updated: 2026-07-28
+Last updated: 2026-07-29
 
 ## Current position
 
@@ -12,14 +12,14 @@ Last updated: 2026-07-28
 | V2-0 through V2-2                                         | Complete                                        | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                        | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                        | `REPORTED`                                                                |
-| Current product package                                   | V2-3 Package C — Staff Frontend                 | `AUTHORIZED` and started                                                  |
+| Current product package                                   | V2-3 Package C — Custom STAFF Frontend          | Approved and complete                                                     |
 | Package C1                                                | Repository and route readiness                  | Complete                                                                  |
 | Package C2                                                | Design requirements lock                        | Complete                                                                  |
 | Package C3                                                | Staff application shell                         | Implementation, focused corrections, and focused QA approved and complete |
 | Package C4                                                | STAFF Dashboard Presentation                    | Approved and complete; independent QA passed with non-blocking notes      |
-| Package C5                                                | Compatibility and Authorization UX              | Partial implementation verified; authenticated role-state QA pending      |
-| Package C6                                                | Package verification                            | Not started                                                               |
-| Package C Git delivery                                    | C3/C4 baseline and partial C5 preparation       | Verified and included in the current baseline commit                      |
+| Package C5                                                | Compatibility and Authorization UX              | Approved and complete; final focused QA passed with no blockers            |
+| Package C6                                                | Final Package C Verification and Closure         | Approved and complete; final verification passed with no blockers         |
+| Package C Git delivery                                    | Final closure delivery                           | Final six-file closure commit and push owner-authorized                   |
 
 ## Repository state at CTRL-001 start
 
@@ -54,22 +54,32 @@ Last updated: 2026-07-28
 
 ## Current management objective
 
-> Deliver the verified C3/C4 baseline and partial C5 preparation, then complete the remaining C5 and C6 work in the approved isolated follow-up.
+> Preserve the completed Package C closure and stop before Package D
+> implementation begins.
 
 ## Risks and blockers
 
 - Historical completion statuses remain `REPORTED` until separately verified.
-- Package C is authorized and active, but it is not complete.
+- Package C — Custom STAFF Frontend is approved and complete.
+- C1 through C6 are approved and complete.
 - C3 implementation, focused corrections, and focused QA are approved and complete.
 - C4 is approved and complete; independent QA passed with non-blocking notes.
-- Authenticated browser, physical-device, and real screen-reader testing were not performed because database access was prohibited.
-- Partial C5 compatibility and authorization UX preparation passed focused unit, component, authorization, build, and unauthenticated browser checks.
-- Authenticated STUDENT, disabled STAFF, zero-capability STAFF, missing-capability, stale-session, and legacy ADMIN browser verification remains pending.
-- C6 has not started.
-- This baseline delivery does not close C5, C6, Package C, or V2-3.
+- C5 is approved and complete.
+- C5 final focused QA passed with no blockers.
+- C6 final verification passed with no blockers.
+- Focused Package C verification passed: 16 files and 209 tests.
+- Full verification passed: 39 files and 439 tests.
+- Three database-integration files and 39 tests were safely skipped.
+- Lint, typecheck, production build, and `git diff --check` passed.
+- Authenticated browser, physical-device, real screen-reader, and
+  database-integration verification remain non-blocking limitations.
+- V2-3 remains the active phase.
+- Package D is next and has not started.
+- Package E has not started.
 
 ## Next approved management action
 
-After the baseline is committed and synchronized, create the approved isolated Package C worktree to complete C5 and C6. Do not begin Package D, Package E, or V2-4 from this recovery task.
+Package D — Account and Capability Management is next. Do not begin it
+without its separately approved task package.
 
 See [ROADMAP.md](ROADMAP.md) for sequencing and [TASK_PACKAGE.md](TASK_PACKAGE.md) for the closed CTRL-001 record.

@@ -89,26 +89,29 @@ Status: `REPORTED COMPLETE`
 - Typed audit
 - PostgreSQL integration safety
 
-#### Package C — Staff frontend
+#### Package C — Custom STAFF Frontend
 
-Status: `ACTIVE — C3/C4 BASELINE VERIFIED; C5 PARTIAL; C6 NOT STARTED`
+Status: `APPROVED AND COMPLETE`
 
 - C1 Repository and route readiness — Complete
 - C2 Design requirements lock — Complete
 - C3 Staff application shell — Implementation, focused corrections, and focused QA approved and complete
 - C4 STAFF Dashboard Presentation — Approved and complete; independent QA passed with non-blocking notes
-- C5 Compatibility and authorization UX — Partial implementation verified; authenticated role-state QA and closure remain pending
-- C6 Package verification — Not started
+- C5 Compatibility and authorization UX — Approved and complete; final focused QA passed with no blockers
+- C6 Final Package C Verification and Closure — Approved and complete; final verification passed with no blockers
 
-Package C remains incomplete. The C3/C4 baseline and partial C5 preparation
-passed focused verification. Authenticated browser, physical-device, and real
-screen-reader testing were not performed because database access was
-prohibited. Remaining C5 role-state verification and all C6 package
-verification must be completed in the approved follow-up.
+Package C is approved and complete. C1 through C6 are approved and complete.
+C5 final focused QA passed with no blockers. C6 final verification passed with
+no blockers. Final evidence includes 16 focused files and 209 passing tests; 39
+full-suite files and 439 passing tests; three database-integration files and 39
+tests safely skipped; and passing lint, typecheck, production build, and
+`git diff --check`. Authenticated browser, physical-device, real screen-reader,
+and database-integration verification remain documented non-blocking
+limitations.
 
-#### Package D — Accounts and capability management
+#### Package D — Account and Capability Management
 
-Status: `PLANNED`
+Status: `NOT STARTED — NEXT PACKAGE`
 
 - Staff inventory
 - Student account management
@@ -118,7 +121,7 @@ Status: `PLANNED`
 
 #### Package E — Admin-to-Staff conversion
 
-Status: `PLANNED`
+Status: `NOT STARTED`
 
 - Conversion readiness
 - Controlled conversion

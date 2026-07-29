@@ -1,6 +1,6 @@
 // @vitest-environment node
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   cookieDelete: vi.fn(),
@@ -36,6 +36,7 @@ import {
 
 const redirectSignal = new Error("NEXT_REDIRECT_TEST_SIGNAL");
 const authenticationSecret = "test-authentication-secret-value-1234";
+const previousAuthenticationSecret = process.env.AUTH_SECRET;
 
 function loginFormData(): FormData {
   const formData = new FormData();
@@ -51,6 +52,14 @@ beforeEach(() => {
   mocks.redirect.mockImplementation(() => {
     throw redirectSignal;
   });
+});
+
+afterEach(() => {
+  if (previousAuthenticationSecret === undefined) {
+    delete process.env.AUTH_SECRET;
+  } else {
+    process.env.AUTH_SECRET = previousAuthenticationSecret;
+  }
 });
 
 describe("authentication session history lifecycle", () => {
@@ -98,18 +107,28 @@ describe("authentication session history lifecycle", () => {
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
 
-  it("replaces a suspicious raw callback before passing it to Auth.js", async () => {
-    mocks.signIn.mockResolvedValue("https://portal.sist.example/auth/continue");
-    const formData = loginFormData();
-    formData.set("callbackUrl", "/student/%252f..%252fadmin");
+  it.each([
+    "/student/%252f..%252fadmin",
+    "/student/%25%32%66..%25%32%66admin",
+    "/student/%25%32%65%25%32%65/admin",
+    "/staff/%2520",
+  ])(
+    "replaces the suspicious raw callback %s before passing it to Auth.js",
+    async (callbackUrl) => {
+      mocks.signIn.mockResolvedValue(
+        "https://portal.sist.example/auth/continue",
+      );
+      const formData = loginFormData();
+      formData.set("callbackUrl", callbackUrl);
 
-    await expect(loginAction(formData)).rejects.toBe(redirectSignal);
+      await expect(loginAction(formData)).rejects.toBe(redirectSignal);
 
-    expect(mocks.signIn).toHaveBeenCalledWith(
-      "credentials",
-      expect.objectContaining({ redirectTo: "/auth/continue" }),
-    );
-  });
+      expect(mocks.signIn).toHaveBeenCalledWith(
+        "credentials",
+        expect.objectContaining({ redirectTo: "/auth/continue" }),
+      );
+    },
+  );
 
   it("clears previous-session evidence after explicit sign-out", async () => {
     mocks.signOut.mockResolvedValue(new Response());
