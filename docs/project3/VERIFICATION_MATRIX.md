@@ -52,9 +52,11 @@ See [TASK_PACKAGE.md](TASK_PACKAGE.md) for permissions and [ARCHITECTURE.md](ARC
 
 ## Package D expected verification
 
-Status: Package D remains active and incomplete. D1 and D2 are approved and
-complete. D3 — Student Account Management implementation and required
-validation are complete and await independent QA. D4 through D7 have not
+Status: Package C remains approved and complete. Package D remains active and
+incomplete. D1 and D2 are approved and complete. D3 — Student Account
+Management implementation and required validation are complete, and the final
+independent QA decision is `APPROVED`. D4 — STAFF Inventory and Lifecycle is
+authorized next and has not started. D4 through D7 and Package E have not
 started.
 
 ### D1 documentation checks
@@ -135,8 +137,8 @@ approved and complete.
 - Database access, migrations, seeds, PostgreSQL tests, commit, push, and
   upstream configuration: not performed.
 
-D3 implementation and required validation are complete. D3 awaits independent
-QA and is not yet approved.
+This implementation-validation checkpoint preceded independent QA. The
+historical correction evidence and final approval are recorded below.
 
 ### D3 independent-QA correction validation
 
@@ -167,8 +169,9 @@ QA and is not yet approved.
 - Database access, migrations, seeds, PostgreSQL tests, dependency changes,
   commit, push, and upstream configuration: not performed.
 
-D3 correction implementation and required validation are complete. D3 awaits
-independent re-QA and is not yet approved.
+D3 correction implementation and required validation were complete at this
+historical checkpoint. The subsequent ordering correction and final approval
+are recorded below.
 
 ### D3 success-feedback ordering re-QA correction
 
@@ -198,11 +201,26 @@ independent re-QA and is not yet approved.
 - Database access, migrations, seeds, PostgreSQL tests, dependency changes,
   commit, push, and upstream configuration: not performed.
 
-D3 remains active and incomplete. The final re-QA blocker is corrected and D3
-awaits final focused independent re-QA; D3 is not approved. D4 through D7 and
-Package E remain not started. All Package D changes remain unstaged.
+At this historical checkpoint, the final re-QA blocker was corrected and all
+Package D changes remained unstaged. The later final independent QA decision is
+`APPROVED`; the Git delivery is recorded below.
 
-### D3 through D7 expected implementation evidence
+### D3 final independent QA approval and Git delivery
+
+- Final independent D3 QA decision: `APPROVED`.
+- D3 implementation, corrections, and required validation are complete and
+  approved.
+- D1 through D3 were committed and pushed in
+  `fd1695232e40295b145b99d6a7fdfd6d697cb995`.
+- Local and remote Package D refs are aligned at that commit.
+- The historical `CORRECTIONS REQUIRED` and subsequent re-QA correction
+  evidence above remain part of the verification record.
+- D4 — STAFF Inventory and Lifecycle is the next authorized task and has not
+  started.
+- D4 through D7 and Package E have not started.
+- Package D remains active and incomplete.
+
+### D3 through D7 implementation evidence
 
 - Student approval, disable, and reactivation lifecycle tests
 - STAFF disable and reactivation tests, including transaction, audit,

@@ -195,6 +195,7 @@ This append-oriented register records approved product, architecture, security, 
 
 ## Package D implementation status
 
+- Package C remains approved and complete.
 - D1 is approved and complete.
 - D2 shared account-management read contracts, authorization composition,
   runtime schemas, and encrypted opaque account references are implemented and
@@ -211,7 +212,13 @@ This append-oriented register records approved product, architecture, security, 
 - Subsequent re-QA found one remaining success-feedback ordering blocker. The
   active modal now closes before local external success state is published, and
   the behavioral ordering regression test passes.
-- D3 awaits final focused independent re-QA and is not yet approved.
+- D3 final independent QA decision is `APPROVED`.
+- D3 is complete, approved, committed, and pushed with D1 and D2 in
+  `fd1695232e40295b145b99d6a7fdfd6d697cb995`.
+- D4 — STAFF Inventory and Lifecycle is the next authorized Package D task and
+  has not started.
 - D4 through D7 and Package E have not started.
 - No database access, migration, dependency change, commit, push, or upstream
-  configuration occurred during D3.
+  configuration occurred during D3 implementation or correction validation;
+  the later approved D1–D3 Git delivery is recorded above.
+- Package D remains active and incomplete.
