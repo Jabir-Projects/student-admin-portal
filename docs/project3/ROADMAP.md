@@ -111,13 +111,27 @@ limitations.
 
 #### Package D — Account and Capability Management
 
-Status: `NOT STARTED — NEXT PACKAGE`
+Status: `ACTIVE AND INCOMPLETE — D3 CORRECTED; INDEPENDENT RE-QA NEXT`
 
-- Staff inventory
-- Student account management
-- Capability management
-- Staff lifecycle management
-- Verification
+- D1 — Readiness and Scope Lock — Approved and complete
+- D2 — Shared Account-Management Read Contracts and Schemas — Implementation, corrections, security review, and final focused QA approved and complete; final QA passed with no blockers
+- D3 — Student Account Management — Implementation and required validation
+  complete; two confirmed independent-QA blockers corrected and validated;
+  the remaining re-QA success-feedback ordering blocker corrected and
+  validated; awaiting final focused independent re-QA; not yet approved
+- D4 — STAFF Inventory and Lifecycle — Not started
+- D5 — Capability Assignment Management — Not started
+- D6 — Destructive-Action and Edge-State UX — Not started
+- D7 — Package D Verification and Closure — Not started
+
+Package D manages existing STAFF accounts only; STAFF creation and role changes
+are excluded. Student management is capability-sectioned, STAFF lifecycle and
+capability assignment remain separately authorized, audit writes remain
+transactional while Audit Log viewing stays in V2-7, and Package D introduces no
+new dependency, schema change, or migration.
+
+The historical D3 independent-QA and subsequent re-QA results remain preserved;
+the correction passes do not approve D3.
 
 #### Package E — Admin-to-Staff conversion
 

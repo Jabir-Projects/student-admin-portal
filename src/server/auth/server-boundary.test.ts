@@ -31,6 +31,12 @@ describe("server-only architecture", () => {
     "src/server/auth/dal.ts",
     "src/server/auth/dal.node.ts",
     "src/server/auth/session-routing.ts",
+    "src/server/account-management/account-reference.node.ts",
+    "src/server/account-management/authorization.node.ts",
+    "src/server/account-management/legacy-admin-student-actions.node.ts",
+    "src/server/account-management/reads.ts",
+    "src/server/account-management/reads.node.ts",
+    "src/server/account-management/student-actions.node.ts",
     "src/test/package-b-test-database.node.ts",
   ])("marks %s as server-only", (relativePath) => {
     expect(source(relativePath)).toMatch(/^import "server-only";/u);

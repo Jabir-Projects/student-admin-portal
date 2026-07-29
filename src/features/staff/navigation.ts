@@ -35,11 +35,10 @@ const staffNavigation: readonly StaffNavigationItem[] = [
     label: "Student Accounts",
     href: "/staff/student-accounts",
     icon: "students",
-    available: false,
+    available: true,
     requiredCapabilities: [
       "MANAGE_STUDENT_ACCOUNTS",
       "REACTIVATE_STUDENT_ACCOUNTS",
-      "EXPORT_STUDENT_DATA",
     ],
   },
   {

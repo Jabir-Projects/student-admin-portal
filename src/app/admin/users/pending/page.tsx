@@ -1,10 +1,11 @@
-import {
-  approveAction,
-  disableByEmailAction,
-  disableAction,
-} from "@/app/admin/users/pending/actions";
+import { redirect } from "next/navigation";
+
+import { legacyStudentAccountAction } from "@/app/admin/users/pending/actions";
 import { Button } from "@/components/ui/button";
+import { createAccountReference } from "@/server/account-management/account-reference.node";
 import { requireCapability } from "@/server/auth/capabilities";
+import { requireActiveUser } from "@/server/auth/dal";
+import { getAuthenticationSecret } from "@/server/auth/env";
 import { db } from "@/server/db";
 
 const resultMessages = {
@@ -19,6 +20,8 @@ export default async function PendingUsersPage({
 }: {
   searchParams: Promise<{ result?: string }>;
 }) {
+  const user = await requireActiveUser(["STAFF", "ADMIN"]);
+  if (user.role === "STAFF") redirect("/staff/student-accounts");
   await requireCapability("MANAGE_STUDENT_ACCOUNTS");
   const { result } = await searchParams;
   const resultMessage =
@@ -37,6 +40,20 @@ export default async function PendingUsersPage({
       },
     },
   });
+  const referenceSecret = getAuthenticationSecret(process.env);
+  if (!referenceSecret) {
+    throw new Error("Authentication secret is unavailable.");
+  }
+  const pendingAccounts = users.map((user) => ({
+    accountReference: createAccountReference(
+      "student",
+      user.id,
+      referenceSecret,
+    ),
+    fullName: user.fullName,
+    createdAt: user.createdAt,
+    studentProfile: user.studentProfile,
+  }));
   return (
     <main className="mx-auto max-w-5xl px-4 py-12">
       <h1 className="text-3xl font-semibold">Pending student accounts</h1>
@@ -53,35 +70,48 @@ export default async function PendingUsersPage({
         </p>
       ) : null}
       <div className="mt-8 space-y-4">
-        {users.length === 0 ? (
+        {pendingAccounts.length === 0 ? (
           <p>No accounts are pending approval.</p>
         ) : (
-          users.map((user) => (
-            <article className="rounded-lg border p-5" key={user.id}>
-              <h2 className="font-semibold">{user.fullName}</h2>
+          pendingAccounts.map((account) => (
+            <article
+              className="rounded-lg border p-5"
+              key={account.accountReference}
+            >
+              <h2 className="font-semibold">{account.fullName}</h2>
               <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
                 <div>
                   <dt className="text-muted-foreground">Student Number</dt>
-                  <dd>{user.studentProfile?.studentNumber}</dd>
+                  <dd>{account.studentProfile?.studentNumber}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Program</dt>
-                  <dd>{user.studentProfile?.program}</dd>
+                  <dd>{account.studentProfile?.program}</dd>
                 </div>
                 <div>
                   <dt className="text-muted-foreground">Academic Year</dt>
-                  <dd>{user.studentProfile?.academicYear}</dd>
+                  <dd>{account.studentProfile?.academicYear}</dd>
                 </div>
               </dl>
               <div className="mt-4 flex gap-3">
-                <form action={approveAction}>
-                  <input name="targetUserId" type="hidden" value={user.id} />
+                <form action={legacyStudentAccountAction}>
+                  <input name="intent" type="hidden" value="approve-student" />
+                  <input
+                    name="accountReference"
+                    type="hidden"
+                    value={account.accountReference}
+                  />
                   <Button size="sm" type="submit">
                     Approve
                   </Button>
                 </form>
-                <form action={disableAction}>
-                  <input name="targetUserId" type="hidden" value={user.id} />
+                <form action={legacyStudentAccountAction}>
+                  <input name="intent" type="hidden" value="disable-student" />
+                  <input
+                    name="accountReference"
+                    type="hidden"
+                    value={account.accountReference}
+                  />
                   <Button size="sm" type="submit" variant="destructive">
                     Disable
                   </Button>
@@ -91,29 +121,6 @@ export default async function PendingUsersPage({
           ))
         )}
       </div>
-      <section className="mt-10 border-t pt-6">
-        <h2 className="text-lg font-semibold">Disable a student account</h2>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Enter the exact registered email address to disable a pending or
-          active student account.
-        </p>
-        <form
-          action={disableByEmailAction}
-          className="mt-4 flex max-w-xl gap-3"
-        >
-          <input
-            className="border-input bg-background h-10 flex-1 rounded-md border px-3 text-sm"
-            name="email"
-            type="email"
-            autoComplete="off"
-            maxLength={320}
-            required
-          />
-          <Button type="submit" variant="destructive">
-            Disable account
-          </Button>
-        </form>
-      </section>
     </main>
   );
 }

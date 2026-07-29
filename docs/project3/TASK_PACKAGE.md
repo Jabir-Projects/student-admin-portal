@@ -1,4 +1,4 @@
-# Closed Project 3 Task Package
+# Project 3 Task Package Register
 
 This file preserves the historical CTRL-001 package record. Its Package C
 restrictions describe CTRL-001 scope and are not the current Package C status.
@@ -12,7 +12,10 @@ See the current authorization addendum at the end of this file.
 | Name   | Create Project 3 control documents |
 | Status | `CLOSED`                           |
 
-Only one control package may be active at a time. `CTRL-001` is closed, and no control package is currently active.
+Only one control package may be active at a time. `CTRL-001` is closed. V2-3
+Package D remains active and incomplete. D2 is approved and complete. D3
+implementation, blocker corrections, and required validation are complete;
+independent re-QA remains.
 
 ## Status lifecycle
 
@@ -159,9 +162,124 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIO
   database-integration verification remain documented non-blocking
   limitations.
 - V2-3 remains the active phase.
-- Package D — Account and Capability Management is next and has not started.
+- Package D — Account and Capability Management remains active and incomplete.
+  D1 and D2 are approved and complete; D3 implementation and required
+  validation are complete, with independent QA remaining.
 - Package E has not started.
 - The owner-authorized final Package C closure includes one six-file commit and
   a normal push to the existing upstream branch.
 - Package C closure does not authorize Package D or Package E implementation,
   V2-4 work, database access, migrations, integration execution, or deployment.
+
+## Active Package D authorization
+
+| Field  | Value                                                 |
+| ------ | ----------------------------------------------------- |
+| ID     | `V2-3-D`                                              |
+| Name   | Account and Capability Management                     |
+| Status | `ACTIVE AND INCOMPLETE — D3 AWAITS INDEPENDENT RE-QA` |
+
+### Objective
+
+Manage existing student and STAFF account lifecycles and STAFF capability
+assignments through capability-scoped, database-revalidated server boundaries.
+
+### Locked mini-phases
+
+1. D1 — Readiness and Scope Lock — Approved and complete
+2. D2 — Shared Account-Management Read Contracts and Schemas — Implementation,
+   corrections, security review, and final focused QA approved and complete;
+   final QA passed with no blockers
+3. D3 — Student Account Management — Implementation and required validation
+   complete; two confirmed independent-QA blockers corrected and validated;
+   awaiting independent re-QA; not yet approved
+4. D4 — STAFF Inventory and Lifecycle — Not started
+5. D5 — Capability Assignment Management — Not started
+6. D6 — Destructive-Action and Edge-State UX — Not started
+7. D7 — Package D Verification and Closure — Not started
+
+The current task authorizes only D3 Student Account Management implementation,
+focused validation, and truthful control-document synchronization. It does not
+authorize database access, migrations, seeds, dependency changes, Git writes,
+or deployment. D4 through D7 have not started.
+
+### Included scope
+
+- Manage existing STAFF accounts only; STAFF account creation is excluded.
+- Reactivate disabled STAFF accounts with `MANAGE_STAFF_ACCOUNTS`.
+- Use database revalidation, a transaction, required audit logging,
+  `sessionVersion` invalidation, and final-manager protection where relevant for
+  STAFF reactivation.
+- After `/staff/student-accounts` exists, redirect STAFF safely from
+  `/admin/users/pending` to that STAFF route. Preserve temporary legacy `ADMIN`
+  compatibility until Package E without an `ADMIN` authorization bypass.
+- Provide one capability-aware student-account page:
+  - `MANAGE_STUDENT_ACCOUNTS` controls pending and active views, approval, and
+    disabling.
+  - `REACTIVATE_STUDENT_ACCOUNTS` controls disabled views and reactivation.
+  - An actor with only one capability sees only its authorized section.
+- Show STAFF capability assignments only with
+  `MANAGE_STAFF_CAPABILITIES`; `MANAGE_STAFF_ACCOUNTS` alone authorizes neither
+  viewing nor changing assignments.
+- Continue transactional audit writes. Audit Log viewing is excluded and
+  remains planned for V2-7.
+- Default pagination to 25 records and cap it at 50.
+- Search students by full name or student number and STAFF by full name.
+- Order pending accounts oldest first with a deterministic stable secondary
+  key.
+- Resolve mutation targets server-side from safe opaque references rather than
+  visibly exposing raw database IDs.
+- Require clear confirmation for approve, reactivate, and grant. Require
+  stronger destructive confirmation for disable and revoke.
+- Prevent duplicate submissions and provide safe success or failure feedback.
+- Use Native Server Actions with runtime Zod validation.
+
+### Excluded scope
+
+- STAFF account creation.
+- Role-changing UI or mutations; legacy `ADMIN` conversion belongs to Package
+  E.
+- Audit Log viewing, which remains planned for V2-7.
+- New dependencies, schema changes, and migrations.
+- Database access or mutation during D1.
+- Application implementation during D1.
+- Commit, push, merge, rebase, reset, restore, stash, branch switching, branch
+  creation, and worktree creation.
+
+### Acceptance criteria for D1
+
+- Package C is recorded as complete.
+- Package D is recorded as active at D1 with no application implementation
+  started.
+- Package E is recorded as not started.
+- All approved Package D decisions and all seven mini-phases are consistent
+  across the required control documents.
+- The Package D worktree, branch, HEAD, clean starting state, and absent upstream
+  are recorded truthfully.
+- Cross-document consistency, relative links, placeholder and secret patterns,
+  and `git diff --check` pass.
+- Only the required project-control documents are modified.
+- No commit or push occurs.
+
+### Repository state after D2 approval
+
+- Worktree: `D:\PROJECT 3\PROJECT 3 SIST-v2-3-agent-d`
+- Branch: `codex/v2-3-d-account-management`
+- HEAD: `29f0195ae9563ed19894d1687691012cf7d9b27b`
+- Upstream: none
+- D1: approved and complete
+- D2: implementation, corrections, security review, and final focused QA
+  approved and complete; final QA passed with no blockers
+- D3: implementation, two confirmed QA blocker corrections, the remaining
+  re-QA success-feedback ordering correction, and required validation complete;
+  awaiting final focused independent re-QA
+- D4 through D7: not started
+- Package E: not started
+- Commit and push: none
+- Index: empty
+- Working tree: all D1 through D3 changes remain unstaged
+- Historical independent D3 QA decision: `CORRECTIONS REQUIRED`
+
+See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md),
+[DECISIONS.md](DECISIONS.md), and
+[VERIFICATION_MATRIX.md](VERIFICATION_MATRIX.md).
