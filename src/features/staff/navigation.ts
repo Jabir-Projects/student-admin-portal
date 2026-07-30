@@ -103,7 +103,7 @@ const staffNavigation: readonly StaffNavigationItem[] = [
     label: "Staff & Capabilities",
     href: "/staff/staff-capabilities",
     icon: "staff",
-    available: false,
+    available: true,
     requiredCapabilities: [
       "MANAGE_STAFF_ACCOUNTS",
       "MANAGE_STAFF_CAPABILITIES",

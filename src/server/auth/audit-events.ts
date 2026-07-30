@@ -11,6 +11,7 @@ export type AuthorizationAuditAction =
   | "ACCOUNT_APPROVED"
   | "ACCOUNT_DISABLED"
   | "ACCOUNT_REACTIVATED"
+  | "STAFF_ACCOUNT_CREATED"
   | "CAPABILITY_GRANTED"
   | "CAPABILITY_REVOKED"
   | "STAFF_ROLE_CHANGED";
@@ -42,6 +43,20 @@ export function accountStatusAuditEvent(input: {
       previousStatus: input.previousStatus,
       newStatus: input.newStatus,
     },
+  };
+}
+
+export function staffAccountCreatedAuditEvent(input: {
+  actorId: string;
+  targetUserId: string;
+  initialCapabilityCount: number;
+}): TypedAuditEvent {
+  return {
+    actorId: input.actorId,
+    action: "STAFF_ACCOUNT_CREATED",
+    entityType: "User",
+    entityId: input.targetUserId,
+    metadata: { initialCapabilityCount: input.initialCapabilityCount },
   };
 }
 

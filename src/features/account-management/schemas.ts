@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 import { CAPABILITIES } from "@/features/auth/constants";
+import {
+  normalizeEmail,
+  normalizeFullName,
+} from "@/features/auth/normalization";
 
 const noControlCharacters = /^[^\u0000-\u001F\u007F]*$/u;
 const normalizedSearch = z
@@ -49,10 +53,47 @@ export const studentAccountActionInputSchema = z
   })
   .strict();
 
+export const staffAccountActionInputSchema = z.discriminatedUnion("intent", [
+  z
+    .object({
+      intent: z.enum(["disable-staff", "reactivate-staff"]),
+      accountReference: accountReferenceSchema,
+    })
+    .strict(),
+  z
+    .object({
+      intent: z.enum(["grant-capability", "revoke-capability"]),
+      accountReference: accountReferenceSchema,
+      capability: capabilityNameSchema,
+    })
+    .strict(),
+  z
+    .object({
+      intent: z.literal("create-staff"),
+      fullName: z
+        .string()
+        .transform(normalizeFullName)
+        .pipe(z.string().min(2).max(200)),
+      email: z.string().transform(normalizeEmail).pipe(z.email().max(320)),
+      password: z.string().min(12).max(128),
+      capabilities: z.array(capabilityNameSchema).max(CAPABILITIES.length),
+    })
+    .strict(),
+]);
+
 export const studentAccountPageQuerySchema = z
   .object({
     search: normalizedSearch.default(""),
     status: z.enum(["all", "pending", "active", "disabled"]).default("all"),
+    page: z.coerce.number().int().min(1).max(10_000).default(1),
+    pageSize: z.coerce.number().int().min(1).max(50).default(25),
+  })
+  .strict();
+
+export const staffAccountPageQuerySchema = z
+  .object({
+    search: normalizedSearch.default(""),
+    status: z.enum(["all", "active", "disabled"]).default("all"),
     page: z.coerce.number().int().min(1).max(10_000).default(1),
     pageSize: z.coerce.number().int().min(1).max(50).default(25),
   })
@@ -103,4 +144,7 @@ export type CapabilityAssignmentReadInput = z.input<
 >;
 export type StudentAccountPageQuery = z.output<
   typeof studentAccountPageQuerySchema
+>;
+export type StaffAccountPageQuery = z.output<
+  typeof staffAccountPageQuerySchema
 >;

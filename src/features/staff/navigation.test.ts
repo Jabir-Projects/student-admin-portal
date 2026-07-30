@@ -49,4 +49,13 @@ describe("STAFF capability-aware navigation", () => {
       "Settings",
     ]);
   });
+
+  it("activates Package D for either STAFF management capability", () => {
+    expect(labelsFor(["MANAGE_STAFF_ACCOUNTS"])).toContain(
+      "Staff & Capabilities",
+    );
+    expect(labelsFor(["MANAGE_STAFF_CAPABILITIES"])).toContain(
+      "Staff & Capabilities",
+    );
+  });
 });

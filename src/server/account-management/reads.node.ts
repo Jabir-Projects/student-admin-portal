@@ -65,6 +65,7 @@ export type StaffAccountView = {
   status: Extract<AccountStatusValue, "ACTIVE" | "DISABLED">;
   createdAt: Date;
   disabledAt: Date | null;
+  isCurrentActor: boolean;
 };
 
 export type StaffCapabilityAssignmentView = {
@@ -72,6 +73,7 @@ export type StaffCapabilityAssignmentView = {
   fullName: string;
   status: Extract<AccountStatusValue, "ACTIVE" | "DISABLED">;
   capabilities: readonly CapabilityValue[];
+  isCurrentActor: boolean;
 };
 
 type ParsedPageInput = {
@@ -317,6 +319,7 @@ export async function readStaffInventory(
         status: user.status as StaffAccountView["status"],
         createdAt: user.createdAt,
         disabledAt: user.disabledAt,
+        isCurrentActor: user.id === authorization.actor.id,
       })),
     );
   } catch {
@@ -378,6 +381,7 @@ export async function readStaffCapabilityAssignments(
         capabilities: user.capabilityAssignments.map(
           ({ capability }) => capability,
         ),
+        isCurrentActor: user.id === authorization.actor.id,
       })),
     );
   } catch {

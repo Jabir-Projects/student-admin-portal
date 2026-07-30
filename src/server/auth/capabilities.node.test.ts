@@ -10,9 +10,11 @@ import {
 } from "@/server/auth/audit-events";
 import {
   changeStaffRoleAsActor,
+  createStaffAccountAsActor,
   disableStaffAccountAsActor,
   grantCapabilityAsActor,
   loadCapabilityActor,
+  reactivateStaffAccountAsActor,
   revokeCapabilityAsActor,
 } from "@/server/auth/capabilities.node";
 import { getSessionUserByClaims } from "@/server/auth/dal.node";
@@ -248,7 +250,10 @@ function managementDatabase(options: {
       create: vi.fn().mockResolvedValue({}),
       deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
-    user: { updateMany: vi.fn().mockResolvedValue({ count: 1 }) },
+    user: {
+      create: vi.fn().mockResolvedValue({ id: managedUserId }),
+      updateMany: vi.fn().mockResolvedValue({ count: 1 }),
+    },
     auditLog: { create: vi.fn().mockResolvedValue({}) },
   };
   const database = {
@@ -261,6 +266,84 @@ function managementDatabase(options: {
 }
 
 describe("runtime capability management invariants", () => {
+  it("creates an active STAFF account with initial capabilities and redacted audits in one transaction", async () => {
+    const actorRow = {
+      id: managerClaims.actorId,
+      role: "STAFF",
+      status: "ACTIVE",
+      sessionVersion: 0,
+    };
+    const fixture = managementDatabase({
+      queryPrefix: [[actorRow], [actorRow]],
+    });
+    await expect(
+      createStaffAccountAsActor(
+        managerClaims,
+        {
+          email: "sara@example.com",
+          fullName: "Sara Amrani",
+          passwordHash: "argon2id-test-hash",
+          capabilities: ["VIEW_AUDIT_LOG"],
+        },
+        fixture.database,
+      ),
+    ).resolves.toEqual({ ok: true });
+
+    expect(fixture.transaction.user.create).toHaveBeenCalledWith({
+      data: {
+        email: "sara@example.com",
+        fullName: "Sara Amrani",
+        passwordHash: "argon2id-test-hash",
+        role: "STAFF",
+        status: "ACTIVE",
+        approvedAt: expect.any(Date),
+        approvedById: managerClaims.actorId,
+        capabilityAssignments: {
+          create: [
+            {
+              capability: "VIEW_AUDIT_LOG",
+              grantedById: managerClaims.actorId,
+            },
+          ],
+        },
+      },
+      select: { id: true },
+    });
+    const auditPayload = JSON.stringify(
+      fixture.transaction.auditLog.create.mock.calls,
+    );
+    expect(auditPayload).toContain("STAFF_ACCOUNT_CREATED");
+    expect(auditPayload).toContain("CAPABILITY_GRANTED");
+    expect(auditPayload).not.toContain("sara@example.com");
+    expect(auditPayload).not.toContain("argon2id-test-hash");
+  });
+
+  it("rejects initial capability assignment when the actor lacks capability-management authority", async () => {
+    const actorRow = {
+      id: managerClaims.actorId,
+      role: "STAFF",
+      status: "ACTIVE",
+      sessionVersion: 0,
+    };
+    const fixture = managementDatabase({
+      actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+      queryPrefix: [[actorRow], [actorRow]],
+    });
+    await expect(
+      createStaffAccountAsActor(
+        managerClaims,
+        {
+          email: "sara@example.com",
+          fullName: "Sara Amrani",
+          passwordHash: "argon2id-test-hash",
+          capabilities: ["VIEW_AUDIT_LOG"],
+        },
+        fixture.database,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "MISSING_CAPABILITY" });
+    expect(fixture.transaction.user.create).not.toHaveBeenCalled();
+  });
+
   it("rejects a self-grant before loading or changing the target", async () => {
     const fixture = managementDatabase({});
     await expect(
@@ -351,6 +434,34 @@ describe("runtime capability management invariants", () => {
     expect(
       fixture.transaction.userCapabilityAssignment.create,
     ).not.toHaveBeenCalled();
+  });
+
+  it("prevents self-revocation before changing assignments", async () => {
+    const fixture = managementDatabase({
+      queryPrefix: [
+        [],
+        [
+          {
+            id: managerClaims.actorId,
+            role: "STAFF",
+            status: "ACTIVE",
+            sessionVersion: 0,
+          },
+        ],
+      ],
+    });
+    await expect(
+      revokeCapabilityAsActor(
+        managerClaims,
+        managerClaims.actorId,
+        "VIEW_AUDIT_LOG",
+        fixture.database,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "SELF_ACTION" });
+    expect(
+      fixture.transaction.userCapabilityAssignment.deleteMany,
+    ).not.toHaveBeenCalled();
+    expect(fixture.transaction.auditLog.create).not.toHaveBeenCalled();
   });
 
   it("requires explicit audited revocation before changing a capability holder to STUDENT", async () => {
@@ -494,6 +605,458 @@ describe("runtime capability management invariants", () => {
         },
       },
     });
+  });
+
+  it.each(["ADMIN", "STUDENT"] as const)(
+    "rejects disable for an exact %s target without mutating account state",
+    async (role) => {
+      const fixture = managementDatabase({
+        actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+        queryPrefix: [
+          [],
+          [
+            {
+              id: managerClaims.actorId,
+              role: "STAFF",
+              status: "ACTIVE",
+              sessionVersion: 0,
+            },
+          ],
+          [
+            {
+              id: managedUserId,
+              role,
+              status: "ACTIVE",
+              sessionVersion: 3,
+            },
+          ],
+        ],
+      });
+
+      await expect(
+        disableStaffAccountAsActor(
+          managerClaims,
+          managedUserId,
+          fixture.database,
+        ),
+      ).resolves.toEqual({
+        ok: false,
+        reason: "TARGET_NOT_ELIGIBLE",
+      });
+      expect(fixture.transaction.user.updateMany).not.toHaveBeenCalled();
+      expect(fixture.transaction.auditLog.create).not.toHaveBeenCalled();
+    },
+  );
+
+  it("reactivates only an exact disabled STAFF target with session invalidation and audit", async () => {
+    const fixture = managementDatabase({
+      actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+      queryPrefix: [
+        [],
+        [
+          {
+            id: managerClaims.actorId,
+            role: "STAFF",
+            status: "ACTIVE",
+            sessionVersion: 0,
+          },
+        ],
+        [
+          {
+            id: managedUserId,
+            role: "STAFF",
+            status: "DISABLED",
+            sessionVersion: 3,
+          },
+        ],
+      ],
+    });
+    await expect(
+      reactivateStaffAccountAsActor(
+        managerClaims,
+        managedUserId,
+        fixture.database,
+      ),
+    ).resolves.toEqual({ ok: true });
+    expect(fixture.transaction.user.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: managedUserId,
+        role: "STAFF",
+        status: "DISABLED",
+        sessionVersion: 3,
+      },
+      data: {
+        status: "ACTIVE",
+        disabledAt: null,
+        disabledById: null,
+        sessionVersion: { increment: 1 },
+      },
+    });
+    expect(fixture.transaction.auditLog.create).toHaveBeenCalledWith({
+      data: {
+        actorId: managerClaims.actorId,
+        action: "ACCOUNT_REACTIVATED",
+        entityType: "User",
+        entityId: managedUserId,
+        metadata: {
+          previousStatus: "DISABLED",
+          newStatus: "ACTIVE",
+        },
+      },
+    });
+  });
+
+  it.each([
+    ["ACTIVE", "STAFF"],
+    ["DISABLED", "ADMIN"],
+    ["DISABLED", "STUDENT"],
+  ] as const)(
+    "rejects reactivation for a %s %s target",
+    async (status, role) => {
+      const fixture = managementDatabase({
+        actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+        queryPrefix: [
+          [],
+          [
+            {
+              id: managerClaims.actorId,
+              role: "STAFF",
+              status: "ACTIVE",
+              sessionVersion: 0,
+            },
+          ],
+          [{ id: managedUserId, role, status, sessionVersion: 3 }],
+        ],
+      });
+      await expect(
+        reactivateStaffAccountAsActor(
+          managerClaims,
+          managedUserId,
+          fixture.database,
+        ),
+      ).resolves.toEqual({
+        ok: false,
+        reason: "TARGET_NOT_ELIGIBLE",
+      });
+      expect(fixture.transaction.user.updateMany).not.toHaveBeenCalled();
+      expect(fixture.transaction.auditLog.create).not.toHaveBeenCalled();
+    },
+  );
+
+  it("rejects legacy ADMIN actors transactionally on STAFF lifecycle actions", async () => {
+    for (const action of [
+      disableStaffAccountAsActor,
+      reactivateStaffAccountAsActor,
+    ]) {
+      const fixture = managementDatabase({
+        actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+        queryPrefix: [
+          [],
+          [
+            {
+              id: managerClaims.actorId,
+              role: "ADMIN",
+              status: "ACTIVE",
+              sessionVersion: 0,
+            },
+          ],
+        ],
+      });
+      await expect(
+        action(managerClaims, managedUserId, fixture.database),
+      ).resolves.toEqual({ ok: false, reason: "WRONG_ROLE" });
+      expect(fixture.transaction.user.updateMany).not.toHaveBeenCalled();
+    }
+  });
+
+  it.each([
+    [
+      "revoked capability",
+      ["MANAGE_STUDENT_ACCOUNTS"],
+      "ACTIVE",
+      0,
+      "MISSING_CAPABILITY",
+    ],
+    [
+      "disabled actor",
+      ["MANAGE_STAFF_ACCOUNTS"],
+      "DISABLED",
+      0,
+      "DISABLED_ACCOUNT",
+    ],
+    [
+      "stale actor session",
+      ["MANAGE_STAFF_ACCOUNTS"],
+      "ACTIVE",
+      2,
+      "STALE_SESSION",
+    ],
+  ] as const)(
+    "transactionally rejects a %s",
+    async (_label, actorCapabilities, status, sessionVersion, reason) => {
+      for (const action of [
+        disableStaffAccountAsActor,
+        reactivateStaffAccountAsActor,
+      ]) {
+        const fixture = managementDatabase({
+          actorCapabilities: [...actorCapabilities],
+          queryPrefix: [
+            [],
+            [
+              {
+                id: managerClaims.actorId,
+                role: "STAFF",
+                status,
+                sessionVersion,
+              },
+            ],
+          ],
+        });
+        await expect(
+          action(managerClaims, managedUserId, fixture.database),
+        ).resolves.toEqual({ ok: false, reason });
+        expect(fixture.transaction.user.updateMany).not.toHaveBeenCalled();
+        expect(fixture.transaction.auditLog.create).not.toHaveBeenCalled();
+      }
+    },
+  );
+
+  it("prevents an exact STAFF actor from disabling their own account", async () => {
+    const fixture = managementDatabase({
+      actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+      queryPrefix: [
+        [],
+        [
+          {
+            id: managerClaims.actorId,
+            role: "STAFF",
+            status: "ACTIVE",
+            sessionVersion: 0,
+          },
+        ],
+      ],
+    });
+    await expect(
+      disableStaffAccountAsActor(
+        managerClaims,
+        managerClaims.actorId,
+        fixture.database,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "SELF_ACTION" });
+    expect(fixture.transaction.user.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("returns a stale-target failure without persisting a disable or audit", async () => {
+    const fixture = managementDatabase({
+      actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+      queryPrefix: [
+        [],
+        [
+          {
+            id: managerClaims.actorId,
+            role: "STAFF",
+            status: "ACTIVE",
+            sessionVersion: 0,
+          },
+        ],
+        [
+          {
+            id: managedUserId,
+            role: "STAFF",
+            status: "ACTIVE",
+            sessionVersion: 3,
+          },
+        ],
+      ],
+    });
+    fixture.transaction.user.updateMany.mockResolvedValueOnce({ count: 0 });
+
+    await expect(
+      disableStaffAccountAsActor(
+        managerClaims,
+        managedUserId,
+        fixture.database,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "STALE_TARGET" });
+    expect(fixture.transaction.user.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: managedUserId,
+        role: "STAFF",
+        status: "ACTIVE",
+        sessionVersion: 3,
+      },
+      data: expect.objectContaining({
+        status: "DISABLED",
+        sessionVersion: { increment: 1 },
+      }),
+    });
+    expect(fixture.transaction.auditLog.create).not.toHaveBeenCalled();
+  });
+
+  it("rolls back disable status and sessionVersion when the audit write fails", async () => {
+    const persistedTarget: {
+      id: string;
+      role: "STAFF";
+      status: "ACTIVE" | "DISABLED";
+      sessionVersion: number;
+      disabledAt: Date | null;
+      disabledById: string | null;
+    } = {
+      id: managedUserId,
+      role: "STAFF",
+      status: "ACTIVE",
+      sessionVersion: 3,
+      disabledAt: null,
+      disabledById: null,
+    };
+    const queryRaw = vi
+      .fn()
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        {
+          id: managerClaims.actorId,
+          role: "STAFF",
+          status: "ACTIVE",
+          sessionVersion: 0,
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: persistedTarget.id,
+          role: persistedTarget.role,
+          status: persistedTarget.status,
+          sessionVersion: persistedTarget.sessionVersion,
+        },
+      ]);
+    const updateMany = vi.fn();
+    const auditCreate = vi
+      .fn()
+      .mockRejectedValue(new Error("audit unavailable"));
+    const transaction = vi.fn(
+      async (
+        callback: (value: {
+          $queryRaw: typeof queryRaw;
+          userCapabilityAssignment: {
+            findMany: ReturnType<typeof vi.fn>;
+            findUnique: ReturnType<typeof vi.fn>;
+          };
+          user: { updateMany: typeof updateMany };
+          auditLog: { create: typeof auditCreate };
+        }) => Promise<unknown>,
+      ) => {
+        const pendingTarget = { ...persistedTarget };
+        updateMany.mockImplementationOnce(async () => {
+          pendingTarget.status = "DISABLED";
+          pendingTarget.disabledAt = new Date();
+          pendingTarget.disabledById = managerClaims.actorId;
+          pendingTarget.sessionVersion += 1;
+          return { count: 1 };
+        });
+        const result = await callback({
+          $queryRaw: queryRaw,
+          userCapabilityAssignment: {
+            findMany: vi
+              .fn()
+              .mockResolvedValue([{ capability: "MANAGE_STAFF_ACCOUNTS" }]),
+            findUnique: vi.fn().mockResolvedValue(null),
+          },
+          user: { updateMany },
+          auditLog: { create: auditCreate },
+        });
+        Object.assign(persistedTarget, pendingTarget);
+        return result;
+      },
+    );
+    const rollbackDatabase = {
+      $transaction: transaction,
+    } as unknown as PrismaClient;
+
+    await expect(
+      disableStaffAccountAsActor(
+        managerClaims,
+        managedUserId,
+        rollbackDatabase,
+      ),
+    ).rejects.toThrow("audit unavailable");
+    expect(updateMany).toHaveBeenCalledOnce();
+    expect(auditCreate).toHaveBeenCalledOnce();
+    expect(persistedTarget).toEqual({
+      id: managedUserId,
+      role: "STAFF",
+      status: "ACTIVE",
+      sessionVersion: 3,
+      disabledAt: null,
+      disabledById: null,
+    });
+  });
+
+  it("returns a stale-target failure without writing a reactivation audit", async () => {
+    const fixture = managementDatabase({
+      actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+      queryPrefix: [
+        [],
+        [
+          {
+            id: managerClaims.actorId,
+            role: "STAFF",
+            status: "ACTIVE",
+            sessionVersion: 0,
+          },
+        ],
+        [
+          {
+            id: managedUserId,
+            role: "STAFF",
+            status: "DISABLED",
+            sessionVersion: 3,
+          },
+        ],
+      ],
+    });
+    fixture.transaction.user.updateMany.mockResolvedValueOnce({ count: 0 });
+    await expect(
+      reactivateStaffAccountAsActor(
+        managerClaims,
+        managedUserId,
+        fixture.database,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "STALE_TARGET" });
+    expect(fixture.transaction.auditLog.create).not.toHaveBeenCalled();
+  });
+
+  it("propagates audit failure so the reactivation transaction can roll back", async () => {
+    const fixture = managementDatabase({
+      actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+      queryPrefix: [
+        [],
+        [
+          {
+            id: managerClaims.actorId,
+            role: "STAFF",
+            status: "ACTIVE",
+            sessionVersion: 0,
+          },
+        ],
+        [
+          {
+            id: managedUserId,
+            role: "STAFF",
+            status: "DISABLED",
+            sessionVersion: 3,
+          },
+        ],
+      ],
+    });
+    fixture.transaction.auditLog.create.mockRejectedValueOnce(
+      new Error("audit unavailable"),
+    );
+    await expect(
+      reactivateStaffAccountAsActor(
+        managerClaims,
+        managedUserId,
+        fixture.database,
+      ),
+    ).rejects.toThrow("audit unavailable");
   });
 
   it("invalidates the target session after a compatible STAFF to ADMIN role change", async () => {

@@ -5,6 +5,8 @@ import {
   accountReferenceSchema,
   capabilityNameSchema,
   managedStudentReadInputSchema,
+  staffAccountActionInputSchema,
+  staffAccountPageQuerySchema,
   staffInventoryReadInputSchema,
   studentAccountPageQuerySchema,
 } from "@/features/account-management/schemas";
@@ -108,6 +110,82 @@ describe("Package D runtime schemas", () => {
     ).toThrow();
     expect(() =>
       studentAccountPageQuerySchema.parse({ search: ["one", "two"] }),
+    ).toThrow();
+  });
+
+  it("validates D4 lifecycle intents and full-name inventory queries", () => {
+    expect(
+      staffAccountActionInputSchema.parse({
+        intent: "disable-staff",
+        accountReference: "acct2.encrypted-reference",
+      }),
+    ).toEqual({
+      intent: "disable-staff",
+      accountReference: "acct2.encrypted-reference",
+    });
+    expect(() =>
+      staffAccountActionInputSchema.parse({
+        intent: "grant-capability",
+        accountReference: "acct2.encrypted-reference",
+      }),
+    ).toThrow();
+    expect(
+      staffAccountActionInputSchema.parse({
+        intent: "grant-capability",
+        accountReference: "acct2.encrypted-reference",
+        capability: "VIEW_AUDIT_LOG",
+      }),
+    ).toMatchObject({
+      intent: "grant-capability",
+      capability: "VIEW_AUDIT_LOG",
+    });
+    expect(() =>
+      staffAccountActionInputSchema.parse({
+        intent: "grant-capability",
+        accountReference: "acct2.encrypted-reference",
+        capability: "UNRECOGNIZED_CAPABILITY",
+      }),
+    ).toThrow();
+    expect(
+      staffAccountActionInputSchema.parse({
+        intent: "create-staff",
+        fullName: "  Sara   Amrani ",
+        email: " SARA@EXAMPLE.COM ",
+        password: "strong-password",
+        capabilities: ["MANAGE_STAFF_ACCOUNTS"],
+      }),
+    ).toMatchObject({
+      intent: "create-staff",
+      fullName: "Sara Amrani",
+      email: "sara@example.com",
+    });
+    expect(staffAccountPageQuerySchema.parse({})).toEqual({
+      search: "",
+      status: "all",
+      page: 1,
+      pageSize: 25,
+    });
+    expect(
+      staffAccountPageQuerySchema.parse({
+        search: "  Sara   Amrani ",
+        status: "disabled",
+        page: "2",
+        pageSize: "50",
+      }),
+    ).toEqual({
+      search: "Sara Amrani",
+      status: "disabled",
+      page: 2,
+      pageSize: 50,
+    });
+    expect(() =>
+      staffAccountPageQuerySchema.parse({ pageSize: "51" }),
+    ).toThrow();
+    expect(() =>
+      staffAccountPageQuerySchema.parse({ status: "pending" }),
+    ).toThrow();
+    expect(() =>
+      staffAccountPageQuerySchema.parse({ search: ["one", "two"] }),
     ).toThrow();
   });
 });
