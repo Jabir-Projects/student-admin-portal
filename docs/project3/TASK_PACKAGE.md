@@ -1,4 +1,4 @@
-# Closed Project 3 Task Package
+# Project 3 Task Package Register
 
 This file preserves the historical CTRL-001 package record. Its Package C
 restrictions describe CTRL-001 scope and are not the current Package C status.
@@ -12,7 +12,8 @@ See the current authorization addendum at the end of this file.
 | Name   | Create Project 3 control documents |
 | Status | `CLOSED`                           |
 
-Only one control package may be active at a time. `CTRL-001` is closed, and no control package is currently active.
+Only one control package may be active at a time. `CTRL-001` is closed.
+`V2-3-CF-001` is the active owner-authorized master package.
 
 ## Status lifecycle
 
@@ -158,10 +159,203 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIO
 - Authenticated browser, physical-device, real screen-reader, and
   database-integration verification remain documented non-blocking
   limitations.
-- V2-3 remains the active phase.
-- Package D — Account and Capability Management is next and has not started.
-- Package E has not started.
+- V2-3 remains the active phase under `V2-3-CF-001`.
+- Package D — Account and Capability Management is complete and pushed in
+  `1e2961af619c7025cb0f322e1cc6d4759594f2ee`.
+- Package E is the active implementation package.
 - The owner-authorized final Package C closure includes one six-file commit and
   a normal push to the existing upstream branch.
-- Package C closure does not authorize Package D or Package E implementation,
-  V2-4 work, database access, migrations, integration execution, or deployment.
+- Package C closure did not authorize later packages. The separate
+  owner-authorized `V2-3-CF-001` master package now governs Packages D through F.
+  V2-4 work, production access, and deployment remain prohibited.
+
+## Historical Package D authorization and completion
+
+| Field  | Value                                           |
+| ------ | ----------------------------------------------- |
+| ID     | `V2-3-D`                                        |
+| Name   | Account and Capability Management               |
+| Status | `COMPLETE`                                      |
+
+### Objective
+
+Manage existing student and STAFF account lifecycles and STAFF capability
+assignments through capability-scoped, database-revalidated server boundaries.
+
+### Locked mini-phases
+
+The checkpoint details below are historical Package D records. Their earlier
+“not started” statements are superseded by the final completion record and the
+active `V2-3-CF-001` package.
+
+1. D1 — Readiness and Scope Lock — Approved and complete
+2. D2 — Shared Account-Management Read Contracts and Schemas — Implementation,
+   corrections, security review, and final focused QA approved and complete;
+   final QA passed with no blockers
+3. D3 — Student Account Management — Implementation and required validation
+   complete; two confirmed independent-QA blockers corrected and validated; the
+   subsequent success-feedback ordering blocker corrected and validated; final
+   independent QA approved; committed and pushed with D1 and D2 in
+   `fd1695232e40295b145b99d6a7fdfd6d697cb995`
+4. D4 — STAFF Inventory and Lifecycle — Next authorized task; not started
+5. D5 — Capability Assignment Management — Not started
+6. D6 — Destructive-Action and Edge-State UX — Not started
+7. D7 — Package D Verification and Closure — Not started
+
+The next authorized implementation task is D4 — STAFF Inventory and Lifecycle.
+D4 has not started, and this control-document synchronization does not begin it.
+It does not authorize database access, migrations, seeds, dependency changes,
+Git writes, or deployment. D4 through D7 have not started.
+
+### Included scope
+
+- Manage existing STAFF accounts only; STAFF account creation is excluded.
+- Reactivate disabled STAFF accounts with `MANAGE_STAFF_ACCOUNTS`.
+- Use database revalidation, a transaction, required audit logging,
+  `sessionVersion` invalidation, and final-manager protection where relevant for
+  STAFF reactivation.
+- After `/staff/student-accounts` exists, redirect STAFF safely from
+  `/admin/users/pending` to that STAFF route. Preserve temporary legacy `ADMIN`
+  compatibility until Package E without an `ADMIN` authorization bypass.
+- Provide one capability-aware student-account page:
+  - `MANAGE_STUDENT_ACCOUNTS` controls pending and active views, approval, and
+    disabling.
+  - `REACTIVATE_STUDENT_ACCOUNTS` controls disabled views and reactivation.
+  - An actor with only one capability sees only its authorized section.
+- Show STAFF capability assignments only with
+  `MANAGE_STAFF_CAPABILITIES`; `MANAGE_STAFF_ACCOUNTS` alone authorizes neither
+  viewing nor changing assignments.
+- Continue transactional audit writes. Audit Log viewing is excluded and
+  remains planned for V2-7.
+- Default pagination to 25 records and cap it at 50.
+- Search students by full name or student number and STAFF by full name.
+- Order pending accounts oldest first with a deterministic stable secondary
+  key.
+- Resolve mutation targets server-side from safe opaque references rather than
+  visibly exposing raw database IDs.
+- Require clear confirmation for approve, reactivate, and grant. Require
+  stronger destructive confirmation for disable and revoke.
+- Prevent duplicate submissions and provide safe success or failure feedback.
+- Use Native Server Actions with runtime Zod validation.
+
+### Excluded scope
+
+- STAFF account creation.
+- Role-changing UI or mutations; legacy `ADMIN` conversion belongs to Package
+  E.
+- Audit Log viewing, which remains planned for V2-7.
+- New dependencies, schema changes, and migrations.
+- Database access or mutation during D1.
+- Application implementation during D1.
+- Commit, push, merge, rebase, reset, restore, stash, branch switching, branch
+  creation, and worktree creation.
+
+### Acceptance criteria for D1
+
+- Package C is recorded as complete.
+- Package D is recorded as active at D1 with no application implementation
+  started.
+- Package E is recorded as not started.
+- All approved Package D decisions and all seven mini-phases are consistent
+  across the required control documents.
+- The Package D worktree, branch, HEAD, clean starting state, and absent upstream
+  are recorded truthfully.
+- Cross-document consistency, relative links, placeholder and secret patterns,
+  and `git diff --check` pass.
+- Only the required project-control documents are modified.
+- No commit or push occurs.
+
+### Repository state after D3 approval and Git delivery
+
+- Worktree: `D:\PROJECT 3\PROJECT 3 SIST-v2-3-agent-d`
+- Branch: `codex/v2-3-d-account-management`
+- HEAD: `fd1695232e40295b145b99d6a7fdfd6d697cb995`
+- Remote ref: `origin/codex/v2-3-d-account-management` aligned with local HEAD
+- Upstream: none
+- D1: approved and complete
+- D2: implementation, corrections, security review, and final focused QA
+  approved and complete; final QA passed with no blockers
+- D3: implementation, two confirmed QA blocker corrections, the subsequent
+  success-feedback ordering correction, and required validation complete; final
+  independent QA approved
+- D4: next authorized task; not started
+- D5 through D7: not started
+- Package E: not started
+- D1–D3 commit and push:
+  `fd1695232e40295b145b99d6a7fdfd6d697cb995`
+- Index: empty before this documentation synchronization
+- Working tree: clean before this documentation synchronization
+- Historical independent D3 QA decision: `CORRECTIONS REQUIRED`
+- Final independent D3 QA decision: `APPROVED`
+
+### Final Package D completion
+
+- D4 through D7 are complete under `V2-3-CF-001`.
+- Final commit:
+  `1e2961af619c7025cb0f322e1cc6d4759594f2ee`
+- Package branch and live remote are synchronized.
+- Package E follows on the integrated Package D baseline.
+
+See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md),
+[DECISIONS.md](DECISIONS.md), and
+[VERIFICATION_MATRIX.md](VERIFICATION_MATRIX.md).
+
+## Active V2-3 master control package
+
+| Field  | Value                                           |
+| ------ | ----------------------------------------------- |
+| ID     | `V2-3-CF-001`                                   |
+| Name   | Complete and close V2-3 Packages C through F    |
+| Status | `ACTIVE`                                        |
+
+### Verified starting state
+
+- Integration worktree:
+  `D:\PROJECT 3\PROJECT 3 SIST-v2-3`
+- Integration branch:
+  `codex/v2-3-roles-auth-authorization`
+- Starting HEAD:
+  `29f0195ae9563ed19894d1687691012cf7d9b27b`
+- Package C final commit:
+  `29f0195ae9563ed19894d1687691012cf7d9b27b`
+- Package D final commit:
+  `1e2961af619c7025cb0f322e1cc6d4759594f2ee`
+- Package E starting branch HEAD:
+  `52f009f8d64a1130c25d64eecefe2bdc965b678e`
+
+### Authorized scope
+
+- Verify and preserve completed Package C.
+- Complete and integrate Package D account and capability management.
+- Implement and integrate deterministic ADMIN-to-STAFF conversion in Package E.
+- Run Package F integrated V2-3 verification.
+- Update project-control evidence, close V2-3, commit, and push.
+- Stop before V2-4.
+
+### Git and database permissions
+
+- Normal commits, pushes, and merge commits on the named V2-3 branches are
+  owner-authorized.
+- Rebase, force-push, history rewriting, deployment, and production access are
+  prohibited.
+- Migration creation is authorized.
+- Migration execution is authorized only against a proven isolated
+  non-production PostgreSQL database.
+- `prisma db push` is prohibited.
+
+### Closure checks
+
+- Targeted and complete Vitest verification, including negative authorization
+  paths.
+- PostgreSQL migration and integration verification against an isolated database.
+- Prisma format, validate, generate, and migration SQL review.
+- ESLint, strict TypeScript typecheck, production build, relevant Playwright,
+  responsive and accessibility review.
+- Secret scan, complete staged-diff review, and final Git synchronization.
+
+### Deferred-improvement rule
+
+Only non-blocking polish, physical-device review, full real-screen-reader
+testing, optional filters, and equivalent low-risk work may move to the Final
+Hardening Backlog. Security, authorization, migration-safety, build, or core
+workflow failures block closure.

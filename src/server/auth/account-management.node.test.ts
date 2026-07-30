@@ -148,6 +148,60 @@ describe("transactional actor revalidation", () => {
     expect(fixture.transaction.user.updateMany).not.toHaveBeenCalled();
   });
 
+  it("rejects a capability-bearing ADMIN when exact STAFF mode is required", async () => {
+    const fixture = mutationDatabase({
+      actorRole: "ADMIN",
+      capabilities: ["MANAGE_STUDENT_ACCOUNTS"],
+    });
+    await expect(
+      approvePendingStudentAsActor(
+        claims,
+        targetId,
+        fixture.database,
+        "STAFF_ONLY",
+      ),
+    ).resolves.toEqual({
+      ok: false,
+      message: "The account transition could not be completed.",
+    });
+    expect(fixture.transaction.$queryRaw).toHaveBeenCalledTimes(1);
+    expect(fixture.transaction.user.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("allows only a capability-bearing exact ADMIN in legacy compatibility mode", async () => {
+    const adminFixture = mutationDatabase({
+      actorRole: "ADMIN",
+      capabilities: ["MANAGE_STUDENT_ACCOUNTS"],
+    });
+    await expect(
+      approvePendingStudentAsActor(
+        claims,
+        targetId,
+        adminFixture.database,
+        "ADMIN_ONLY",
+      ),
+    ).resolves.toEqual({ ok: true });
+    expect(adminFixture.transaction.user.updateMany).toHaveBeenCalledTimes(1);
+
+    const staffFixture = mutationDatabase({
+      actorRole: "STAFF",
+      capabilities: ["MANAGE_STUDENT_ACCOUNTS"],
+    });
+    await expect(
+      approvePendingStudentAsActor(
+        claims,
+        targetId,
+        staffFixture.database,
+        "ADMIN_ONLY",
+      ),
+    ).resolves.toEqual({
+      ok: false,
+      message: "The account transition could not be completed.",
+    });
+    expect(staffFixture.transaction.$queryRaw).toHaveBeenCalledTimes(1);
+    expect(staffFixture.transaction.user.updateMany).not.toHaveBeenCalled();
+  });
+
   it("rejects a malformed target identifier without sending it to PostgreSQL", async () => {
     const fixture = mutationDatabase({});
     await expect(

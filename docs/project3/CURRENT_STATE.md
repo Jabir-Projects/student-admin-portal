@@ -1,25 +1,41 @@
 # Project 3 Current State
 
-Last updated: 2026-07-29
+Last updated: 2026-07-31
 
 ## Current position
 
-| Item                                                      | State                                           | Evidence                                                                  |
-| --------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------- |
-| Phase                                                     | V2-3 — Roles, Authentication, and Authorization | `REPORTED` Active                                                         |
-| Active control package                                    | None                                            | `VERIFIED` after CTRL-001 closure recording                               |
-| Closed control package                                    | CTRL-001 — Create Project 3 control documents   | `VERIFIED` `CLOSED`                                                       |
-| V2-0 through V2-2                                         | Complete                                        | `REPORTED`                                                                |
-| V2-3 Package A — Additive database and session foundation | Complete                                        | `REPORTED`                                                                |
-| V2-3 Package B — Backend capability authorization         | Complete                                        | `REPORTED`                                                                |
-| Current product package                                   | V2-3 Package C — Custom STAFF Frontend          | Approved and complete                                                     |
-| Package C1                                                | Repository and route readiness                  | Complete                                                                  |
-| Package C2                                                | Design requirements lock                        | Complete                                                                  |
-| Package C3                                                | Staff application shell                         | Implementation, focused corrections, and focused QA approved and complete |
-| Package C4                                                | STAFF Dashboard Presentation                    | Approved and complete; independent QA passed with non-blocking notes      |
-| Package C5                                                | Compatibility and Authorization UX              | Approved and complete; final focused QA passed with no blockers            |
-| Package C6                                                | Final Package C Verification and Closure         | Approved and complete; final verification passed with no blockers         |
-| Package C Git delivery                                    | Final closure delivery                           | Final six-file closure commit and push owner-authorized                   |
+| Item                                                      | State                                              | Evidence                                                                  |
+| --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
+| Phase                                                     | V2-3 — Roles, Authentication, and Authorization    | `VERIFIED` Active                                                         |
+| Active control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `ACTIVE`; owner-authorized master execution                               |
+| Closed control package                                    | CTRL-001 — Create Project 3 control documents      | `VERIFIED` `CLOSED`                                                       |
+| V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
+| V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
+| V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
+| Current product package                                   | V2-3 Package E — ADMIN-to-STAFF conversion          | Implementation and isolated-database verification remain                  |
+| Package C1                                                | Repository and route readiness                     | Complete                                                                  |
+| Package C2                                                | Design requirements lock                           | Complete                                                                  |
+| Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
+| Package C4                                                | STAFF Dashboard Presentation                       | Approved and complete; independent QA passed with non-blocking notes      |
+| Package C5                                                | Compatibility and Authorization UX                 | Approved and complete; final focused QA passed with no blockers           |
+| Package C6                                                | Final Package C Verification and Closure           | Approved and complete; final verification passed with no blockers         |
+| Package C Git delivery                                    | Final closure delivery                             | Final six-file closure commit and push owner-authorized                   |
+| Package D implementation                                  | Complete                                           | Final package commit `1e2961af619c7025cb0f322e1cc6d4759594f2ee` pushed   |
+| Package E                                                 | Active under V2-3-CF-001                           | Static inventory complete; implementation follows Package D integration   |
+| Package F                                                 | Not started                                        | Starts only after Package E integration                                   |
+
+## Package D final delivery state
+
+| Item                  | State                                                                  |
+| --------------------- | ---------------------------------------------------------------------- |
+| Worktree              | `VERIFIED` `D:\PROJECT 3\PROJECT 3 SIST-v2-3-agent-d`                  |
+| Branch                | `VERIFIED` `codex/v2-3-d-account-management`                           |
+| HEAD                  | `VERIFIED` `1e2961af619c7025cb0f322e1cc6d4759594f2ee`                  |
+| Remote ref            | `VERIFIED` matches local HEAD                                          |
+| Package D code        | Student, STAFF lifecycle, creation, and capability management complete |
+| Focused verification  | `VERIFIED` 12 files and 160 tests passed                               |
+| Full verification     | `VERIFIED` 52 files and 577 tests passed; 39 PostgreSQL tests skipped  |
+| Static/build gates    | Lint, typecheck, Prisma validation/generation, and webpack build passed |
 
 ## Repository state at CTRL-001 start
 
@@ -54,32 +70,28 @@ Last updated: 2026-07-29
 
 ## Current management objective
 
-> Preserve the completed Package C closure and stop before Package D
-> implementation begins.
+> Complete Package E against the integrated Package D baseline, run Package F
+> phase verification, close V2-3-CF-001, and stop before V2-4.
 
 ## Risks and blockers
 
-- Historical completion statuses remain `REPORTED` until separately verified.
-- Package C — Custom STAFF Frontend is approved and complete.
-- C1 through C6 are approved and complete.
-- C3 implementation, focused corrections, and focused QA are approved and complete.
-- C4 is approved and complete; independent QA passed with non-blocking notes.
-- C5 is approved and complete.
-- C5 final focused QA passed with no blockers.
-- C6 final verification passed with no blockers.
-- Focused Package C verification passed: 16 files and 209 tests.
-- Full verification passed: 39 files and 439 tests.
-- Three database-integration files and 39 tests were safely skipped.
-- Lint, typecheck, production build, and `git diff --check` passed.
-- Authenticated browser, physical-device, real screen-reader, and
-  database-integration verification remain non-blocking limitations.
-- V2-3 remains the active phase.
-- Package D is next and has not started.
-- Package E has not started.
+- Package C is complete and synchronized at
+  `29f0195ae9563ed19894d1687691012cf7d9b27b`.
+- Package C fresh verification passed 251 Vitest tests and 11 Playwright tests.
+- Package D is complete and pushed at
+  `1e2961af619c7025cb0f322e1cc6d4759594f2ee`.
+- The current environment has no isolated PostgreSQL configuration and Docker
+  is unavailable. Database execution remains pending after all independent
+  Package E work is complete.
+- The historical development-admin backfill migration requires a prepared
+  administrator and prevents a genuinely pristine full-history deployment.
+  Applied migration SQL will not be rewritten.
+- Physical-device and full real-screen-reader testing remain eligible for the
+  Final Hardening Backlog if browser-level checks continue to pass.
 
 ## Next approved management action
 
-Package D — Account and Capability Management is next. Do not begin it
-without its separately approved task package.
+Integrate this Package D merge with V2-3-CF-001 active, then implement Package E
+on the resulting baseline. Do not begin V2-4.
 
 See [ROADMAP.md](ROADMAP.md) for sequencing and [TASK_PACKAGE.md](TASK_PACKAGE.md) for the closed CTRL-001 record.

@@ -9,6 +9,7 @@ import type { CapabilityValue } from "@/features/auth/constants";
 import {
   accountStatusAuditEvent,
   capabilityAuditEvent,
+  staffAccountCreatedAuditEvent,
   staffRoleAuditEvent,
 } from "@/server/auth/audit-events";
 import type {
@@ -42,6 +43,9 @@ export type CapabilityMutationFailure =
 
 export type CapabilityMutationResult =
   { ok: true } | { ok: false; reason: CapabilityMutationFailure };
+
+export type CreateStaffAccountResult =
+  { ok: true } | { ok: false; reason: AuthorizationFailure | "EMAIL_IN_USE" };
 
 function validClaimedVersion(value: number | undefined): value is number {
   return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
@@ -278,6 +282,8 @@ export async function revokeCapabilityAsActor(
       "MANAGE_STAFF_CAPABILITIES",
     );
     if (!authorization.ok) return authorization;
+    if (authorization.actor.id === targetUserId)
+      return { ok: false, reason: "SELF_ACTION" };
 
     const target = await lockEligibleCapabilityTarget(
       transaction,
@@ -322,6 +328,8 @@ export async function disableStaffAccountAsActor(
       "MANAGE_STAFF_ACCOUNTS",
     );
     if (!authorization.ok) return authorization;
+    if (authorization.actor.role !== "STAFF")
+      return { ok: false, reason: "WRONG_ROLE" };
     if (authorization.actor.id === targetUserId)
       return { ok: false, reason: "SELF_ACTION" };
 
@@ -329,7 +337,8 @@ export async function disableStaffAccountAsActor(
       transaction,
       targetUserId,
     );
-    if (!target) return { ok: false, reason: "TARGET_NOT_ELIGIBLE" };
+    if (!target || target.role !== "STAFF")
+      return { ok: false, reason: "TARGET_NOT_ELIGIBLE" };
     if (await targetIsFinalActiveCapabilityManager(transaction, target.id))
       return { ok: false, reason: "LAST_CAPABILITY_MANAGER" };
 
@@ -360,6 +369,139 @@ export async function disableStaffAccountAsActor(
     });
     return { ok: true };
   });
+}
+
+export async function reactivateStaffAccountAsActor(
+  claims: ActorSessionClaims,
+  targetUserId: string,
+  database: PrismaClient,
+): Promise<CapabilityMutationResult> {
+  return database.$transaction(async (transaction) => {
+    await lockStaffCapabilityManagerInvariant(transaction);
+    const authorization = await revalidateCapabilityActorInTransaction(
+      transaction,
+      claims,
+      "MANAGE_STAFF_ACCOUNTS",
+    );
+    if (!authorization.ok) return authorization;
+    if (authorization.actor.role !== "STAFF")
+      return { ok: false, reason: "WRONG_ROLE" };
+
+    const target = await lockUserForUpdate(transaction, targetUserId);
+    if (!target || target.role !== "STAFF" || target.status !== "DISABLED") {
+      return { ok: false, reason: "TARGET_NOT_ELIGIBLE" };
+    }
+
+    const changed = await transaction.user.updateMany({
+      where: {
+        id: target.id,
+        role: "STAFF",
+        status: "DISABLED",
+        sessionVersion: target.sessionVersion,
+      },
+      data: {
+        status: "ACTIVE",
+        disabledAt: null,
+        disabledById: null,
+        sessionVersion: { increment: 1 },
+      },
+    });
+    if (changed.count !== 1) return { ok: false, reason: "STALE_TARGET" };
+
+    await transaction.auditLog.create({
+      data: accountStatusAuditEvent({
+        actorId: authorization.actor.id,
+        action: "ACCOUNT_REACTIVATED",
+        targetUserId: target.id,
+        previousStatus: "DISABLED",
+        newStatus: "ACTIVE",
+      }),
+    });
+    return { ok: true };
+  });
+}
+
+export async function createStaffAccountAsActor(
+  claims: ActorSessionClaims,
+  input: {
+    email: string;
+    fullName: string;
+    passwordHash: string;
+    capabilities: readonly CapabilityValue[];
+  },
+  database: PrismaClient,
+): Promise<CreateStaffAccountResult> {
+  try {
+    return await database.$transaction(async (transaction) => {
+      const authorization = await revalidateCapabilityActorInTransaction(
+        transaction,
+        claims,
+        "MANAGE_STAFF_ACCOUNTS",
+      );
+      if (!authorization.ok) return authorization;
+      if (authorization.actor.role !== "STAFF")
+        return { ok: false, reason: "WRONG_ROLE" };
+
+      if (input.capabilities.length > 0) {
+        const capabilityAuthorization =
+          await revalidateCapabilityActorInTransaction(
+            transaction,
+            claims,
+            "MANAGE_STAFF_CAPABILITIES",
+          );
+        if (!capabilityAuthorization.ok) return capabilityAuthorization;
+      }
+
+      const target = await transaction.user.create({
+        data: {
+          email: input.email,
+          fullName: input.fullName,
+          passwordHash: input.passwordHash,
+          role: "STAFF",
+          status: "ACTIVE",
+          approvedAt: new Date(),
+          approvedById: authorization.actor.id,
+          capabilityAssignments:
+            input.capabilities.length === 0
+              ? undefined
+              : {
+                  create: input.capabilities.map((capability) => ({
+                    capability,
+                    grantedById: authorization.actor.id,
+                  })),
+                },
+        },
+        select: { id: true },
+      });
+
+      await transaction.auditLog.create({
+        data: staffAccountCreatedAuditEvent({
+          actorId: authorization.actor.id,
+          targetUserId: target.id,
+          initialCapabilityCount: input.capabilities.length,
+        }),
+      });
+      for (const capability of input.capabilities) {
+        await transaction.auditLog.create({
+          data: capabilityAuditEvent({
+            actorId: authorization.actor.id,
+            targetUserId: target.id,
+            action: "CAPABILITY_GRANTED",
+            capability,
+          }),
+        });
+      }
+      return { ok: true };
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return { ok: false, reason: "EMAIL_IN_USE" };
+    }
+    throw error;
+  }
 }
 
 export async function changeStaffRoleAsActor(

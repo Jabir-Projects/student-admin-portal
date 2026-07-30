@@ -15,7 +15,6 @@ describe("STAFF capability-aware navigation", () => {
   it.each([
     ["MANAGE_STUDENT_ACCOUNTS", "Student Accounts"],
     ["REACTIVATE_STUDENT_ACCOUNTS", "Student Accounts"],
-    ["EXPORT_STUDENT_DATA", "Student Accounts"],
     ["PROCESS_REQUESTS", "Requests"],
     ["EXPORT_REQUEST_DATA", "Requests"],
     ["MANAGE_REQUEST_CATEGORIES", "Request Categories"],
@@ -42,4 +41,21 @@ describe("STAFF capability-aware navigation", () => {
       expect(labels).toHaveLength(4);
     },
   );
+
+  it("does not activate student management navigation for export-only access", () => {
+    expect(labelsFor(["EXPORT_STUDENT_DATA"])).toEqual([
+      "Dashboard",
+      "Profile",
+      "Settings",
+    ]);
+  });
+
+  it("activates Package D for either STAFF management capability", () => {
+    expect(labelsFor(["MANAGE_STAFF_ACCOUNTS"])).toContain(
+      "Staff & Capabilities",
+    );
+    expect(labelsFor(["MANAGE_STAFF_CAPABILITIES"])).toContain(
+      "Staff & Capabilities",
+    );
+  });
 });

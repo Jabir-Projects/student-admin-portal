@@ -3,47 +3,40 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import {
-  approvePendingStudent,
-  disableStudent,
-  disableStudentByEmail,
-} from "@/server/auth/account-management";
+import { executeLegacyAdminStudentAction } from "@/server/account-management/legacy-admin-student-actions.node";
+import { getActorSessionClaims } from "@/server/auth/capabilities";
+import { getAuthenticationSecret } from "@/server/auth/env";
+import { db } from "@/server/db";
 
-export async function approveAction(formData: FormData): Promise<void> {
-  const targetUserId = formData.get("targetUserId");
-  if (typeof targetUserId !== "string")
-    redirect("/admin/users/pending?result=rejected");
-  const result = await approvePendingStudent(targetUserId);
-  revalidatePath("/admin/users/pending");
-  redirect(
-    result.ok
-      ? "/admin/users/pending?result=approved"
-      : "/admin/users/pending?result=stale",
-  );
-}
+export async function legacyStudentAccountAction(
+  formData: FormData,
+): Promise<void> {
+  let result: Awaited<ReturnType<typeof executeLegacyAdminStudentAction>>;
+  try {
+    const secret = getAuthenticationSecret(process.env);
+    if (!secret) throw new Error("Authentication secret is unavailable.");
+    result = await executeLegacyAdminStudentAction(
+      await getActorSessionClaims(),
+      {
+        intent: formData.get("intent"),
+        accountReference: formData.get("accountReference"),
+      },
+      db,
+      secret,
+    );
+  } catch {
+    result = {
+      status: "error",
+      message: "The account action could not be completed. Refresh and retry.",
+    };
+  }
 
-export async function disableByEmailAction(formData: FormData): Promise<void> {
-  const email = formData.get("email");
-  if (typeof email !== "string")
-    redirect("/admin/users/pending?result=rejected");
-  const result = await disableStudentByEmail(email);
   revalidatePath("/admin/users/pending");
-  redirect(
-    result.ok
-      ? "/admin/users/pending?result=disabled"
-      : "/admin/users/pending?result=rejected",
-  );
-}
-
-export async function disableAction(formData: FormData): Promise<void> {
-  const targetUserId = formData.get("targetUserId");
-  if (typeof targetUserId !== "string")
-    redirect("/admin/users/pending?result=rejected");
-  const result = await disableStudent(targetUserId);
-  revalidatePath("/admin/users/pending");
-  redirect(
-    result.ok
-      ? "/admin/users/pending?result=disabled"
-      : "/admin/users/pending?result=stale",
-  );
+  const outcome =
+    result.status === "success"
+      ? formData.get("intent") === "approve-student"
+        ? "approved"
+        : "disabled"
+      : "rejected";
+  redirect(`/admin/users/pending?result=${outcome}`);
 }

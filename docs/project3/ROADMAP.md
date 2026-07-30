@@ -111,17 +111,34 @@ limitations.
 
 #### Package D — Account and Capability Management
 
-Status: `NOT STARTED — NEXT PACKAGE`
+Status: `COMPLETE — FINAL PACKAGE COMMIT PUSHED`
 
-- Staff inventory
-- Student account management
-- Capability management
-- Staff lifecycle management
-- Verification
+- D1 — Readiness and Scope Lock — Approved and complete
+- D2 — Shared Account-Management Read Contracts and Schemas — Implementation, corrections, security review, and final focused QA approved and complete; final QA passed with no blockers
+- D3 — Student Account Management — Implementation and required validation
+  complete; two confirmed independent-QA blockers corrected and validated; the
+  subsequent success-feedback ordering blocker corrected and validated; final
+  independent QA approved; committed and pushed with D1 and D2 in
+  `fd1695232e40295b145b99d6a7fdfd6d697cb995`
+- D4 — STAFF Inventory and Lifecycle — Complete
+- D5 — Capability Assignment Management — Complete
+- D6 — Destructive-Action and Edge-State UX — Complete
+- D7 — Package D Verification and Closure — Complete
+
+Package D includes student lifecycle management, authorized STAFF creation and
+lifecycle management, and assignment of the approved 18 capabilities. Server
+authorization remains database-authoritative; sensitive mutations are
+transactional with required audit behavior and final-manager protection.
+
+The historical D3 independent-QA `CORRECTIONS REQUIRED` decision and subsequent
+re-QA correction evidence remain preserved. Those correction passes did not by
+themselves approve D3; the final independent QA decision is `APPROVED`.
+Package D is complete in
+`1e2961af619c7025cb0f322e1cc6d4759594f2ee`.
 
 #### Package E — Admin-to-Staff conversion
 
-Status: `NOT STARTED`
+Status: `ACTIVE UNDER V2-3-CF-001`
 
 - Conversion readiness
 - Controlled conversion
@@ -130,7 +147,7 @@ Status: `NOT STARTED`
 
 #### Package F — Final V2-3 verification
 
-Status: `PLANNED`
+Status: `NOT STARTED — FOLLOWS PACKAGE E`
 
 - Scope inventory
 - Integrated authorization verification
