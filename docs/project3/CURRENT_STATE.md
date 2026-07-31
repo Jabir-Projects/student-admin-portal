@@ -12,7 +12,7 @@ Last updated: 2026-07-31
 | V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
-| Current product package                                   | V2-3 Package F — Integrated verification            | Active after Package E integration                                        |
+| Current product package                                   | V2-3 Package F — Integrated verification            | Owner action required for isolated PostgreSQL verification                |
 | Package C1                                                | Repository and route readiness                     | Complete                                                                  |
 | Package C2                                                | Design requirements lock                           | Complete                                                                  |
 | Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
@@ -22,7 +22,7 @@ Last updated: 2026-07-31
 | Package C Git delivery                                    | Final closure delivery                             | Final six-file closure commit and push owner-authorized                   |
 | Package D implementation                                  | Complete                                           | Final package commit `1e2961af619c7025cb0f322e1cc6d4759594f2ee` pushed   |
 | Package E                                                 | Complete                                           | Final branch `81f799af50d2aeab22ade97d350bc4c03e434b29` pushed           |
-| Package F                                                 | Active                                            | Integrated verification and closure remain                               |
+| Package F                                                 | Owner action required                             | Independent gates passed; isolated PostgreSQL closure gate remains        |
 
 ## Package D final delivery state
 
@@ -97,6 +97,14 @@ Last updated: 2026-07-31
   `81f799af50d2aeab22ade97d350bc4c03e434b29`.
 - The current environment has no isolated PostgreSQL configuration and Docker
   is unavailable. Database execution remains pending before V2-3 closure.
+- Package F non-database verification passed: ESLint, strict typecheck, 563
+  Vitest tests, Prisma format/validate/generate, Next.js production build, and
+  all 12 Playwright assertions. The Playwright assertions completed, but the
+  Windows runner timed out during web-server teardown.
+- Production dependency audit is clean after `72e69e4`. Nine high-severity
+  development-tooling findings remain in the upstream ESLint/Next plugin
+  `minimatch` chain; both the nested override and ESLint 10 remediation were
+  tested and rejected because they break lint execution.
 - The historical development-admin backfill migration requires a prepared
   administrator and prevents a genuinely pristine full-history deployment.
   Applied migration SQL will not be rewritten.
@@ -105,8 +113,8 @@ Last updated: 2026-07-31
 
 ## Next approved management action
 
-Run all independent Package F gates, then request the one isolated PostgreSQL
-owner action required for migration and database-integration verification. Do
-not begin V2-4.
+Owner must configure one isolated non-production PostgreSQL environment. Resume
+Package F at migration and database-integration verification. Do not begin
+V2-4.
 
 See [ROADMAP.md](ROADMAP.md) for sequencing and [TASK_PACKAGE.md](TASK_PACKAGE.md) for the closed CTRL-001 record.

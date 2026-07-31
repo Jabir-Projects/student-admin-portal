@@ -275,3 +275,18 @@ Status: `ACTIVE`
 - Independent SQL/security review found no validated blocker.
 - Migration execution, rollback, locks, enum replacement, audit-trigger
   interaction, and rerun behavior remain unverified against PostgreSQL.
+
+### Package F independent verification checkpoint
+
+| Check | Result |
+| --- | --- |
+| ESLint | `PASS` |
+| TypeScript strict typecheck | `PASS` |
+| Complete non-database Vitest | `PASS` — 50 files, 563 tests; 3 files and 39 PostgreSQL tests skipped |
+| Prisma format, validate, generate | `PASS` — Prisma 7.9.1 |
+| Production build | `PASS` — Next.js 16.2.12, 13 expected routes |
+| Playwright assertions | `PASS` — 12/12 across two runs; runner teardown timed out |
+| Production dependency audit | `PASS` — 0 vulnerabilities |
+| Complete dependency audit | `LIMITED` — 9 high development-only upstream lint-tool findings |
+| Migration and PostgreSQL integration | `NOT RUN` — isolated database configuration unavailable |
+| V2-3 closure | `OWNER ACTION REQUIRED` pending the PostgreSQL gate |

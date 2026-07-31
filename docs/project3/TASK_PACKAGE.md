@@ -376,3 +376,23 @@ Only non-blocking polish, physical-device review, full real-screen-reader
 testing, optional filters, and equivalent low-risk work may move to the Final
 Hardening Backlog. Security, authorization, migration-safety, build, or core
 workflow failures block closure.
+
+### Package F independent verification checkpoint
+
+- Dependency hardening commit:
+  `72e69e437706ce09367042f602308c976ca2c92f`.
+- ESLint and strict TypeScript typecheck passed.
+- Complete non-database Vitest verification passed: 50 files and 563 tests;
+  three PostgreSQL files and 39 tests skipped.
+- Prisma 7.9.1 format, validate, and generate passed.
+- Next.js 16.2.12 production build passed with 13 expected routes and no
+  retired ADMIN route.
+- All 12 Playwright assertions passed across the closure and focused rerun.
+  Both Windows invocations timed out only during web-server teardown.
+- Production dependency audit passed with zero vulnerabilities.
+- Nine development-only high-severity findings remain in the upstream
+  ESLint/Next plugin `minimatch` chain. A fixed nested dependency override and
+  the audit-recommended ESLint 10 update were both rejected after each broke
+  lint execution.
+- Isolated PostgreSQL migration execution and the 39 database integration tests
+  remain mandatory. `V2-3-CF-001` remains `ACTIVE`; V2-3 is not closed.

@@ -152,12 +152,12 @@ against an isolated PostgreSQL database remains a V2-3 closure gate.
 
 #### Package F — Final V2-3 verification
 
-Status: `ACTIVE`
+Status: `OWNER ACTION REQUIRED`
 
 - Scope inventory
 - Integrated authorization verification
 - Repository verification
-- Phase closure
+- Phase closure — pending isolated PostgreSQL migration and integration proof
 
 ### V2-4 — Institutional UI Foundation
 
