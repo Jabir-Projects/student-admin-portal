@@ -51,10 +51,8 @@ function validClaimedVersion(value: number | undefined): value is number {
   return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
 }
 
-function isStaffCompatibleRole(
-  role: UserRole,
-): role is Extract<UserRole, "STAFF" | "ADMIN"> {
-  return role === "STAFF" || role === "ADMIN";
+function isStaffRole(role: UserRole): role is Extract<UserRole, "STAFF"> {
+  return role === "STAFF";
 }
 
 function authorizeReloadedActor(
@@ -68,8 +66,7 @@ function authorizeReloadedActor(
     return { ok: false, reason: "DISABLED_ACCOUNT" };
   if (actor.status !== "ACTIVE")
     return { ok: false, reason: "INACTIVE_ACCOUNT" };
-  if (!isStaffCompatibleRole(actor.role))
-    return { ok: false, reason: "WRONG_ROLE" };
+  if (!isStaffRole(actor.role)) return { ok: false, reason: "WRONG_ROLE" };
   if (
     !validClaimedVersion(claims.claimedSessionVersion) ||
     actor.sessionVersion !== claims.claimedSessionVersion
@@ -188,7 +185,7 @@ async function targetIsFinalActiveCapabilityManager(
       JOIN "User" subject ON subject."id" = assignment."userId"
       WHERE assignment."capability" = 'MANAGE_STAFF_CAPABILITIES'
         AND subject."status" = 'ACTIVE'
-        AND subject."role" IN ('STAFF', 'ADMIN')
+        AND subject."role" = 'STAFF'
     `,
   );
   return (rows[0]?.count ?? BigInt(0)) <= BigInt(1);
@@ -199,11 +196,7 @@ async function lockEligibleCapabilityTarget(
   targetUserId: string,
 ): Promise<LockedUser | null> {
   const target = await lockUserForUpdate(transaction, targetUserId);
-  if (
-    !target ||
-    target.status !== "ACTIVE" ||
-    !isStaffCompatibleRole(target.role)
-  ) {
+  if (!target || target.status !== "ACTIVE" || !isStaffRole(target.role)) {
     return null;
   }
   return target;
@@ -528,7 +521,7 @@ export async function changeStaffRoleAsActor(
     if (!target || target.role === newRole)
       return { ok: false, reason: "TARGET_NOT_ELIGIBLE" };
 
-    const leavesStaffAuthorization = newRole !== "STAFF" && newRole !== "ADMIN";
+    const leavesStaffAuthorization = newRole !== "STAFF";
     if (
       leavesStaffAuthorization &&
       (await targetIsFinalActiveCapabilityManager(transaction, target.id))

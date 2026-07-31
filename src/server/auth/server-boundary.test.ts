@@ -33,7 +33,6 @@ describe("server-only architecture", () => {
     "src/server/auth/session-routing.ts",
     "src/server/account-management/account-reference.node.ts",
     "src/server/account-management/authorization.node.ts",
-    "src/server/account-management/legacy-admin-student-actions.node.ts",
     "src/server/account-management/reads.ts",
     "src/server/account-management/reads.node.ts",
     "src/server/account-management/student-actions.node.ts",
@@ -58,10 +57,15 @@ describe("server-only architecture", () => {
     );
   });
 
-  it("keeps the pending-user compatibility route capability-protected", () => {
-    expect(source("src/app/admin/users/pending/page.tsx")).toMatch(
-      /await requireCapability\("MANAGE_STUDENT_ACCOUNTS"\)/u,
-    );
+  it("removes the retired ADMIN compatibility route and action boundary", () => {
+    for (const relativePath of [
+      "src/app/admin/page.tsx",
+      "src/app/admin/users/pending/page.tsx",
+      "src/app/admin/users/pending/actions.ts",
+      "src/server/account-management/legacy-admin-student-actions.node.ts",
+    ]) {
+      expect(fs.existsSync(path.resolve(root, relativePath))).toBe(false);
+    }
   });
 
   it("keeps NULL grantors out of runtime capability management", () => {

@@ -33,8 +33,8 @@ import {
 
 const managerAId = "97000000-0000-4000-8000-000000000001";
 const managerBId = "97000000-0000-4000-8000-000000000002";
-const bootstrapAdminId = "10000000-0000-4000-8000-000000000001";
-const bootstrapAdminEmail = "admin.dev@example.invalid";
+const bootstrapStaffId = "10000000-0000-4000-8000-000000000001";
+const bootstrapStaffEmail = "admin.dev@example.invalid";
 const bootstrapCapabilities = [
   "MANAGE_STUDENT_ACCOUNTS",
   "REACTIVATE_STUDENT_ACCOUNTS",
@@ -118,11 +118,11 @@ async function upsertManager(
   });
 }
 
-async function readBootstrapAdminManagerAssignment(
+async function readBootstrapStaffManagerAssignment(
   database: VerifiedPackageBTestDatabaseClient,
 ) {
-  const admin = await database.user.findUnique({
-    where: { id: bootstrapAdminId },
+  const staff = await database.user.findUnique({
+    where: { id: bootstrapStaffId },
     select: {
       email: true,
       role: true,
@@ -141,30 +141,30 @@ async function readBootstrapAdminManagerAssignment(
   });
   const expectedCapabilities = [...bootstrapCapabilities].sort();
   const actualCapabilities =
-    admin?.capabilityAssignments.map(({ capability }) => capability).sort() ??
+    staff?.capabilityAssignments.map(({ capability }) => capability).sort() ??
     [];
   if (
-    !admin ||
-    admin.email !== bootstrapAdminEmail ||
-    admin.role !== "ADMIN" ||
-    admin.status !== "ACTIVE" ||
-    admin.sessionVersion !== 0 ||
+    !staff ||
+    staff.email !== bootstrapStaffEmail ||
+    staff.role !== "STAFF" ||
+    staff.status !== "ACTIVE" ||
+    staff.sessionVersion !== 1 ||
     actualCapabilities.length !== expectedCapabilities.length ||
     actualCapabilities.some(
       (capability, index) => capability !== expectedCapabilities[index],
     ) ||
-    admin.capabilityAssignments.some(({ grantedById }) => grantedById !== null)
+    staff.capabilityAssignments.some(({ grantedById }) => grantedById !== null)
   ) {
     throw new Error(
-      "Package B bootstrap Test ADMIN baseline verification failed.",
+      "Package B bootstrap Test STAFF baseline verification failed.",
     );
   }
-  const managerAssignment = admin.capabilityAssignments.find(
+  const managerAssignment = staff.capabilityAssignments.find(
     ({ capability }) => capability === "MANAGE_STAFF_CAPABILITIES",
   );
   if (!managerAssignment) {
     throw new Error(
-      "Package B bootstrap Test ADMIN baseline verification failed.",
+      "Package B bootstrap Test STAFF baseline verification failed.",
     );
   }
   return {
@@ -173,18 +173,18 @@ async function readBootstrapAdminManagerAssignment(
   };
 }
 
-async function restoreBootstrapAdminManagerAssignment(
+async function restoreBootstrapStaffManagerAssignment(
   database: VerifiedPackageBTestDatabaseClient,
 ): Promise<void> {
   if (!bootstrapManagerAssignmentSnapshot) {
     throw new Error(
-      "Package B bootstrap Test ADMIN snapshot is not available.",
+      "Package B bootstrap Test STAFF snapshot is not available.",
     );
   }
   await database.userCapabilityAssignment.upsert({
     where: {
       userId_capability: {
-        userId: bootstrapAdminId,
+        userId: bootstrapStaffId,
         capability: "MANAGE_STAFF_CAPABILITIES",
       },
     },
@@ -194,7 +194,7 @@ async function restoreBootstrapAdminManagerAssignment(
       createdAt: bootstrapManagerAssignmentSnapshot.createdAt,
     },
   });
-  await readBootstrapAdminManagerAssignment(database);
+  await readBootstrapStaffManagerAssignment(database);
 }
 
 async function normalizeManagers(
@@ -218,7 +218,7 @@ async function normalizeManagers(
 async function readUnrelatedState(
   database: VerifiedPackageBTestDatabaseClient,
 ) {
-  const excludedUserIds = [bootstrapAdminId, ...allFixtureIds];
+  const excludedUserIds = [bootstrapStaffId, ...allFixtureIds];
   const [users, capabilityAssignments] = await Promise.all([
     database.user.findMany({
       where: { id: { notIn: excludedUserIds } },
@@ -251,7 +251,7 @@ async function verifyCanonicalFixtureState(): Promise<void> {
       "Package B PostgreSQL final fixture verification is unavailable.",
     );
   }
-  await readBootstrapAdminManagerAssignment(isolatedDb);
+  await readBootstrapStaffManagerAssignment(isolatedDb);
   const [managers, scenarioAssignmentCount, targetCount, unrelatedState] =
     await Promise.all([
       isolatedDb.user.findMany({
@@ -300,8 +300,8 @@ async function cleanupFixtures(): Promise<void> {
     });
     cleanupStep = "scenario manager normalization";
     await normalizeManagers(isolatedDb, false);
-    cleanupStep = "bootstrap Test ADMIN restoration";
-    await restoreBootstrapAdminManagerAssignment(isolatedDb);
+    cleanupStep = "bootstrap Test STAFF restoration";
+    await restoreBootstrapStaffManagerAssignment(isolatedDb);
   } catch {
     throw new Error(
       `Package B PostgreSQL fixture cleanup failed during ${cleanupStep}.`,
@@ -407,7 +407,7 @@ async function activeCapabilityManagerCount(
       capability: "MANAGE_STAFF_CAPABILITIES",
       user: {
         status: "ACTIVE",
-        role: { in: ["STAFF", "ADMIN"] },
+        role: "STAFF",
       },
     },
   });
@@ -429,7 +429,7 @@ async function withTrueFinalManagerState<Result>(
   let bootstrapAssignmentRemoved = false;
   try {
     const currentSnapshot =
-      await readBootstrapAdminManagerAssignment(scenarioDatabase);
+      await readBootstrapStaffManagerAssignment(scenarioDatabase);
     if (
       !bootstrapManagerAssignmentSnapshot ||
       currentSnapshot.createdAt.getTime() !==
@@ -438,13 +438,13 @@ async function withTrueFinalManagerState<Result>(
         bootstrapManagerAssignmentSnapshot.grantedById
     ) {
       throw new Error(
-        "Package B bootstrap Test ADMIN snapshot verification failed.",
+        "Package B bootstrap Test STAFF snapshot verification failed.",
       );
     }
     await scenarioDatabase.userCapabilityAssignment.delete({
       where: {
         userId_capability: {
-          userId: bootstrapAdminId,
+          userId: bootstrapStaffId,
           capability: "MANAGE_STAFF_CAPABILITIES",
         },
       },
@@ -465,7 +465,7 @@ async function withTrueFinalManagerState<Result>(
         },
       });
       if (bootstrapAssignmentRemoved) {
-        await restoreBootstrapAdminManagerAssignment(scenarioDatabase);
+        await restoreBootstrapStaffManagerAssignment(scenarioDatabase);
       }
     } finally {
       await readiness.verified.close();
@@ -602,7 +602,7 @@ describe.sequential(
       verifiedDatabase = readiness.verified;
       isolatedDb = readiness.verified.database;
       bootstrapManagerAssignmentSnapshot =
-        await readBootstrapAdminManagerAssignment(isolatedDb);
+        await readBootstrapStaffManagerAssignment(isolatedDb);
       unrelatedStateSnapshot = await readUnrelatedState(isolatedDb);
       await cleanupFixtures();
     });

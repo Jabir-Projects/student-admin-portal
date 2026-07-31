@@ -89,30 +89,24 @@ export function getProxyAuthorizationOutcome(
   const isStudentRoute =
     pathname === "/student" || pathname.startsWith("/student/");
   const isStaffRoute = pathname === "/staff" || pathname.startsWith("/staff/");
-  const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
-  if (!isStudentRoute && !isStaffRoute && !isAdminRoute) return "ALLOW";
+  if (!isStudentRoute && !isStaffRoute) return "ALLOW";
   if (!session) return hasPreviousAuthentication ? "SESSION_ENDED" : "LOGIN";
   if (session.user.status !== "ACTIVE") return "SESSION_ENDED";
   if (isStudentRoute)
     return session.user.role === "STUDENT" ? "ALLOW" : "UNAUTHORIZED";
-  if (isStaffRoute)
-    return session.user.role === "STAFF" ? "ALLOW" : "UNAUTHORIZED";
-  return session.user.role === "STAFF" || session.user.role === "ADMIN"
-    ? "ALLOW"
-    : "UNAUTHORIZED";
+  return session.user.role === "STAFF" ? "ALLOW" : "UNAUTHORIZED";
 }
 
 export function getPostAuthenticationPath(
   role: UserRoleValue,
-): "/admin" | "/staff" | "/student" {
+): "/staff" | "/student" {
   if (role === "STAFF") return "/staff";
-  return role === "ADMIN" ? "/admin" : "/student";
+  return "/student";
 }
 
-const safeCallbackRoots = ["/student", "/staff", "/admin"] as const;
+const safeCallbackRoots = ["/student", "/staff"] as const;
 const asciiControlCharacter = /[\u0000-\u001f\u007f]/u;
-const unsafeEncodedValue =
-  /%(?:25)*(?:0[0-9a-f]|1[0-9a-f]|20|2e|2f|5c|7f)/iu;
+const unsafeEncodedValue = /%(?:25)*(?:0[0-9a-f]|1[0-9a-f]|20|2e|2f|5c|7f)/iu;
 const malformedPercentEncoding = /%(?![0-9a-f]{2})/iu;
 const percentEncodedOctet = /%[0-9a-f]{2}/iu;
 const rawTraversalSegment = /(?:^|\/)\.{1,2}(?:\/|$)/u;

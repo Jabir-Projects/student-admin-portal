@@ -28,18 +28,13 @@ describe("/auth/continue authorization boundary", () => {
 
     await expect(ContinuePage()).rejects.toBe(invalidActorSignal);
 
-    expect(mocks.requireActiveUser).toHaveBeenCalledWith([
-      "STUDENT",
-      "STAFF",
-      "ADMIN",
-    ]);
+    expect(mocks.requireActiveUser).toHaveBeenCalledWith(["STUDENT", "STAFF"]);
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
 
   it.each([
     ["STUDENT", "/student"],
     ["STAFF", "/staff"],
-    ["ADMIN", "/admin"],
   ] as const)(
     "routes a revalidated %s actor to %s",
     async (role, destination) => {

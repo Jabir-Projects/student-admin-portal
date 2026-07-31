@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { CAPABILITIES, USER_ROLES } from "@/features/auth/constants";
 
 describe("V2-3 authorization constants", () => {
-  it("retains STUDENT and temporary ADMIN while adding STAFF", () => {
-    expect(USER_ROLES).toEqual(["STUDENT", "STAFF", "ADMIN"]);
+  it("defines only the post-conversion STUDENT and STAFF roles", () => {
+    expect(USER_ROLES).toEqual(["STUDENT", "STAFF"]);
   });
 
   it("defines exactly the approved capability catalog", () => {

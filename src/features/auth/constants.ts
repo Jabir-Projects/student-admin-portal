@@ -23,7 +23,7 @@ export const ACADEMIC_YEARS = [
   { value: "MASTER_2", label: "Master 2" },
 ] as const;
 
-export const USER_ROLES = ["STUDENT", "STAFF", "ADMIN"] as const;
+export const USER_ROLES = ["STUDENT", "STAFF"] as const;
 export const ACCOUNT_STATUSES = [
   "PENDING_APPROVAL",
   "ACTIVE",

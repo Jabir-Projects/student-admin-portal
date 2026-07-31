@@ -21,19 +21,6 @@ const genericTransitionFailure = {
   message: "The account transition could not be completed.",
 } as const;
 
-type StudentMutationActorMode = "STAFF_OR_ADMIN" | "STAFF_ONLY" | "ADMIN_ONLY";
-
-function actorRoleIsAllowed(
-  role: "STAFF" | "ADMIN",
-  mode: StudentMutationActorMode,
-): boolean {
-  return (
-    mode === "STAFF_OR_ADMIN" ||
-    (mode === "STAFF_ONLY" && role === "STAFF") ||
-    (mode === "ADMIN_ONLY" && role === "ADMIN")
-  );
-}
-
 function transitionFailure(message: string): AccountTransitionResult {
   return { ok: false, message };
 }
@@ -60,7 +47,6 @@ export async function approvePendingStudentAsActor(
   claims: ActorSessionClaims,
   targetUserId: string,
   database: PrismaClient,
-  actorMode: StudentMutationActorMode = "STAFF_OR_ADMIN",
 ): Promise<AccountTransitionResult> {
   return database.$transaction(async (transaction) => {
     const authorization = await revalidateCapabilityActorInTransaction(
@@ -69,8 +55,6 @@ export async function approvePendingStudentAsActor(
       "MANAGE_STUDENT_ACCOUNTS",
     );
     if (!authorization.ok) return genericTransitionFailure;
-    if (!actorRoleIsAllowed(authorization.actor.role, actorMode))
-      return genericTransitionFailure;
 
     const target = await lockUserForUpdate(transaction, targetUserId);
     if (!target || target.role !== "STUDENT") return genericTransitionFailure;
@@ -152,7 +136,6 @@ export async function disableStudentAsActor(
   claims: ActorSessionClaims,
   targetUserId: string,
   database: PrismaClient,
-  actorMode: StudentMutationActorMode = "STAFF_OR_ADMIN",
 ): Promise<AccountTransitionResult> {
   return database.$transaction(async (transaction) => {
     const authorization = await revalidateCapabilityActorInTransaction(
@@ -161,8 +144,6 @@ export async function disableStudentAsActor(
       "MANAGE_STUDENT_ACCOUNTS",
     );
     if (!authorization.ok) return genericTransitionFailure;
-    if (!actorRoleIsAllowed(authorization.actor.role, actorMode))
-      return genericTransitionFailure;
     return disableAuthorizedStudentInTransaction(
       transaction,
       authorization.actor.id,
@@ -200,7 +181,6 @@ export async function reactivateDisabledStudentAsActor(
   claims: ActorSessionClaims,
   targetUserId: string,
   database: PrismaClient,
-  actorMode: StudentMutationActorMode = "STAFF_OR_ADMIN",
 ): Promise<AccountTransitionResult> {
   return database.$transaction(async (transaction) => {
     const authorization = await revalidateCapabilityActorInTransaction(
@@ -209,8 +189,6 @@ export async function reactivateDisabledStudentAsActor(
       "REACTIVATE_STUDENT_ACCOUNTS",
     );
     if (!authorization.ok) return genericTransitionFailure;
-    if (!actorRoleIsAllowed(authorization.actor.role, actorMode))
-      return genericTransitionFailure;
 
     const target = await lockUserForUpdate(transaction, targetUserId);
     if (!target || target.role !== "STUDENT" || target.status !== "DISABLED") {

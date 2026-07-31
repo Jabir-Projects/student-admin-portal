@@ -81,12 +81,7 @@ describe("D3 student account actions", () => {
         secret,
       );
       expect(authorize).toHaveBeenCalledWith(claims, capability, database);
-      expect(mutation).toHaveBeenCalledWith(
-        claims,
-        accountId,
-        database,
-        "STAFF_ONLY",
-      );
+      expect(mutation).toHaveBeenCalledWith(claims, accountId, database);
       expect(result).toEqual({ status: "success", message });
     },
   );
