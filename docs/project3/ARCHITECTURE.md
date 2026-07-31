@@ -12,7 +12,6 @@ The SIST Portal is an institutional Next.js application serving student and staf
 
 - `STUDENT`: accesses only authorized personal student services and records.
 - `STAFF`: performs only operations granted by database-authoritative capabilities.
-- Temporary legacy `ADMIN`: compatibility and migration state only; never a universal bypass.
 
 ## Trust boundaries
 
@@ -67,7 +66,6 @@ Approved roles:
 
 - `STUDENT`
 - `STAFF`
-- Temporary legacy `ADMIN`
 
 Approved capabilities:
 
@@ -102,6 +100,15 @@ Apply ownership constraints in trusted server queries and mutations, not only in
 
 Disabled accounts cannot perform protected operations. Students cannot receive staff capabilities. Self-grant is forbidden. Protect the final active holder of `MANAGE_STAFF_CAPABILITIES` from revocation, disabling, or conversion to an ineligible role, including concurrent check-then-write races.
 
+## Legacy ADMIN conversion
+
+The current role model contains only `STUDENT` and `STAFF`. The Package E
+migration converts every historical ADMIN to STAFF atomically, preserves each
+account's existing capability assignments without escalation, invalidates its
+sessions, records a redacted system audit event, and fails closed unless an
+active capability manager survives. Historical migrations retain ADMIN literals
+as immutable migration records; runtime code cannot assign or authorize ADMIN.
+
 ## Audit requirements
 
 Sensitive actions require attributable, typed, minimal, sanitized audit metadata. Secrets, hashes, tokens, and unnecessary personal data are excluded. Failure to create a required audit record must roll back its protected mutation.
@@ -133,6 +140,8 @@ Vercel is the planned deployment direction. Production deployment, access, monit
 
 ## Known unverified areas
 
+- Package E migration execution, rollback, locking, enum replacement, and rerun
+  behavior against an isolated PostgreSQL database
 - Exact route, component, module, and server-action inventory
 - Current production topology and operational controls
 - Notification and private-storage providers

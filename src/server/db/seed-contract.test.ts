@@ -29,4 +29,19 @@ describe("development seed safety contract", () => {
       /console\.(?:info|error|log)\([^)]*(?:password|hash|token|secret|DATABASE_URL|DIRECT_URL)/iu,
     );
   });
+
+  it("seeds only the deterministic STAFF manager with the four approved bootstrap capabilities", () => {
+    expect(source).toContain('requireSeedPassword("SEED_STAFF_PASSWORD")');
+    expect(source).not.toContain("SEED_ADMIN_PASSWORD");
+    expect(source).toContain("role: UserRole.STAFF");
+    expect(source).not.toContain("UserRole.ADMIN");
+    for (const capability of [
+      "MANAGE_STUDENT_ACCOUNTS",
+      "REACTIVATE_STUDENT_ACCOUNTS",
+      "MANAGE_STAFF_ACCOUNTS",
+      "MANAGE_STAFF_CAPABILITIES",
+    ]) {
+      expect(source).toContain(`Capability.${capability}`);
+    }
+  });
 });

@@ -78,23 +78,20 @@ describe("database-authoritative capability authorization", () => {
     },
   );
 
-  it.each(["STAFF", "ADMIN"] as const)(
-    "allows an active %s only with the explicit database assignment",
-    async (role) => {
-      findUnique.mockResolvedValue(actor({ role }));
-      const result = await loadCapabilityActor(
-        { actorId: "actor-id", claimedSessionVersion: 7 },
-        "MANAGE_STUDENT_ACCOUNTS",
-        database,
-      );
-      expect(result).toMatchObject({
-        ok: true,
-        actor: { id: "actor-id", role, sessionVersion: 7 },
-      });
-    },
-  );
+  it("allows an active STAFF only with the explicit database assignment", async () => {
+    findUnique.mockResolvedValue(actor({ role: "STAFF" }));
+    const result = await loadCapabilityActor(
+      { actorId: "actor-id", claimedSessionVersion: 7 },
+      "MANAGE_STUDENT_ACCOUNTS",
+      database,
+    );
+    expect(result).toMatchObject({
+      ok: true,
+      actor: { id: "actor-id", role: "STAFF", sessionVersion: 7 },
+    });
+  });
 
-  it("does not give ADMIN an authorization bypass", async () => {
+  it("rejects a retired ADMIN value even with a capability assignment", async () => {
     findUnique.mockResolvedValue(actor({ role: "ADMIN", capabilities: [] }));
     await expect(
       loadCapabilityActor(
@@ -102,7 +99,7 @@ describe("database-authoritative capability authorization", () => {
         "MANAGE_STUDENT_ACCOUNTS",
         database,
       ),
-    ).resolves.toEqual({ ok: false, reason: "MISSING_CAPABILITY" });
+    ).resolves.toEqual({ ok: false, reason: "WRONG_ROLE" });
   });
 
   it("rejects an active student even if an invalid assignment exists", async () => {
@@ -133,7 +130,7 @@ describe("database-authoritative capability authorization", () => {
 
 describe("database-authoritative session users", () => {
   it("returns the current database role and version, not browser claims", async () => {
-    findUnique.mockResolvedValue(actor({ role: "ADMIN" }));
+    findUnique.mockResolvedValue(actor({ role: "STAFF" }));
     await expect(
       getSessionUserByClaims(
         { actorId: "actor-id", claimedSessionVersion: 7 },
@@ -141,7 +138,7 @@ describe("database-authoritative session users", () => {
       ),
     ).resolves.toMatchObject({
       ok: true,
-      user: { role: "ADMIN", status: "ACTIVE", sessionVersion: 7 },
+      user: { role: "STAFF", status: "ACTIVE", sessionVersion: 7 },
     });
   });
 
@@ -186,7 +183,7 @@ describe("typed redacted authorization audit events", () => {
         actorId: "actor-id",
         targetUserId: "target-id",
         previousRole: "STAFF",
-        newRole: "ADMIN",
+        newRole: "STUDENT",
         removedCapabilityCount: 0,
       }),
     ];
@@ -215,6 +212,7 @@ function managementDatabase(options: {
   target?: LockedUser;
   queryPrefix?: unknown[][];
   assignment?: { userId: string } | null;
+  assignedCapabilityCount?: number;
 }) {
   const actor: LockedUser = {
     id: managerClaims.actorId,
@@ -246,7 +244,7 @@ function managementDatabase(options: {
           ).map((capability) => ({ capability })),
         ),
       findUnique: vi.fn().mockResolvedValue(options.assignment ?? null),
-      count: vi.fn().mockResolvedValue(1),
+      count: vi.fn().mockResolvedValue(options.assignedCapabilityCount ?? 1),
       create: vi.fn().mockResolvedValue({}),
       deleteMany: vi.fn().mockResolvedValue({ count: 1 }),
     },
@@ -1059,9 +1057,10 @@ describe("runtime capability management invariants", () => {
     ).rejects.toThrow("audit unavailable");
   });
 
-  it("invalidates the target session after a compatible STAFF to ADMIN role change", async () => {
+  it("invalidates the target session after a STAFF to STUDENT role change", async () => {
     const fixture = managementDatabase({
       actorCapabilities: ["MANAGE_STAFF_ACCOUNTS"],
+      assignedCapabilityCount: 0,
       queryPrefix: [
         [],
         [
@@ -1086,7 +1085,7 @@ describe("runtime capability management invariants", () => {
       changeStaffRoleAsActor(
         managerClaims,
         managedUserId,
-        "ADMIN",
+        "STUDENT",
         fixture.database,
       ),
     ).resolves.toEqual({ ok: true });
@@ -1097,7 +1096,7 @@ describe("runtime capability management invariants", () => {
         status: "ACTIVE",
         sessionVersion: 5,
       },
-      data: { role: "ADMIN", sessionVersion: { increment: 1 } },
+      data: { role: "STUDENT", sessionVersion: { increment: 1 } },
     });
   });
 });

@@ -18,7 +18,7 @@ export type ActorSessionClaims = {
 
 export type CapabilityActor = {
   id: string;
-  role: Extract<UserRoleValue, "STAFF" | "ADMIN">;
+  role: Extract<UserRoleValue, "STAFF">;
   status: Extract<AccountStatusValue, "ACTIVE">;
   sessionVersion: number;
   capabilities: readonly CapabilityValue[];

@@ -30,15 +30,15 @@ describe.skipIf(true)(
   "seeded development database (requires applied Phase 3 migration)",
   () => {
     it("reads the expected development fixtures without mutating data", async () => {
-      const [administratorCount, studentCount, profileCount, historyCount] =
+      const [staffCount, studentCount, profileCount, historyCount] =
         await Promise.all([
-          runtimeClient!.user.count({ where: { role: "ADMIN" } }),
+          runtimeClient!.user.count({ where: { role: "STAFF" } }),
           runtimeClient!.user.count({ where: { role: "STUDENT" } }),
           runtimeClient!.studentProfile.count(),
           runtimeClient!.requestStatusHistory.count(),
         ]);
 
-      expect(administratorCount).toBeGreaterThanOrEqual(1);
+      expect(staffCount).toBeGreaterThanOrEqual(1);
       expect(studentCount).toBeGreaterThanOrEqual(2);
       expect(profileCount).toBeGreaterThanOrEqual(2);
       expect(historyCount).toBeGreaterThanOrEqual(3);

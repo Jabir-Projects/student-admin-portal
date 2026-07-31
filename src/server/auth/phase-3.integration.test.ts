@@ -173,7 +173,7 @@ async function ensureAdministrator(): Promise<void> {
     expect(existing).toStrictEqual({
       email: administratorEmail,
       fullName: "SIST Test Phase 3 Administrator",
-      role: "ADMIN",
+      role: "STAFF",
       status: "ACTIVE",
       sessionVersion: 0,
     });
@@ -184,7 +184,7 @@ async function ensureAdministrator(): Promise<void> {
         email: administratorEmail,
         fullName: "SIST Test Phase 3 Administrator",
         passwordHash: "integration-test-non-authenticating-value",
-        role: "ADMIN",
+        role: "STAFF",
         status: "ACTIVE",
       },
     });

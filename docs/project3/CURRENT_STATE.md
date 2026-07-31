@@ -12,7 +12,7 @@ Last updated: 2026-07-31
 | V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
-| Current product package                                   | V2-3 Package E — ADMIN-to-STAFF conversion          | Implementation and isolated-database verification remain                  |
+| Current product package                                   | V2-3 Package F — Integrated verification            | Active after Package E integration                                        |
 | Package C1                                                | Repository and route readiness                     | Complete                                                                  |
 | Package C2                                                | Design requirements lock                           | Complete                                                                  |
 | Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
@@ -21,8 +21,8 @@ Last updated: 2026-07-31
 | Package C6                                                | Final Package C Verification and Closure           | Approved and complete; final verification passed with no blockers         |
 | Package C Git delivery                                    | Final closure delivery                             | Final six-file closure commit and push owner-authorized                   |
 | Package D implementation                                  | Complete                                           | Final package commit `1e2961af619c7025cb0f322e1cc6d4759594f2ee` pushed   |
-| Package E                                                 | Active under V2-3-CF-001                           | Static inventory complete; implementation follows Package D integration   |
-| Package F                                                 | Not started                                        | Starts only after Package E integration                                   |
+| Package E                                                 | Complete                                           | Final branch `81f799af50d2aeab22ade97d350bc4c03e434b29` pushed           |
+| Package F                                                 | Active                                            | Integrated verification and closure remain                               |
 
 ## Package D final delivery state
 
@@ -36,6 +36,19 @@ Last updated: 2026-07-31
 | Focused verification  | `VERIFIED` 12 files and 160 tests passed                               |
 | Full verification     | `VERIFIED` 52 files and 577 tests passed; 39 PostgreSQL tests skipped  |
 | Static/build gates    | Lint, typecheck, Prisma validation/generation, and webpack build passed |
+
+## Package E final delivery state
+
+| Item                 | State                                                                  |
+| -------------------- | ---------------------------------------------------------------------- |
+| Worktree             | `VERIFIED` `D:\PROJECT 3\PROJECT 3 SIST-v2-3-agent-e`                  |
+| Branch               | `VERIFIED` `codex/v2-3-e-admin-conversion`                             |
+| Final HEAD           | `VERIFIED` `81f799af50d2aeab22ade97d350bc4c03e434b29`                  |
+| Runtime model        | `STUDENT` and `STAFF`; ADMIN compatibility removed                     |
+| Migration            | Transactional conversion SQL created; PostgreSQL execution not run     |
+| Focused verification | `VERIFIED` 10 files and 199 tests passed                               |
+| Full verification    | `VERIFIED` 50 files and 563 tests passed; 39 PostgreSQL tests skipped  |
+| Browser verification | `VERIFIED` 4 Package E Playwright tests passed                         |
 
 ## Repository state at CTRL-001 start
 
@@ -70,8 +83,8 @@ Last updated: 2026-07-31
 
 ## Current management objective
 
-> Complete Package E against the integrated Package D baseline, run Package F
-> phase verification, close V2-3-CF-001, and stop before V2-4.
+> Run Package F phase verification. Closure requires isolated PostgreSQL
+> migration evidence; stop for the owner action if no test database is supplied.
 
 ## Risks and blockers
 
@@ -80,9 +93,10 @@ Last updated: 2026-07-31
 - Package C fresh verification passed 251 Vitest tests and 11 Playwright tests.
 - Package D is complete and pushed at
   `1e2961af619c7025cb0f322e1cc6d4759594f2ee`.
+- Package E is complete and pushed at
+  `81f799af50d2aeab22ade97d350bc4c03e434b29`.
 - The current environment has no isolated PostgreSQL configuration and Docker
-  is unavailable. Database execution remains pending after all independent
-  Package E work is complete.
+  is unavailable. Database execution remains pending before V2-3 closure.
 - The historical development-admin backfill migration requires a prepared
   administrator and prevents a genuinely pristine full-history deployment.
   Applied migration SQL will not be rewritten.
@@ -91,7 +105,8 @@ Last updated: 2026-07-31
 
 ## Next approved management action
 
-Integrate this Package D merge with V2-3-CF-001 active, then implement Package E
-on the resulting baseline. Do not begin V2-4.
+Run all independent Package F gates, then request the one isolated PostgreSQL
+owner action required for migration and database-integration verification. Do
+not begin V2-4.
 
 See [ROADMAP.md](ROADMAP.md) for sequencing and [TASK_PACKAGE.md](TASK_PACKAGE.md) for the closed CTRL-001 record.

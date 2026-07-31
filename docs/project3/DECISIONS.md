@@ -242,3 +242,21 @@ This append-oriented register records approved product, architecture, security, 
   prohibited. Migration execution requires a proven isolated non-production
   PostgreSQL database.
 - Related phase or package: V2-3 Packages C through F; `V2-3-CF-001`.
+
+### DEC-014 — Retire ADMIN without capability escalation
+
+- Date: 2026-07-31
+- Status: `APPROVED`
+- Context: Package E removes the temporary ADMIN compatibility role.
+- Decision: Convert every historical ADMIN account to STAFF in one transaction,
+  preserve its existing capability assignments exactly, increment its
+  `sessionVersion`, write one redacted system audit event, and fail closed unless
+  an active capability manager survives. Remove ADMIN from the current database
+  enum and runtime authorization surface. Preserve historical migration SQL.
+- Rationale: Complete the two-role model without silently widening authority or
+  invalidating applied migration history.
+- Consequences: An account already holding all 18 capabilities retains all 18;
+  narrower or zero-capability accounts retain only their existing assignments.
+  Migration execution must be proven against an isolated non-production
+  PostgreSQL database before V2-3 closure.
+- Related phase or package: V2-3 Package E and Package F.

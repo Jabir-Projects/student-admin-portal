@@ -3,6 +3,7 @@ import { databaseEnv } from "../src/server/db/env.node";
 import {
   AcademicYear,
   AccountStatus,
+  Capability,
   DeliveryMethod,
   MessageVisibility,
   PreferredLanguage,
@@ -13,7 +14,7 @@ import { hashPassword, verifyPassword } from "../src/server/auth/password.node";
 import { reconcileStudentRegistryDemo } from "./student-registry-demo";
 
 const ids = {
-  admin: "10000000-0000-4000-8000-000000000001",
+  staff: "10000000-0000-4000-8000-000000000001",
   studentOne: "10000000-0000-4000-8000-000000000002",
   studentTwo: "10000000-0000-4000-8000-000000000003",
   profileOne: "20000000-0000-4000-8000-000000000001",
@@ -67,16 +68,16 @@ async function reusablePasswordHash(
 }
 
 async function seed(): Promise<void> {
-  const adminPassword = requireSeedPassword("SEED_ADMIN_PASSWORD");
+  const staffPassword = requireSeedPassword("SEED_STAFF_PASSWORD");
   const studentOnePassword = requireSeedPassword("SEED_STUDENT_ONE_PASSWORD");
   const studentTwoPassword = requireSeedPassword("SEED_STUDENT_TWO_PASSWORD");
   const users = [
     {
-      id: ids.admin,
+      id: ids.staff,
       email: "admin.dev@example.invalid",
-      fullName: "Development Administrator",
-      passwordHash: await reusablePasswordHash(ids.admin, adminPassword),
-      role: UserRole.ADMIN,
+      fullName: "Development Staff Manager",
+      passwordHash: await reusablePasswordHash(ids.staff, staffPassword),
+      role: UserRole.STAFF,
       status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.ENGLISH,
     },
@@ -111,6 +112,22 @@ async function seed(): Promise<void> {
       where: { id: user.id },
       create: { ...user, createdAt: seededAt },
       update: user,
+    });
+  }
+
+  const staffCapabilities = [
+    Capability.MANAGE_STUDENT_ACCOUNTS,
+    Capability.REACTIVATE_STUDENT_ACCOUNTS,
+    Capability.MANAGE_STAFF_ACCOUNTS,
+    Capability.MANAGE_STAFF_CAPABILITIES,
+  ] as const;
+  for (const capability of staffCapabilities) {
+    await prisma.userCapabilityAssignment.upsert({
+      where: {
+        userId_capability: { userId: ids.staff, capability },
+      },
+      create: { userId: ids.staff, capability, grantedById: null },
+      update: {},
     });
   }
 
@@ -213,7 +230,7 @@ async function seed(): Promise<void> {
         requestId: ids.requestOne,
         fromStatus: RequestStatus.SUBMITTED,
         toStatus: RequestStatus.UNDER_REVIEW,
-        changedById: ids.admin,
+        changedById: ids.staff,
         note: "Development request entered review.",
         createdAt: new Date("2026-01-15T10:00:00.000Z"),
       },
@@ -235,7 +252,7 @@ async function seed(): Promise<void> {
     create: {
       id: ids.publicMessage,
       requestId: ids.requestOne,
-      authorId: ids.admin,
+      authorId: ids.staff,
       visibility: MessageVisibility.PUBLIC,
       body: "Your request is being reviewed.",
       createdAt: seededAt,
@@ -251,7 +268,7 @@ async function seed(): Promise<void> {
     create: {
       id: ids.internalMessage,
       requestId: ids.requestOne,
-      authorId: ids.admin,
+      authorId: ids.staff,
       visibility: MessageVisibility.INTERNAL,
       body: "Verify the academic record before approval.",
       createdAt: seededAt,

@@ -11,8 +11,19 @@ test("student registration exposes only approved fields", async ({ page }) => {
 });
 
 test("unauthenticated protected routes redirect to login", async ({ page }) => {
-  await page.goto("/admin/users/pending");
-  await expect(page).toHaveURL(/\/login/u);
+  for (const route of ["/student", "/staff"]) {
+    await page.goto(route);
+    await expect(page).toHaveURL(/\/login/u);
+  }
+});
+
+test("retired legacy admin route is unavailable", async ({ page }) => {
+  const response = await page.goto("/admin/users/pending");
+
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Page not found" }),
+  ).toBeVisible();
 });
 
 test("login uses email and password only", async ({ page }) => {

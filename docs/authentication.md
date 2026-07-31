@@ -16,7 +16,7 @@ confirm role, and enforce ownership close to data access. Stale JWT claims are n
 trusted as the final authorization decision.
 
 Passwords are limited before Argon2id work and are never logged or audited. The
-development seed requires `SEED_ADMIN_PASSWORD`, `SEED_STUDENT_ONE_PASSWORD`, and
+development seed requires `SEED_STAFF_PASSWORD`, `SEED_STUDENT_ONE_PASSWORD`, and
 `SEED_STUDENT_TWO_PASSWORD`; values remain in ignored local configuration. A
 durable distributed login and registration rate limiter is still required before
 production deployment. An in-memory serverless limiter is intentionally omitted.

@@ -52,9 +52,7 @@ See [TASK_PACKAGE.md](TASK_PACKAGE.md) for permissions and [ARCHITECTURE.md](ARC
 
 ## Package D expected verification
 
-Status: Package C and Package D are complete. Package D final implementation is
-pushed in `1e2961af619c7025cb0f322e1cc6d4759594f2ee`. Package E is active under
-`V2-3-CF-001`.
+Status: Packages C, D, and E are complete. Package F is active.
 
 ### D1 documentation checks
 
@@ -262,3 +260,18 @@ Status: `ACTIVE`
   Playwright checks.
 - Secret scan, dependency/configuration review, complete integrated diff review,
   and final local/remote synchronization.
+
+### Package E completion evidence
+
+- Focused migration, auth, seed, and runtime verification: 10 files and 199
+  tests passed.
+- Complete non-database Vitest verification: 50 files and 563 tests passed.
+- Three PostgreSQL files and 39 tests skipped because no isolated database was
+  configured.
+- ESLint, strict typecheck, Prisma format/validate/generate, changed-file
+  Prettier, build, diff check, and secret scan passed.
+- Package E browser contract: 4 Chromium tests passed, including retired ADMIN
+  route 404 behavior.
+- Independent SQL/security review found no validated blocker.
+- Migration execution, rollback, locks, enum replacement, audit-trigger
+  interaction, and rerun behavior remain unverified against PostgreSQL.

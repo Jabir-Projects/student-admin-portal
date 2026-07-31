@@ -36,7 +36,6 @@ type StudentActionDependencies = {
       claims: ActorSessionClaims,
       accountId: string,
       database: PrismaClient,
-      actorMode: "STAFF_ONLY",
     ) => Promise<AccountTransitionResult>
   >;
 };
@@ -107,7 +106,6 @@ export async function executeStudentAccountAction(
       claims,
       resolved.accountId,
       database,
-      "STAFF_ONLY",
     );
     return result.ok
       ? {

@@ -138,16 +138,21 @@ Package D is complete in
 
 #### Package E — Admin-to-Staff conversion
 
-Status: `ACTIVE UNDER V2-3-CF-001`
+Status: `COMPLETE — FINAL PACKAGE BRANCH PUSHED`
 
-- Conversion readiness
-- Controlled conversion
-- Compatibility cleanup
-- Verification
+- Conversion readiness — Complete
+- Controlled conversion migration — Created and statically verified
+- Compatibility cleanup — Complete
+- Non-database verification — Complete
+
+The migration preserves existing capability assignments exactly, invalidates
+converted sessions, writes redacted system audit events, preserves an active
+capability manager, and removes ADMIN from the current role enum. Execution
+against an isolated PostgreSQL database remains a V2-3 closure gate.
 
 #### Package F — Final V2-3 verification
 
-Status: `NOT STARTED — FOLLOWS PACKAGE E`
+Status: `ACTIVE`
 
 - Scope inventory
 - Integrated authorization verification

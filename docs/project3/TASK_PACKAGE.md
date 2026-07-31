@@ -162,7 +162,9 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIO
 - V2-3 remains the active phase under `V2-3-CF-001`.
 - Package D — Account and Capability Management is complete and pushed in
   `1e2961af619c7025cb0f322e1cc6d4759594f2ee`.
-- Package E is the active implementation package.
+- Package E is complete and pushed at
+  `81f799af50d2aeab22ade97d350bc4c03e434b29`.
+- Package F is active.
 - The owner-authorized final Package C closure includes one six-file commit and
   a normal push to the existing upstream branch.
 - Package C closure did not authorize later packages. The separate
@@ -352,6 +354,21 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md),
 - ESLint, strict TypeScript typecheck, production build, relevant Playwright,
   responsive and accessibility review.
 - Secret scan, complete staged-diff review, and final Git synchronization.
+
+### Package E completion evidence
+
+- Main conversion commit:
+  `2a8f50531c506ef1db1c3714a0f7aa542be175d8`
+- Seed documentation correction:
+  `bd1416159d9392902f0924c35917c1186b6d6a17`
+- Retired-route browser correction:
+  `81f799af50d2aeab22ade97d350bc4c03e434b29`
+- Package branch and live remote are synchronized.
+- Focused verification passed 199 tests.
+- Complete non-database verification passed 563 tests; 39 PostgreSQL tests
+  skipped because no isolated database was configured.
+- Four Package E Playwright tests passed.
+- PostgreSQL migration execution remains required before closure.
 
 ### Deferred-improvement rule
 

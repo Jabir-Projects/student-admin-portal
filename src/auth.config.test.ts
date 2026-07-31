@@ -26,23 +26,15 @@ function session(role: UserRoleValue, status: AccountStatusValue) {
 }
 
 describe("Proxy authorization", () => {
-  it.each([
-    "/student",
-    "/student/requests",
-    "/staff",
-    "/staff/requests",
-    "/admin",
-    "/admin/users/pending",
-  ])("rejects unauthenticated access to %s", (pathname) =>
-    expect(isProxyAuthorized(pathname, null)).toBe(false),
+  it.each(["/student", "/student/requests", "/staff", "/staff/requests"])(
+    "rejects unauthenticated access to %s",
+    (pathname) => expect(isProxyAuthorized(pathname, null)).toBe(false),
   );
   it("enforces active student route boundaries", () => {
     const student = session("STUDENT", "ACTIVE");
     expect(isProxyAuthorized("/student", student)).toBe(true);
     expect(isProxyAuthorized("/student/requests", student)).toBe(true);
     expect(isProxyAuthorized("/staff", student)).toBe(false);
-    expect(isProxyAuthorized("/admin", student)).toBe(false);
-    expect(isProxyAuthorized("/admin/users/pending", student)).toBe(false);
   });
   it("distinguishes first-time, ended-session, and wrong-role access", () => {
     expect(getProxyAuthorizationOutcome("/staff", null, false)).toBe("LOGIN");
@@ -93,20 +85,10 @@ describe("Proxy authorization", () => {
       else process.env.AUTH_SECRET = previousSecret;
     }
   });
-  it("enforces active administrator route boundaries", () => {
-    const administrator = session("ADMIN", "ACTIVE");
-    expect(isProxyAuthorized("/admin", administrator)).toBe(true);
-    expect(isProxyAuthorized("/admin/users/pending", administrator)).toBe(true);
-    expect(isProxyAuthorized("/staff", administrator)).toBe(false);
-    expect(isProxyAuthorized("/student", administrator)).toBe(false);
-    expect(isProxyAuthorized("/student/requests", administrator)).toBe(false);
-  });
-  it("allows active staff through the coarse admin route boundary", () => {
+  it("allows active staff only through the staff route boundary", () => {
     const staff = session("STAFF", "ACTIVE");
     expect(isProxyAuthorized("/staff", staff)).toBe(true);
     expect(isProxyAuthorized("/staff/requests", staff)).toBe(true);
-    expect(isProxyAuthorized("/admin", staff)).toBe(true);
-    expect(isProxyAuthorized("/admin/users/pending", staff)).toBe(true);
     expect(isProxyAuthorized("/student", staff)).toBe(false);
   });
   it.each(["PENDING_APPROVAL", "DISABLED"] as const)(
@@ -116,9 +98,8 @@ describe("Proxy authorization", () => {
         false,
       );
       expect(isProxyAuthorized("/staff", session("STAFF", status))).toBe(false);
-      expect(isProxyAuthorized("/admin", session("ADMIN", status))).toBe(false);
       expect(
-        getProxyAuthorizationOutcome("/admin", session("ADMIN", status)),
+        getProxyAuthorizationOutcome("/staff", session("STAFF", status)),
       ).toBe("SESSION_ENDED");
     },
   );
@@ -128,7 +109,6 @@ describe("post-authentication routing", () => {
   it.each([
     ["STUDENT", "/student"],
     ["STAFF", "/staff"],
-    ["ADMIN", "/admin"],
   ] as const)("routes %s to %s", (role, expectedPath) => {
     expect(getPostAuthenticationPath(role)).toBe(expectedPath);
   });
@@ -142,7 +122,6 @@ describe("safe authentication callbacks", () => {
       "/student/requests?status=open",
       `${baseUrl}/student/requests?status=open`,
     ],
-    ["/admin/users/pending", `${baseUrl}/admin/users/pending`],
     ["/staff", `${baseUrl}/staff`],
     ["/student/profile/%E2%9C%93", `${baseUrl}/student/profile/%E2%9C%93`],
     [
@@ -196,6 +175,8 @@ describe("safe authentication callbacks", () => {
     "/login",
     "/login?callbackUrl=/staff",
     "/auth/continue",
+    "/admin",
+    "/admin/users/pending",
     "/api/auth/signin",
     "/api/auth/callback/credentials",
     "/api/auth/signout",
@@ -207,7 +188,7 @@ describe("safe authentication callbacks", () => {
   });
 
   it("does not let an accepted callback change role authorization", () => {
-    const callback = new URL(getSafeCallbackUrl("/admin", baseUrl));
+    const callback = new URL(getSafeCallbackUrl("/staff", baseUrl));
 
     expect(
       getProxyAuthorizationOutcome(
@@ -253,7 +234,7 @@ describe("minimal Auth.js claims", () => {
   it("constructs a session user containing only approved identity claims", () => {
     const result = createMinimalSession("expiry", {
       sub: "user-id",
-      role: "ADMIN",
+      role: "STAFF",
       status: "ACTIVE",
       sessionVersion: 3,
       email: "not-retained@example.invalid",
@@ -265,7 +246,7 @@ describe("minimal Auth.js claims", () => {
       expires: "expiry",
       user: {
         id: "user-id",
-        role: "ADMIN",
+        role: "STAFF",
         status: "ACTIVE",
         sessionVersion: 3,
       },
