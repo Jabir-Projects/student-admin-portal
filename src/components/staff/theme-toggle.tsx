@@ -1,10 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
 const themeStorageKey = "sist-color-theme";
 
 export function ThemeToggle() {
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsHydrated(true), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   function toggleTheme() {
     const root = document.documentElement;
     const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
@@ -21,6 +29,7 @@ export function ThemeToggle() {
     <button
       aria-label="Toggle light and dark theme"
       className="border-border bg-background text-foreground hover:bg-muted inline-flex size-10 items-center justify-center rounded-lg border transition-colors"
+      disabled={!isHydrated}
       onClick={toggleTheme}
       title="Toggle light and dark theme"
       type="button"

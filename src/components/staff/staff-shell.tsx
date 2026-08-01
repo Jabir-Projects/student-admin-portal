@@ -1,8 +1,7 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Bell, ChevronDown, CircleUserRound, Search } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 
-import { logoutAction } from "@/app/logout/actions";
+import { SistBrand } from "@/components/brand/sist-brand";
+import { AccountMenu as PortalAccountMenu } from "@/components/layout/account-menu";
 import {
   DesktopStaffNavigation,
   MobileStaffNavigation,
@@ -18,77 +17,17 @@ type StaffShellProps = {
 
 function StaffBranding() {
   return (
-    <Link
-      aria-label="SIST staff dashboard"
-      className="inline-flex min-w-0 flex-col"
+    <SistBrand
+      className="flex-col items-start gap-2"
       href="/staff"
-    >
-      <span className="inline-flex w-fit rounded-md bg-white px-2 py-1">
-        <Image
-          alt="SIST - Superior Institute of Science and Technology"
-          className="h-auto w-31"
-          height={1302}
-          priority
-          sizes="124px"
-          src="/sist-logo.jpg"
-          width={2550}
-        />
-      </span>
-      <span className="text-staff-sidebar-foreground mt-3 text-sm font-semibold">
-        Staff Administration Portal
-      </span>
-    </Link>
+      portalLabel="Staff Administration Portal"
+      priority
+    />
   );
-}
-
-function getInitials(fullName: string): string {
-  const parts = fullName.split(/\s+/u).filter(Boolean);
-  if (parts.length === 0) return "S";
-  const first = parts[0]?.[0] ?? "";
-  const last = parts.length > 1 ? (parts.at(-1)?.[0] ?? "") : "";
-  return `${first}${last}`.toLocaleUpperCase();
 }
 
 export function AccountMenu({ fullName }: { fullName: string }) {
-  return (
-    <details className="group relative">
-      <summary
-        aria-label="Open account menu"
-        className="hover:bg-muted flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg px-2 transition-colors [&::-webkit-details-marker]:hidden"
-      >
-        <span className="bg-secondary text-secondary-foreground inline-flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold">
-          {getInitials(fullName)}
-        </span>
-        <span className="hidden min-w-0 text-left sm:block">
-          <span className="block max-w-36 truncate text-sm font-semibold">
-            {fullName}
-          </span>
-          <span className="text-muted-foreground block text-xs">STAFF</span>
-        </span>
-        <ChevronDown
-          aria-hidden="true"
-          className="text-muted-foreground hidden size-4 transition-transform group-open:rotate-180 sm:block"
-        />
-      </summary>
-      <div className="bg-card absolute top-[calc(100%+0.5rem)] right-0 z-50 w-64 rounded-lg border p-2 shadow-xl">
-        <div className="border-border border-b px-3 py-2">
-          <p className="truncate text-sm font-semibold">{fullName}</p>
-          <p className="text-muted-foreground mt-0.5 text-xs">
-            Active STAFF account
-          </p>
-        </div>
-        <form action={logoutAction} className="mt-2">
-          <button
-            className="hover:bg-muted flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors"
-            type="submit"
-          >
-            <CircleUserRound aria-hidden="true" className="size-4" />
-            Sign out
-          </button>
-        </form>
-      </div>
-    </details>
-  );
+  return <PortalAccountMenu fullName={fullName} roleLabel="STAFF" />;
 }
 
 function NotificationsPanel() {

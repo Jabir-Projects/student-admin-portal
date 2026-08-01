@@ -12,6 +12,13 @@
   --sist-olive: #6e8c3a;
   --sist-olive-dark: #506b26;
   --sist-olive-light: #eaf0df;
+  --accent-strong: #506b26;
+  --success: #2f6b3b;
+  --success-soft: #e8f3e8;
+  --warning: #8a5a00;
+  --warning-soft: #fff4d6;
+  --info: #245b86;
+  --info-soft: #e8f1f8;
   --border: #e1e5e1;
   --border-strong: #cbd2cb;
   --surface: #ffffff;
@@ -41,6 +48,13 @@
   --staff-active: #e6f0df;
   --staff-active-foreground: #244f1d;
   --staff-overlay: rgb(8 29 51 / 0.58);
+  --header-surface: rgb(255 255 255 / 0.94);
+  --sidebar: var(--staff-sidebar);
+  --sidebar-foreground: var(--staff-sidebar-foreground);
+  --sidebar-muted: var(--staff-sidebar-muted);
+  --sidebar-active: var(--staff-active);
+  --sidebar-active-foreground: var(--staff-active-foreground);
+  --sidebar-overlay: var(--staff-overlay);
 }
 
 [data-theme="dark"] {
@@ -55,6 +69,13 @@
   --sist-olive: #95c750;
   --sist-olive-dark: #bce77d;
   --sist-olive-light: #193d2b;
+  --accent-strong: #bce77d;
+  --success: #9bd6a2;
+  --success-soft: #173b27;
+  --warning: #f3c86a;
+  --warning-soft: #3f3112;
+  --info: #9dc8ed;
+  --info-soft: #123652;
   --border: #24445e;
   --border-strong: #365a75;
   --surface: #0a243b;
@@ -83,6 +104,13 @@
   --staff-active: #1d4b25;
   --staff-active-foreground: #e7f6d4;
   --staff-overlay: rgb(1 10 18 / 0.78);
+  --header-surface: rgb(6 29 49 / 0.94);
+  --sidebar: var(--staff-sidebar);
+  --sidebar-foreground: var(--staff-sidebar-foreground);
+  --sidebar-muted: var(--staff-sidebar-muted);
+  --sidebar-active: var(--staff-active);
+  --sidebar-active-foreground: var(--staff-active-foreground);
+  --sidebar-overlay: var(--staff-overlay);
 }
 
 @theme inline {
@@ -116,6 +144,13 @@
   --color-sist-olive: var(--sist-olive);
   --color-sist-olive-dark: var(--sist-olive-dark);
   --color-sist-olive-light: var(--sist-olive-light);
+  --color-accent-strong: var(--accent-strong);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
   --color-border-strong: var(--border-strong);
   --color-surface: var(--surface);
   --color-staff-sidebar: var(--staff-sidebar);
@@ -127,6 +162,13 @@
   --color-staff-active: var(--staff-active);
   --color-staff-active-foreground: var(--staff-active-foreground);
   --color-staff-overlay: var(--staff-overlay);
+  --color-header-surface: var(--header-surface);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-sidebar-active-foreground: var(--sidebar-active-foreground);
+  --color-sidebar-overlay: var(--sidebar-overlay);
   --font-sans: var(--font-inter), "Segoe UI", Arial, sans-serif;
   --font-mono:
     var(--font-ibm-plex-mono), "Cascadia Code", "SFMono-Regular", Consolas,

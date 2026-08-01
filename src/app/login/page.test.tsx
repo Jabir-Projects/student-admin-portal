@@ -18,6 +18,29 @@ describe("login session-state presentation", () => {
     render(await LoginPage({ searchParams: Promise.resolve({ reason }) }));
 
     expect(screen.getByRole("alert")).toHaveTextContent(message);
+    expect(screen.getByLabelText("Email")).toHaveAttribute(
+      "aria-describedby",
+      "login-error",
+    );
+    expect(screen.getByLabelText("Password")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+  });
+
+  it("presents a generic authentication failure without internal detail", async () => {
+    render(
+      await LoginPage({
+        searchParams: Promise.resolve({ error: "CallbackRouteError" }),
+      }),
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "The email address or password is incorrect.",
+    );
+    expect(
+      screen.queryByText(/CallbackRouteError|stack|database/iu),
+    ).toBeNull();
   });
 
   it("preserves a bounded callback request for server-side validation", async () => {

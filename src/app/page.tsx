@@ -1,7 +1,7 @@
 import { Info, LockKeyhole } from "lucide-react";
 import Link from "next/link";
 
-import { SiteHeader } from "@/components/layout/site-header";
+import { PublicShell } from "@/components/layout/public-shell";
 
 const services = [
   {
@@ -21,8 +21,7 @@ const services = [
 
 export default function Home() {
   return (
-    <div className="bg-paper min-h-screen">
-      <SiteHeader />
+    <PublicShell className="bg-paper">
       <main>
         <section className="mx-auto max-w-[75rem] px-5 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
           <div className="grid items-center gap-9 min-[860px]:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)] min-[860px]:gap-12">
@@ -135,6 +134,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-    </div>
+    </PublicShell>
   );
 }

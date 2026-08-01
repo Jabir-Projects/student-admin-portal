@@ -1,27 +1,16 @@
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SystemState } from "@/components/feedback/system-state";
+import { AuthShell } from "@/components/layout/auth-shell";
 
 export default function PendingApprovalPage() {
   return (
-    <main className="mx-auto max-w-xl px-4 py-16">
-      <Card>
-        <CardHeader>
-          <CardTitle>Administrative approval pending</CardTitle>
-        </CardHeader>
-        <CardContent className="text-muted-foreground space-y-4 text-sm">
-          <p>
-            Your registration has been submitted. Access will remain unavailable
-            until an administrator approves the account.
-          </p>
-          <p>If you require assistance, please contact SIST administration.</p>
-          <Link
-            className="text-primary font-medium hover:underline"
-            href="/login"
-          >
-            Return to login
-          </Link>
-        </CardContent>
-      </Card>
-    </main>
+    <AuthShell>
+      <SystemState
+        actionHref="/login"
+        actionLabel="Return to sign in"
+        description="Your registration has been submitted. Portal access remains unavailable until SIST administration approves the account."
+        kind="pending"
+        title="Administrative approval pending"
+      />
+    </AuthShell>
   );
 }

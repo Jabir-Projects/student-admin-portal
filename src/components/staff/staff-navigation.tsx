@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   FileText,
   LayoutDashboard,
-  Menu,
   ReceiptText,
   ScrollText,
   Settings,
@@ -16,7 +14,6 @@ import {
   UserRound,
   Users,
   WalletCards,
-  X,
   type LucideIcon,
 } from "lucide-react";
 
@@ -24,6 +21,7 @@ import type {
   StaffNavigationIcon,
   StaffNavigationItem,
 } from "@/features/staff/navigation";
+import { MobileNavigationDrawer } from "@/components/layout/mobile-navigation-drawer";
 import { cn } from "@/lib/utils";
 
 const icons: Record<StaffNavigationIcon, LucideIcon> = {
@@ -120,122 +118,15 @@ export function MobileStaffNavigation({
   items: readonly StaffNavigationItem[];
   branding: React.ReactNode;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const openerRef = useRef<HTMLButtonElement>(null);
-  const drawerRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const opener = openerRef.current;
-    const drawer = drawerRef.current;
-    if (!drawer) return;
-    const activeDrawer = drawer;
-
-    const focusableSelector = [
-      "a[href]",
-      "button:not([disabled])",
-      "input:not([disabled])",
-      "select:not([disabled])",
-      "textarea:not([disabled])",
-      '[tabindex]:not([tabindex="-1"])',
-    ].join(",");
-
-    function getFocusableElements(): HTMLElement[] {
-      return Array.from(
-        activeDrawer.querySelectorAll<HTMLElement>(focusableSelector),
-      );
-    }
-
-    getFocusableElements()[0]?.focus();
-
-    function handleDrawerKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        setIsOpen(false);
-        return;
-      }
-      if (event.key !== "Tab") return;
-
-      const focusableElements = getFocusableElements();
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements.at(-1);
-      if (!firstElement || !lastElement) {
-        event.preventDefault();
-        return;
-      }
-
-      const activeElement = document.activeElement;
-      const focusIsOutsideDrawer =
-        activeElement instanceof Node && !activeDrawer.contains(activeElement);
-      if (event.shiftKey) {
-        if (activeElement === firstElement || focusIsOutsideDrawer) {
-          event.preventDefault();
-          lastElement.focus();
-        }
-        return;
-      }
-      if (activeElement === lastElement || focusIsOutsideDrawer) {
-        event.preventDefault();
-        firstElement.focus();
-      }
-    }
-
-    document.addEventListener("keydown", handleDrawerKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleDrawerKeyDown);
-      if (opener?.isConnected) opener.focus();
-    };
-  }, [isOpen]);
-
   return (
-    <>
-      <button
-        ref={openerRef}
-        aria-controls="staff-mobile-navigation"
-        aria-expanded={isOpen}
-        aria-label="Open staff navigation"
-        className="border-border bg-background text-foreground hover:bg-muted inline-flex size-10 items-center justify-center rounded-lg border lg:hidden"
-        onClick={() => setIsOpen(true)}
-        type="button"
-      >
-        <Menu aria-hidden="true" className="size-5" />
-      </button>
-      {isOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <button
-            aria-label="Close staff navigation"
-            className="bg-staff-overlay absolute inset-0"
-            onClick={() => setIsOpen(false)}
-            type="button"
-          />
-          <aside
-            ref={drawerRef}
-            aria-label="Staff navigation drawer"
-            aria-modal="true"
-            className="bg-staff-sidebar absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] flex-col border-r p-5 shadow-2xl"
-            id="staff-mobile-navigation"
-            role="dialog"
-          >
-            <div className="flex items-start justify-between gap-4">
-              {branding}
-              <button
-                aria-label="Close staff navigation"
-                className="border-border text-staff-sidebar-foreground hover:bg-staff-active inline-flex size-10 shrink-0 items-center justify-center rounded-lg border"
-                onClick={() => setIsOpen(false)}
-                type="button"
-              >
-                <X aria-hidden="true" className="size-5" />
-              </button>
-            </div>
-            <div className="mt-7 min-h-0 flex-1 overflow-y-auto">
-              <NavigationList
-                items={items}
-                onNavigate={() => setIsOpen(false)}
-              />
-            </div>
-          </aside>
-        </div>
-      ) : null}
-    </>
+    <MobileNavigationDrawer
+      branding={branding}
+      closeLabel="Close staff navigation"
+      drawerLabel="Staff navigation drawer"
+      id="staff-mobile-navigation"
+      triggerLabel="Open staff navigation"
+    >
+      {(close) => <NavigationList items={items} onNavigate={close} />}
+    </MobileNavigationDrawer>
   );
 }

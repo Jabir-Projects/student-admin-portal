@@ -2,8 +2,9 @@ import Link from "next/link";
 
 import { loginAction } from "@/app/login/actions";
 import { getSafeCallbackPath } from "@/auth.config";
+import { FeedbackBanner } from "@/components/feedback/feedback-banner";
+import { AuthPanel, AuthShell } from "@/components/layout/auth-shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getLoginPresentationMessage } from "@/features/auth/session-ux";
 
 const inputClass =
@@ -31,15 +32,11 @@ export default async function LoginPage({
       : undefined;
 
   return (
-    <main className="mx-auto max-w-md px-4 py-16">
-      <Card>
-        <CardHeader>
-          <CardTitle>SIST portal sign in</CardTitle>
-          <p className="text-muted-foreground text-sm">
-            Use your registered email address and password.
-          </p>
-        </CardHeader>
-        <CardContent>
+    <AuthShell>
+      <AuthPanel
+        description="Use your registered email address and password."
+        title="SIST portal sign in"
+      >
           <form action={loginAction} className="space-y-5">
             {safeLengthCallbackUrl ? (
               <input
@@ -51,6 +48,8 @@ export default async function LoginPage({
             <label className="block space-y-2 text-sm font-medium">
               Email
               <input
+                aria-describedby={errorMessage ? "login-error" : undefined}
+                aria-invalid={Boolean(errorMessage)}
                 autoComplete="email"
                 className={inputClass}
                 maxLength={320}
@@ -62,6 +61,8 @@ export default async function LoginPage({
             <label className="block space-y-2 text-sm font-medium">
               Password
               <input
+                aria-describedby={errorMessage ? "login-error" : undefined}
+                aria-invalid={Boolean(errorMessage)}
                 autoComplete="current-password"
                 className={inputClass}
                 maxLength={128}
@@ -71,9 +72,18 @@ export default async function LoginPage({
               />
             </label>
             {errorMessage ? (
-              <p className="text-destructive text-sm" role="alert">
+              <FeedbackBanner
+                id="login-error"
+                tone={
+                  reason === "disabled"
+                    ? "warning"
+                    : reason === "session-ended"
+                      ? "info"
+                      : "error"
+                }
+              >
                 {errorMessage}
-              </p>
+              </FeedbackBanner>
             ) : null}
             <Button className="w-full" type="submit">
               Sign in
@@ -88,8 +98,7 @@ export default async function LoginPage({
               </Link>
             </p>
           </form>
-        </CardContent>
-      </Card>
-    </main>
+      </AuthPanel>
+    </AuthShell>
   );
 }

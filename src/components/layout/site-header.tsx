@@ -1,22 +1,40 @@
-import Image from "next/image";
+import Link from "next/link";
+
+import { SistBrand } from "@/components/brand/sist-brand";
+import { ThemeToggle } from "@/components/staff/theme-toggle";
 
 export function SiteHeader() {
   return (
-    <header className="border-border bg-surface border-b">
-      <div className="mx-auto flex min-h-19 max-w-[75rem] items-center gap-3 px-5 py-2 sm:gap-4 sm:px-8 lg:px-12">
-        <Image
-          alt="SIST - Superior Institute of Science and Technology"
-          className="h-auto w-[5.5rem] shrink-0 sm:w-28"
-          height={1302}
-          sizes="(min-width: 640px) 112px, 88px"
-          src="/sist-logo.jpg"
-          width={2550}
+    <header className="border-border bg-header-surface border-b backdrop-blur">
+      <div className="mx-auto flex min-h-20 max-w-[75rem] items-center justify-between gap-3 px-4 py-2 sm:px-8 lg:px-12">
+        <SistBrand
+          className="[&>span:last-child]:hidden min-[480px]:[&>span:last-child]:block"
+          portalLabel="Student Administration"
+          priority
+          variant="compact"
         />
-        <div className="border-border-strong min-w-0 border-l pl-3 sm:pl-4">
-          <p className="text-sist-navy-dark text-sm leading-tight font-semibold tracking-tight sm:text-base">
-            Student Administration
-          </p>
-          <p className="text-slate mt-1 text-xs">University services portal</p>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <nav aria-label="Public navigation">
+            <ul className="flex items-center gap-1 sm:gap-2">
+              <li>
+                <Link
+                  className="hover:bg-muted inline-flex min-h-10 items-center rounded-md px-3 text-sm font-medium"
+                  href="/login"
+                >
+                  Sign in
+                </Link>
+              </li>
+              <li className="hidden sm:block">
+                <Link
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex min-h-10 items-center rounded-md px-3 text-sm font-medium"
+                  href="/register"
+                >
+                  Register
+                </Link>
+              </li>
+            </ul>
+          </nav>
+          <ThemeToggle />
         </div>
       </div>
     </header>

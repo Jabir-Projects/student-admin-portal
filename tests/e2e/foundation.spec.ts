@@ -19,10 +19,11 @@ test("landing page presents the portal foundation", async ({ page }) => {
       "New student accounts require administrative approval before portal access.",
     ),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Sign in" })).toHaveAttribute(
-    "href",
-    "/login",
-  );
+  await expect(
+    page
+      .getByRole("complementary", { name: "Access the portal" })
+      .getByRole("link", { name: "Sign in" }),
+  ).toHaveAttribute("href", "/login");
   await expect(
     page.getByRole("link", { name: "Create account" }),
   ).toHaveAttribute("href", "/register");
