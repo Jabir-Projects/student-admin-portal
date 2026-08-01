@@ -65,7 +65,7 @@ Status: `REPORTED COMPLETE`
 
 ### V2-3 — Roles, Authentication, and Authorization
 
-Status: `ACTIVE`
+Status: `VERIFIED COMPLETE`
 
 #### Package A — Additive database and session foundation
 
@@ -147,17 +147,17 @@ Status: `COMPLETE — FINAL PACKAGE BRANCH PUSHED`
 
 The migration preserves existing capability assignments exactly, invalidates
 converted sessions, writes redacted system audit events, preserves an active
-capability manager, and removes ADMIN from the current role enum. Execution
-against an isolated PostgreSQL database remains a V2-3 closure gate.
+capability manager, and removes ADMIN from the current role enum. Execution was
+verified against a distinct isolated non-production PostgreSQL database.
 
 #### Package F — Final V2-3 verification
 
-Status: `OWNER ACTION REQUIRED`
+Status: `VERIFIED COMPLETE`
 
 - Scope inventory
 - Integrated authorization verification
 - Repository verification
-- Phase closure — pending isolated PostgreSQL migration and integration proof
+- Phase closure — Complete; 7 migrations and 39 PostgreSQL tests verified
 
 ### V2-4 — Institutional UI Foundation
 

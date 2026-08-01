@@ -12,8 +12,8 @@ See the current authorization addendum at the end of this file.
 | Name   | Create Project 3 control documents |
 | Status | `CLOSED`                           |
 
-Only one control package may be active at a time. `CTRL-001` is closed.
-`V2-3-CF-001` is the active owner-authorized master package.
+Only one control package may be active at a time. `CTRL-001` and
+`V2-3-CF-001` are closed. No later package is active.
 
 ## Status lifecycle
 
@@ -164,7 +164,7 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIO
   `1e2961af619c7025cb0f322e1cc6d4759594f2ee`.
 - Package E is complete and pushed at
   `81f799af50d2aeab22ade97d350bc4c03e434b29`.
-- Package F is active.
+- Package F is complete and V2-3 is closed.
 - The owner-authorized final Package C closure includes one six-file commit and
   a normal push to the existing upstream branch.
 - Package C closure did not authorize later packages. The separate
@@ -302,13 +302,13 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md),
 [DECISIONS.md](DECISIONS.md), and
 [VERIFICATION_MATRIX.md](VERIFICATION_MATRIX.md).
 
-## Active V2-3 master control package
+## Closed V2-3 master control package
 
 | Field  | Value                                           |
 | ------ | ----------------------------------------------- |
 | ID     | `V2-3-CF-001`                                   |
 | Name   | Complete and close V2-3 Packages C through F    |
-| Status | `ACTIVE`                                        |
+| Status | `CLOSED`                                        |
 
 ### Verified starting state
 
@@ -368,7 +368,8 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md),
 - Complete non-database verification passed 563 tests; 39 PostgreSQL tests
   skipped because no isolated database was configured.
 - Four Package E Playwright tests passed.
-- PostgreSQL migration execution remains required before closure.
+- PostgreSQL migration execution completed against the verified isolated test
+  target before closure.
 
 ### Deferred-improvement rule
 
@@ -394,5 +395,29 @@ workflow failures block closure.
   ESLint/Next plugin `minimatch` chain. A fixed nested dependency override and
   the audit-recommended ESLint 10 update were both rejected after each broke
   lint execution.
-- Isolated PostgreSQL migration execution and the 39 database integration tests
-  remain mandatory. `V2-3-CF-001` remains `ACTIVE`; V2-3 is not closed.
+- Isolated PostgreSQL migration execution and all 39 database integration tests
+  passed. `V2-3-CF-001` and V2-3 are closed.
+
+### Package F final PostgreSQL and closure evidence
+
+- Sanitized control and test fingerprints proved distinct logical targets; only
+  read-only identity queries touched the owner-reported non-production control
+  database.
+- The isolated target contained only deterministic suite-owned fixtures and
+  empty student/request/document application tables before mutation.
+- All seven migrations completed with no failed migration record. Redeploy was
+  deterministic and reported no pending migration.
+- Two ADMIN fixtures converted to STAFF with exact 4-capability and
+  2-capability sets preserved, session versions incremented from 0 to 1, two
+  redacted audit events, one surviving active capability manager, and no ADMIN
+  enum value.
+- Controlled audit failure and lock contention rolled back with no partial
+  conversion.
+- PostgreSQL verification: 5 files, 39 passed, 0 failed, 0 skipped.
+- Full Vitest verification: 53 files, 602 passed, 0 failed, 0 skipped.
+- Package D's five historical control-document modifications were archived to
+  `D:\PROJECT 3\SIST-backups\v2-3-agent-d-control-docs-20260801-222519.patch`
+  (26,475 bytes; SHA-256
+  `cd33f2fedadba7466e71be997781eb8a4373a63b9c4c3539f53df07c309eaa8f`),
+  then restored exactly. Its branch is clean and synchronized at `0/0`.
+- V2-4 remains planned and was not started.

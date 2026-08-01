@@ -52,7 +52,7 @@ See [TASK_PACKAGE.md](TASK_PACKAGE.md) for permissions and [ARCHITECTURE.md](ARC
 
 ## Package D expected verification
 
-Status: Packages C, D, and E are complete. Package F is active.
+Status: Packages C through F and V2-3 are verified complete.
 
 ### D1 documentation checks
 
@@ -247,7 +247,7 @@ Package D and remains planned for V2-7.
 
 ## V2-3-CF-001 closure verification
 
-Status: `ACTIVE`
+Status: `CLOSED`
 
 - Package C targeted, browser, responsive, accessibility, and secret checks.
 - Package D lifecycle, capability, audit, transaction, concurrency, and
@@ -288,5 +288,23 @@ Status: `ACTIVE`
 | Playwright assertions | `PASS` — 12/12 across two runs; runner teardown timed out |
 | Production dependency audit | `PASS` — 0 vulnerabilities |
 | Complete dependency audit | `LIMITED` — 9 high development-only upstream lint-tool findings |
-| Migration and PostgreSQL integration | `NOT RUN` — isolated database configuration unavailable |
-| V2-3 closure | `OWNER ACTION REQUIRED` pending the PostgreSQL gate |
+| Migration and PostgreSQL integration | `PASS` — 7 migrations; 5 files and 39 tests passed with zero skips |
+| V2-3 closure | `CLOSED` — all technical closure gates passed; V2-4 not started |
+
+### Package F final database evidence
+
+| Requirement | Result |
+| --- | --- |
+| Control/test target separation | `PASS` — distinct sanitized target fingerprints |
+| Test-data classification | `PASS` — reserved suite fixtures only; meaningful application tables empty |
+| Migration history | `PASS` — 7 successful, 0 failed, 0 pending |
+| Deterministic redeploy | `PASS` — no pending migrations |
+| Capability preservation | `PASS` — exact 4-capability and 2-capability sets unchanged |
+| Session invalidation | `PASS` — converted ADMIN session versions incremented 0 to 1 |
+| Audit behavior | `PASS` — 2 redacted conversion audits; forced audit failure rolled back |
+| Locking and atomicity | `PASS` — lock contention rolled back with no partial conversion |
+| Final-manager survival | `PASS` — one active manager survived conversion |
+| Enum replacement | `PASS` — current role enum contains only STUDENT and STAFF |
+| PostgreSQL suite | `PASS` — 5 files, 39 passed, 0 failed, 0 skipped |
+| Full Vitest suite | `PASS` — 53 files, 602 passed, 0 failed, 0 skipped |
+| Package D recovery | `PASS` — five-file patch verified; auxiliary worktree clean at 0/0 |

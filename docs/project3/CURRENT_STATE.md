@@ -1,18 +1,18 @@
 # Project 3 Current State
 
-Last updated: 2026-07-31
+Last updated: 2026-08-01
 
 ## Current position
 
 | Item                                                      | State                                              | Evidence                                                                  |
 | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
-| Phase                                                     | V2-3 — Roles, Authentication, and Authorization    | `VERIFIED` Active                                                         |
-| Active control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `ACTIVE`; owner-authorized master execution                               |
+| Phase                                                     | V2-3 — Roles, Authentication, and Authorization    | `VERIFIED COMPLETE`                                                       |
+| Closed control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | CTRL-001 — Create Project 3 control documents      | `VERIFIED` `CLOSED`                                                       |
 | V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
-| Current product package                                   | V2-3 Package F — Integrated verification            | Owner action required for isolated PostgreSQL verification                |
+| Current product package                                   | None                                                | V2-3 closed; V2-4 not started                                             |
 | Package C1                                                | Repository and route readiness                     | Complete                                                                  |
 | Package C2                                                | Design requirements lock                           | Complete                                                                  |
 | Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
@@ -22,7 +22,7 @@ Last updated: 2026-07-31
 | Package C Git delivery                                    | Final closure delivery                             | Final six-file closure commit and push owner-authorized                   |
 | Package D implementation                                  | Complete                                           | Final package commit `1e2961af619c7025cb0f322e1cc6d4759594f2ee` pushed   |
 | Package E                                                 | Complete                                           | Final branch `81f799af50d2aeab22ade97d350bc4c03e434b29` pushed           |
-| Package F                                                 | Owner action required                             | Independent gates passed; isolated PostgreSQL closure gate remains        |
+| Package F                                                 | Complete                                            | Integrated and isolated PostgreSQL verification passed                    |
 
 ## Package D final delivery state
 
@@ -83,8 +83,7 @@ Last updated: 2026-07-31
 
 ## Current management objective
 
-> Run Package F phase verification. Closure requires isolated PostgreSQL
-> migration evidence; stop for the owner action if no test database is supplied.
+> V2-3 is verified and closed. V2-4 remains planned and has not started.
 
 ## Risks and blockers
 
@@ -95,8 +94,20 @@ Last updated: 2026-07-31
   `1e2961af619c7025cb0f322e1cc6d4759594f2ee`.
 - Package E is complete and pushed at
   `81f799af50d2aeab22ade97d350bc4c03e434b29`.
-- The current environment has no isolated PostgreSQL configuration and Docker
-  is unavailable. Database execution remains pending before V2-3 closure.
+- A distinct isolated PostgreSQL test target was verified with a sanitized
+  target fingerprint before mutation. The control target was owner-reported
+  non-production and accessed only for read-only identity verification;
+  production access was neither authorized nor performed.
+- All seven migrations applied successfully. Deterministic redeploy reported no
+  pending migrations; migration history contains seven successful records and
+  no failed record.
+- The ADMIN-to-STAFF conversion preserved exact capability sets, incremented
+  converted session versions, wrote two redacted audit records, removed ADMIN
+  from the role enum, and preserved an active capability manager.
+- Controlled audit-insert failure and lock contention both rolled back without
+  partial conversion.
+- The complete PostgreSQL inventory passed: 5 files, 39 tests, 0 failed, 0
+  skipped. The full suite passed 53 files and 602 tests.
 - Package F non-database verification passed: ESLint, strict typecheck, 563
   Vitest tests, Prisma format/validate/generate, Next.js production build, and
   all 12 Playwright assertions. The Playwright assertions completed, but the
@@ -105,16 +116,21 @@ Last updated: 2026-07-31
   development-tooling findings remain in the upstream ESLint/Next plugin
   `minimatch` chain; both the nested override and ESLint 10 remediation were
   tested and rejected because they break lint execution.
-- The historical development-admin backfill migration requires a prepared
-  administrator and prevents a genuinely pristine full-history deployment.
-  Applied migration SQL will not be rewritten.
+- The seven-migration chain was verified using the required deterministic
+  pre-conversion ADMIN fixtures; historical migration SQL was not rewritten.
 - Physical-device and full real-screen-reader testing remain eligible for the
   Final Hardening Backlog if browser-level checks continue to pass.
 
 ## Next approved management action
 
-Owner must configure one isolated non-production PostgreSQL environment. Resume
-Package F at migration and database-integration verification. Do not begin
-V2-4.
+Await explicit authorization for V2-4. Do not begin it automatically.
+
+## Final Hardening Backlog
+
+- Physical-device testing.
+- Full real-screen-reader testing.
+- Playwright Windows server-teardown reliability.
+- Nine development-only upstream ESLint/Next lint-tool audit findings.
+- Cosmetic UI polish and optional refactoring.
 
 See [ROADMAP.md](ROADMAP.md) for sequencing and [TASK_PACKAGE.md](TASK_PACKAGE.md) for the closed CTRL-001 record.

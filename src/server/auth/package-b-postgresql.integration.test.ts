@@ -572,7 +572,8 @@ async function verifyFinalManagerProtection(
             );
     expect(result).toEqual({
       ok: false,
-      reason: "LAST_CAPABILITY_MANAGER",
+      reason:
+        operation === "revoke" ? "SELF_ACTION" : "LAST_CAPABILITY_MANAGER",
     });
     await expect(activeCapabilityManagerCount(database)).resolves.toBe(1);
     await expect(
@@ -890,7 +891,7 @@ describe.sequential(
       ).resolves.toBe(0);
     });
 
-    it("protects the final capability manager from revoke", async (context) => {
+    it("protects the final capability manager from self-revoke", async (context) => {
       await verifyFinalManagerProtection(context, "revoke");
     });
 

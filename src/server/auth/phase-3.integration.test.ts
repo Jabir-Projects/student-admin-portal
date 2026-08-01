@@ -41,7 +41,7 @@ const administratorId = "95000000-0000-4000-8000-000000000001";
 const administratorEmail = "sist-test-phase3-admin@example.test";
 const administratorClaims = {
   actorId: administratorId,
-  claimedSessionVersion: 0,
+  claimedSessionVersion: 1,
 } as const;
 const scenarioUserIds = [
   "95100000-0000-4000-8000-000000000001",
@@ -175,7 +175,7 @@ async function ensureAdministrator(): Promise<void> {
       fullName: "SIST Test Phase 3 Administrator",
       role: "STAFF",
       status: "ACTIVE",
-      sessionVersion: 0,
+      sessionVersion: 1,
     });
   } else {
     await isolatedDb!.user.create({
@@ -186,6 +186,7 @@ async function ensureAdministrator(): Promise<void> {
         passwordHash: "integration-test-non-authenticating-value",
         role: "STAFF",
         status: "ACTIVE",
+        sessionVersion: 1,
       },
     });
   }
