@@ -420,4 +420,48 @@ workflow failures block closure.
   (26,475 bytes; SHA-256
   `cd33f2fedadba7466e71be997781eb8a4373a63b9c4c3539f53df07c309eaa8f`),
   then restored exactly. Its branch is clean and synchronized at `0/0`.
-- V2-4 remains planned and was not started.
+- At V2-3 closure, V2-4 remained planned and had not started.
+
+## Closed V2-4 institutional UI foundation package
+
+| Field | Value |
+| --- | --- |
+| ID | `V2-4` |
+| Name | Institutional UI Foundation |
+| Status | `VERIFIED` `CLOSED` |
+| Starting commit | `c7ed77884944663e8bd4ebd6ec837767f483c04c` |
+| Branch | `codex/v2-4-institutional-ui-foundation` |
+| Database permission | No database access, schema change, migration, or seed |
+
+### Approved Minimum Closure Scope
+
+- V2-4.1 centralized the existing SIST navy/green brand values into semantic
+  light and dark tokens without creating a competing token system.
+- V2-4.2 established shared public, authentication/access, student, and STAFF
+  foundations for existing routes only.
+- V2-4.3 consolidated login, registration, pending approval, disabled/session
+  messaging, unauthorized, safe authentication failure, and loading states.
+- V2-4.4 reused the checked-in logo and existing UI primitives while adding only
+  focused shared brand, shell, account-menu, drawer, feedback, and state
+  components used by current pages.
+- V2-4.5 applied reusable loading, error, not-found, unauthorized, pending, and
+  session/access presentation without leaking internal details.
+- V2-4.6 verified keyboard focus, drawer focus trapping/restoration, themes,
+  contrast, no horizontal overflow, and the approved responsive viewport matrix.
+
+### Closure evidence
+
+- Verified implementation commit:
+  `20e8115db274a0e584bd890004901ac3ff44e581`
+  (`feat(v2-4): establish institutional UI foundation`).
+- Focused Vitest: 9 files, 55 passed, 0 failed, 0 skipped.
+- Full non-database Vitest: 52 files and 576 tests passed; 3 PostgreSQL files
+  and 39 PostgreSQL tests intentionally skipped because V2-4 changed no backend
+  or database-sensitive behavior.
+- ESLint and strict TypeScript typecheck passed.
+- Next.js 16.2.12 production build passed with 13 expected routes.
+- Targeted Chromium: 18 passed, 0 failed, 0 skipped, including 360×800,
+  768×1024, 1024×768, and 1440×900 verification.
+- Scoped formatting, secret scan, diff check, documentation links, final Git
+  synchronization, and cleanliness are required final delivery gates.
+- V2-5 remains planned and was not started.

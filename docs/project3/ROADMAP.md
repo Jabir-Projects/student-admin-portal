@@ -161,14 +161,20 @@ Status: `VERIFIED COMPLETE`
 
 ### V2-4 — Institutional UI Foundation
 
-Status: `PLANNED`
+Status: `VERIFIED COMPLETE`
 
-- V2-4.1 Brand and design tokens
-- V2-4.2 Shared application shells
-- V2-4.3 Authentication and access states
-- V2-4.4 Shared UI components
-- V2-4.5 Shared system states
-- V2-4.6 Accessibility and responsive verification
+- V2-4.1 Brand and design tokens — Complete
+- V2-4.2 Shared application shells — Complete
+- V2-4.3 Authentication and access states — Complete
+- V2-4.4 Shared UI components — Complete
+- V2-4.5 Shared system states — Complete
+- V2-4.6 Accessibility and responsive verification — Complete
+
+The owner-approved Design Lock reuses the repository SIST logo, deep navy and
+green identity, existing typography, and existing theme mechanism. Shared
+public, authentication, student, and STAFF foundations cover existing routes
+without adding business workflows. Verification passed the required 360×800,
+768×1024, 1024×768, and 1440×900 viewport matrix. V2-5 was not started.
 
 ### V2-5 — Student Core Portal
 

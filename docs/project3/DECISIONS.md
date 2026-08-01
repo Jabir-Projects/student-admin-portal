@@ -260,3 +260,22 @@ This append-oriented register records approved product, architecture, security, 
   Migration execution must be proven against an isolated non-production
   PostgreSQL database before V2-3 closure.
 - Related phase or package: V2-3 Package E and Package F.
+
+### DEC-015 — V2-4 institutional UI Design Lock
+
+- Date: 2026-08-01
+- Status: `APPROVED`
+- Context: V2-4 required binding visual, shell, state, accessibility, and
+  responsive requirements before implementation.
+- Decision: Reuse the checked-in SIST logo, existing navy and green palette,
+  existing typography and theme mechanism, and existing V2-3 authorization
+  behavior. Establish shared foundations only for existing public,
+  authentication, student, and STAFF routes; do not create later-phase routes
+  or workflows. Target WCAG 2.2 AA where technically applicable and verify
+  360×800, 768×1024, 1024×768, and 1440×900 viewports.
+- Rationale: Provide a consistent institutional foundation without redesigning
+  SIST branding or weakening server-side security.
+- Consequences: V2-4 includes no database, migration, role, capability, or new
+  business-workflow work. Help & Support and Logout remain absent from sidebars;
+  navigation links remain limited to existing routes.
+- Related phase or package: V2-4 — Institutional UI Foundation.

@@ -6,13 +6,14 @@ Last updated: 2026-08-01
 
 | Item                                                      | State                                              | Evidence                                                                  |
 | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
-| Phase                                                     | V2-3 — Roles, Authentication, and Authorization    | `VERIFIED COMPLETE`                                                       |
+| Phase                                                     | V2-4 — Institutional UI Foundation                 | `VERIFIED COMPLETE`                                                       |
+| Closed control package                                    | V2-4 — Owner-approved Design Lock and phase scope  | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | CTRL-001 — Create Project 3 control documents      | `VERIFIED` `CLOSED`                                                       |
 | V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
-| Current product package                                   | None                                                | V2-3 closed; V2-4 not started                                             |
+| Current product package                                   | None                                                | V2-4 closed; V2-5 not started                                             |
 | Package C1                                                | Repository and route readiness                     | Complete                                                                  |
 | Package C2                                                | Design requirements lock                           | Complete                                                                  |
 | Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
@@ -83,7 +84,7 @@ Last updated: 2026-08-01
 
 ## Current management objective
 
-> V2-3 is verified and closed. V2-4 remains planned and has not started.
+> V2-4 is verified and closed. V2-5 remains planned and has not started.
 
 ## Risks and blockers
 
@@ -120,10 +121,21 @@ Last updated: 2026-08-01
   pre-conversion ADMIN fixtures; historical migration SQL was not rewritten.
 - Physical-device and full real-screen-reader testing remain eligible for the
   Final Hardening Backlog if browser-level checks continue to pass.
+- V2-4 centralized the existing SIST navy/green palette into semantic light and
+  dark tokens, established shared public, authentication, student, and STAFF
+  foundations, and applied reusable system states to existing routes only.
+- The verified V2-4 implementation is committed at
+  `20e8115db274a0e584bd890004901ac3ff44e581`.
+- V2-4 verification passed 576 non-database Vitest tests with 39 PostgreSQL
+  tests intentionally skipped, a 13-route production build, and 18 Chromium
+  tests covering the required responsive matrix, keyboard focus, themes,
+  contrast, access states, and existing authentication regressions.
+- Repository-wide `prettier --check .` remains a pre-existing baseline issue in
+  151 unchanged files. Every V2-4 changed file passes its scoped format check.
 
 ## Next approved management action
 
-Await explicit authorization for V2-4. Do not begin it automatically.
+Await explicit authorization for V2-5. Do not begin it automatically.
 
 ## Final Hardening Backlog
 
@@ -132,5 +144,6 @@ Await explicit authorization for V2-4. Do not begin it automatically.
 - Playwright Windows server-teardown reliability.
 - Nine development-only upstream ESLint/Next lint-tool audit findings.
 - Cosmetic UI polish and optional refactoring.
+- Repository-wide Prettier baseline normalization for unchanged historical files.
 
 See [ROADMAP.md](ROADMAP.md) for sequencing and [TASK_PACKAGE.md](TASK_PACKAGE.md) for the closed CTRL-001 record.

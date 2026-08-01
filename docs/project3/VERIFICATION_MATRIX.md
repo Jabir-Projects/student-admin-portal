@@ -308,3 +308,26 @@ Status: `CLOSED`
 | PostgreSQL suite | `PASS` — 5 files, 39 passed, 0 failed, 0 skipped |
 | Full Vitest suite | `PASS` — 53 files, 602 passed, 0 failed, 0 skipped |
 | Package D recovery | `PASS` — five-file patch verified; auxiliary worktree clean at 0/0 |
+
+## V2-4 institutional UI foundation verification
+
+Status: `CLOSED`
+
+| Requirement | Result |
+| --- | --- |
+| Approved Design Lock | `PASS` — checked-in SIST logo, existing navy/green identity, existing fonts and theme mechanism |
+| Shared tokens | `PASS` — semantic surface, feedback, header, sidebar, focus, light, and dark tokens centralized |
+| Public/authentication foundations | `PASS` — existing landing, login, registration, pending, unauthorized, and not-found routes migrated |
+| Student foundation | `PASS` — existing `/student` route uses responsive sidebar, topbar, valid dashboard link, theme, and account menu |
+| STAFF foundation | `PASS` — capability-aware navigation and existing `/staff/*` behavior preserved; drawer focus behavior retained |
+| System states | `PASS` — shared loading, empty, error, success, not-found, pending, disabled, session-ended, and access presentations covered |
+| Keyboard and focus | `PASS` — visible focus, Tab/Shift+Tab containment, Escape close, and opener restoration |
+| Theme and contrast | `PASS` — light/dark persistence, unchanged layout, and measured body contrast at least 4.5:1 |
+| Responsive matrix | `PASS` — 360×800, 768×1024, 1024×768, and 1440×900; no horizontal page overflow |
+| Focused Vitest | `PASS` — 9 files, 55 tests |
+| Full Vitest | `PASS` — 52 files, 576 tests; 3 PostgreSQL files and 39 tests intentionally skipped |
+| Production build | `PASS` — Next.js 16.2.12, 13 expected routes |
+| Targeted Playwright | `PASS` — 18 Chromium tests |
+| Database | `NOT APPLICABLE` — no database access or backend-sensitive change |
+| Repository-wide formatting | `LIMITED` — pre-existing 151-file baseline; every V2-4 changed file passes scoped formatting |
+| V2-4 closure | `CLOSED` — technical gates passed; V2-5 not started |
