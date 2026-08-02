@@ -1,5 +1,13 @@
+"use client";
+
 import Link from "next/link";
-import { LayoutDashboard, Search } from "lucide-react";
+import {
+  ClipboardList,
+  FilePlus2,
+  LayoutDashboard,
+  Search,
+  UserRound,
+} from "lucide-react";
 
 import { SistBrand } from "@/components/brand/sist-brand";
 import { AccountMenu } from "@/components/layout/account-menu";
@@ -18,20 +26,27 @@ function StudentBranding() {
 }
 
 function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
+  const items = [
+    { href: "/student", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/student/requests", label: "My Requests", icon: ClipboardList },
+    { href: "/student/requests/new", label: "New Request", icon: FilePlus2 },
+    { href: "/student/profile", label: "Profile", icon: UserRound },
+  ];
   return (
     <nav aria-label="Student navigation">
-      <ul>
-        <li>
-          <Link
-            aria-current="page"
-            className="bg-sidebar-active text-sidebar-active-foreground flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium"
-            href="/student"
-            onClick={onNavigate}
-          >
-            <LayoutDashboard aria-hidden="true" className="size-5" />
-            Dashboard
-          </Link>
-        </li>
+      <ul className="space-y-1">
+        {items.map(({ href, icon: Icon, label }) => (
+          <li key={href}>
+            <Link
+              className="text-sidebar-foreground hover:bg-sidebar-active hover:text-sidebar-active-foreground flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium"
+              href={href}
+              onClick={onNavigate}
+            >
+              <Icon aria-hidden="true" className="size-5" />
+              {label}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );

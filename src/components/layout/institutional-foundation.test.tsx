@@ -80,7 +80,7 @@ describe("shared system states", () => {
 });
 
 describe("student authenticated shell", () => {
-  it("links only the existing dashboard route and keeps sign out outside navigation", () => {
+  it("links only implemented V2-5 routes and keeps sign out outside navigation", () => {
     render(
       <StudentShell fullName="SIST Test Student">
         <h1>Student dashboard</h1>
@@ -94,6 +94,15 @@ describe("student authenticated shell", () => {
       expect(
         within(navigation).getByRole("link", { name: "Dashboard" }),
       ).toHaveAttribute("href", "/student");
+      expect(
+        within(navigation).getByRole("link", { name: "My Requests" }),
+      ).toHaveAttribute("href", "/student/requests");
+      expect(
+        within(navigation).getByRole("link", { name: "New Request" }),
+      ).toHaveAttribute("href", "/student/requests/new");
+      expect(
+        within(navigation).getByRole("link", { name: "Profile" }),
+      ).toHaveAttribute("href", "/student/profile");
       expect(
         within(navigation).queryByText(/help|logout|sign out/iu),
       ).toBeNull();

@@ -1,6 +1,25 @@
 import { defineConfig, devices } from "@playwright/test";
+import { config as loadEnvironment } from "dotenv";
+
+import {
+  browserOnlyAuthSecret,
+  requireIsolatedBrowserDatabaseUrl,
+} from "./tests/e2e/v2-5-test-environment";
 
 const baseURL = "http://127.0.0.1:3000";
+
+loadEnvironment({ path: ".env.local", quiet: true });
+const isolatedDatabaseUrl = requireIsolatedBrowserDatabaseUrl();
+const browserServerEnvironment = {
+  ...process.env,
+  AUTH_SECRET: browserOnlyAuthSecret,
+  AUTH_TRUST_HOST: "true",
+  AUTH_URL: baseURL,
+  DATABASE_URL: isolatedDatabaseUrl,
+  DIRECT_URL: isolatedDatabaseUrl,
+};
+
+Object.assign(process.env, browserServerEnvironment);
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -19,9 +38,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev",
+    command: "npm run dev -- --webpack",
+    env: browserServerEnvironment,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });
