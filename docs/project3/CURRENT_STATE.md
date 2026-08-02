@@ -1,19 +1,42 @@
 # Project 3 Current State
 
-Last updated: 2026-08-01
+## V2-5 final closure â€” 2026-08-02
+
+- Phase: `V2-5 â€” Student Core Portal`.
+- Status: `VERIFIED COMPLETE â€” CLOSED`.
+- Dashboard, read-only profile, enabled-category catalogue, global delivery
+  selector, submission, history, owned details/public timeline, and idempotent
+  cancellation are implemented on the five approved routes.
+- The existing Prisma schema and seven migrations are unchanged.
+- Focused PostgreSQL verification passed 5 tests. The serialized complete
+  Vitest suite passed 58 files and 635 tests with zero failures or skips.
+- ESLint, strict non-incremental typecheck, Prisma checks, migration status, and
+  the 16-route webpack production build passed.
+- Authenticated Chromium root cause was a render-prop function crossing the
+  StudentShell Server-to-Client boundary. Declaring StudentShell as the client
+  entry point corrected the runtime error without changing authentication or
+  authorization. The isolated webpack Playwright harness now refuses to reuse
+  an unrelated server and uses the test database only.
+- Eight authenticated Chromium tests passed with zero failures or skips,
+  covering the four approved viewports, account/session denial, request
+  workflows, privacy, themes, focus, drawer behavior, and dialog behavior.
+- Implementation commit `bbf091eba431ed60444d7558c4ae0b0785027ac1`
+  is verified. V2-5 is closed and V2-6 has not started.
+
+Last updated: 2026-08-02
 
 ## Current position
 
 | Item                                                      | State                                              | Evidence                                                                  |
 | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
-| Phase                                                     | V2-4 — Institutional UI Foundation                 | `VERIFIED COMPLETE`                                                       |
+| Phase                                                     | V2-5 — Student Core Portal                         | `VERIFIED COMPLETE`                                                       |
 | Closed control package                                    | V2-4 — Owner-approved Design Lock and phase scope  | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | CTRL-001 — Create Project 3 control documents      | `VERIFIED` `CLOSED`                                                       |
 | V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
-| Current product package                                   | None                                                | V2-4 closed; V2-5 not started                                             |
+| Current product package                                   | None                                               | V2-5 closed; V2-6 not started                                             |
 | Package C1                                                | Repository and route readiness                     | Complete                                                                  |
 | Package C2                                                | Design requirements lock                           | Complete                                                                  |
 | Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
@@ -21,35 +44,35 @@ Last updated: 2026-08-01
 | Package C5                                                | Compatibility and Authorization UX                 | Approved and complete; final focused QA passed with no blockers           |
 | Package C6                                                | Final Package C Verification and Closure           | Approved and complete; final verification passed with no blockers         |
 | Package C Git delivery                                    | Final closure delivery                             | Final six-file closure commit and push owner-authorized                   |
-| Package D implementation                                  | Complete                                           | Final package commit `1e2961af619c7025cb0f322e1cc6d4759594f2ee` pushed   |
-| Package E                                                 | Complete                                           | Final branch `81f799af50d2aeab22ade97d350bc4c03e434b29` pushed           |
-| Package F                                                 | Complete                                            | Integrated and isolated PostgreSQL verification passed                    |
+| Package D implementation                                  | Complete                                           | Final package commit `1e2961af619c7025cb0f322e1cc6d4759594f2ee` pushed    |
+| Package E                                                 | Complete                                           | Final branch `81f799af50d2aeab22ade97d350bc4c03e434b29` pushed            |
+| Package F                                                 | Complete                                           | Integrated and isolated PostgreSQL verification passed                    |
 
 ## Package D final delivery state
 
-| Item                  | State                                                                  |
-| --------------------- | ---------------------------------------------------------------------- |
-| Worktree              | `VERIFIED` `D:\PROJECT 3\PROJECT 3 SIST-v2-3-agent-d`                  |
-| Branch                | `VERIFIED` `codex/v2-3-d-account-management`                           |
-| HEAD                  | `VERIFIED` `1e2961af619c7025cb0f322e1cc6d4759594f2ee`                  |
-| Remote ref            | `VERIFIED` matches local HEAD                                          |
-| Package D code        | Student, STAFF lifecycle, creation, and capability management complete |
-| Focused verification  | `VERIFIED` 12 files and 160 tests passed                               |
-| Full verification     | `VERIFIED` 52 files and 577 tests passed; 39 PostgreSQL tests skipped  |
-| Static/build gates    | Lint, typecheck, Prisma validation/generation, and webpack build passed |
+| Item                 | State                                                                   |
+| -------------------- | ----------------------------------------------------------------------- |
+| Worktree             | `VERIFIED` `D:\PROJECT 3\PROJECT 3 SIST-v2-3-agent-d`                   |
+| Branch               | `VERIFIED` `codex/v2-3-d-account-management`                            |
+| HEAD                 | `VERIFIED` `1e2961af619c7025cb0f322e1cc6d4759594f2ee`                   |
+| Remote ref           | `VERIFIED` matches local HEAD                                           |
+| Package D code       | Student, STAFF lifecycle, creation, and capability management complete  |
+| Focused verification | `VERIFIED` 12 files and 160 tests passed                                |
+| Full verification    | `VERIFIED` 52 files and 577 tests passed; 39 PostgreSQL tests skipped   |
+| Static/build gates   | Lint, typecheck, Prisma validation/generation, and webpack build passed |
 
 ## Package E final delivery state
 
-| Item                 | State                                                                  |
-| -------------------- | ---------------------------------------------------------------------- |
-| Worktree             | `VERIFIED` `D:\PROJECT 3\PROJECT 3 SIST-v2-3-agent-e`                  |
-| Branch               | `VERIFIED` `codex/v2-3-e-admin-conversion`                             |
-| Final HEAD           | `VERIFIED` `81f799af50d2aeab22ade97d350bc4c03e434b29`                  |
-| Runtime model        | `STUDENT` and `STAFF`; ADMIN compatibility removed                     |
-| Migration            | Transactional conversion SQL created; PostgreSQL execution not run     |
-| Focused verification | `VERIFIED` 10 files and 199 tests passed                               |
-| Full verification    | `VERIFIED` 50 files and 563 tests passed; 39 PostgreSQL tests skipped  |
-| Browser verification | `VERIFIED` 4 Package E Playwright tests passed                         |
+| Item                 | State                                                                 |
+| -------------------- | --------------------------------------------------------------------- |
+| Worktree             | `VERIFIED` `D:\PROJECT 3\PROJECT 3 SIST-v2-3-agent-e`                 |
+| Branch               | `VERIFIED` `codex/v2-3-e-admin-conversion`                            |
+| Final HEAD           | `VERIFIED` `81f799af50d2aeab22ade97d350bc4c03e434b29`                 |
+| Runtime model        | `STUDENT` and `STAFF`; ADMIN compatibility removed                    |
+| Migration            | Transactional conversion SQL created; PostgreSQL execution not run    |
+| Focused verification | `VERIFIED` 10 files and 199 tests passed                              |
+| Full verification    | `VERIFIED` 50 files and 563 tests passed; 39 PostgreSQL tests skipped |
+| Browser verification | `VERIFIED` 4 Package E Playwright tests passed                        |
 
 ## Repository state at CTRL-001 start
 
@@ -84,7 +107,7 @@ Last updated: 2026-08-01
 
 ## Current management objective
 
-> V2-4 is verified and closed. V2-5 remains planned and has not started.
+> V2-5 is verified and closed. V2-6 remains planned and has not started.
 
 ## Risks and blockers
 
@@ -132,10 +155,16 @@ Last updated: 2026-08-01
   contrast, access states, and existing authentication regressions.
 - Repository-wide `prettier --check .` remains a pre-existing baseline issue in
   151 unchanged files. Every V2-4 changed file passes its scoped format check.
+- V2-5 passed 58 database-enabled Vitest files and 635 tests with zero skips,
+  the focused 5-test PostgreSQL suite, Prisma validation and generation, ESLint,
+  strict typecheck, the 16-route webpack build, and 8 authenticated Chromium
+  tests across the required responsive matrix.
+- No V2-5 schema or migration change was made. No production database or
+  production authentication path was accessed or altered.
 
 ## Next approved management action
 
-Await explicit authorization for V2-5. Do not begin it automatically.
+Await explicit authorization for V2-6. Do not begin it automatically.
 
 ## Final Hardening Backlog
 

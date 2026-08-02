@@ -1,5 +1,27 @@
 # Project 3 Verification Matrix
 
+## V2-5 Student Core Portal closure
+
+Status: `CLOSED â€” VERIFIED`
+
+| Requirement                      | Result                                                                                          |
+| -------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Validation and delivery selector | `PASS` â€” both approved methods; copy count 1â€“5; details maximum 1000                        |
+| Ownership and privacy            | `PASS` â€” owner-constrained reads/mutations; INTERNAL messages excluded                        |
+| Submission concurrency           | `PASS` â€” advisory transaction lock permits at most one open request                           |
+| Cancellation                     | `PASS` â€” owned SUBMITTED only; concurrent/idempotent result and single audit/history          |
+| Audit rollback                   | `PASS` â€” controlled required-audit failure rolled back request creation                       |
+| PostgreSQL focused               | `PASS` â€” 1 file, 5 passed, 0 failed, 0 skipped                                                |
+| Complete Vitest                  | `PASS` â€” 58 files, 635 passed, 0 failed, 0 skipped, serialized for shared database safety     |
+| Static and Prisma                | `PASS` â€” ESLint, strict typecheck, format, validate, generate, and seven-migration status     |
+| Production build                 | `PASS` â€” Next.js webpack build, 16 routes including all five V2-5 routes                      |
+| Authenticated browser            | `PASS` â€” 8 passed, 0 failed, 0 skipped; protected real layout and workflows executed          |
+| Responsive matrix                | `PASS` â€” 360Ã—800, 768Ã—1024, 1024Ã—768, and 1440Ã—900; contained history scrolling only      |
+| Theme and accessibility          | `PASS` â€” light/dark, labels, keyboard focus, drawer trap/Escape/restore, dialog focus         |
+| Authentication regression        | `PASS` â€” unauthenticated, disabled, and stale sessions denied; no production bypass           |
+| Browser root-cause correction    | `PASS` â€” StudentShell client boundary; isolated webpack test harness; no auth/authz weakening |
+| V2-5 closure                     | `CLOSED` â€” implementation commit `bbf091eba431ed60444d7558c4ae0b0785027ac1`; V2-6 not started |
+
 ## Purpose
 
 Define risk-based evidence expectations. This matrix does not claim that future checks have passed.
@@ -278,56 +300,56 @@ Status: `CLOSED`
 
 ### Package F independent verification checkpoint
 
-| Check | Result |
-| --- | --- |
-| ESLint | `PASS` |
-| TypeScript strict typecheck | `PASS` |
-| Complete non-database Vitest | `PASS` — 50 files, 563 tests; 3 files and 39 PostgreSQL tests skipped |
-| Prisma format, validate, generate | `PASS` — Prisma 7.9.1 |
-| Production build | `PASS` — Next.js 16.2.12, 13 expected routes |
-| Playwright assertions | `PASS` — 12/12 across two runs; runner teardown timed out |
-| Production dependency audit | `PASS` — 0 vulnerabilities |
-| Complete dependency audit | `LIMITED` — 9 high development-only upstream lint-tool findings |
-| Migration and PostgreSQL integration | `PASS` — 7 migrations; 5 files and 39 tests passed with zero skips |
-| V2-3 closure | `CLOSED` — all technical closure gates passed; V2-4 not started |
+| Check                                | Result                                                                |
+| ------------------------------------ | --------------------------------------------------------------------- |
+| ESLint                               | `PASS`                                                                |
+| TypeScript strict typecheck          | `PASS`                                                                |
+| Complete non-database Vitest         | `PASS` — 50 files, 563 tests; 3 files and 39 PostgreSQL tests skipped |
+| Prisma format, validate, generate    | `PASS` — Prisma 7.9.1                                                 |
+| Production build                     | `PASS` — Next.js 16.2.12, 13 expected routes                          |
+| Playwright assertions                | `PASS` — 12/12 across two runs; runner teardown timed out             |
+| Production dependency audit          | `PASS` — 0 vulnerabilities                                            |
+| Complete dependency audit            | `LIMITED` — 9 high development-only upstream lint-tool findings       |
+| Migration and PostgreSQL integration | `PASS` — 7 migrations; 5 files and 39 tests passed with zero skips    |
+| V2-3 closure                         | `CLOSED` — all technical closure gates passed; V2-4 not started       |
 
 ### Package F final database evidence
 
-| Requirement | Result |
-| --- | --- |
-| Control/test target separation | `PASS` — distinct sanitized target fingerprints |
-| Test-data classification | `PASS` — reserved suite fixtures only; meaningful application tables empty |
-| Migration history | `PASS` — 7 successful, 0 failed, 0 pending |
-| Deterministic redeploy | `PASS` — no pending migrations |
-| Capability preservation | `PASS` — exact 4-capability and 2-capability sets unchanged |
-| Session invalidation | `PASS` — converted ADMIN session versions incremented 0 to 1 |
-| Audit behavior | `PASS` — 2 redacted conversion audits; forced audit failure rolled back |
-| Locking and atomicity | `PASS` — lock contention rolled back with no partial conversion |
-| Final-manager survival | `PASS` — one active manager survived conversion |
-| Enum replacement | `PASS` — current role enum contains only STUDENT and STAFF |
-| PostgreSQL suite | `PASS` — 5 files, 39 passed, 0 failed, 0 skipped |
-| Full Vitest suite | `PASS` — 53 files, 602 passed, 0 failed, 0 skipped |
-| Package D recovery | `PASS` — five-file patch verified; auxiliary worktree clean at 0/0 |
+| Requirement                    | Result                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| Control/test target separation | `PASS` — distinct sanitized target fingerprints                            |
+| Test-data classification       | `PASS` — reserved suite fixtures only; meaningful application tables empty |
+| Migration history              | `PASS` — 7 successful, 0 failed, 0 pending                                 |
+| Deterministic redeploy         | `PASS` — no pending migrations                                             |
+| Capability preservation        | `PASS` — exact 4-capability and 2-capability sets unchanged                |
+| Session invalidation           | `PASS` — converted ADMIN session versions incremented 0 to 1               |
+| Audit behavior                 | `PASS` — 2 redacted conversion audits; forced audit failure rolled back    |
+| Locking and atomicity          | `PASS` — lock contention rolled back with no partial conversion            |
+| Final-manager survival         | `PASS` — one active manager survived conversion                            |
+| Enum replacement               | `PASS` — current role enum contains only STUDENT and STAFF                 |
+| PostgreSQL suite               | `PASS` — 5 files, 39 passed, 0 failed, 0 skipped                           |
+| Full Vitest suite              | `PASS` — 53 files, 602 passed, 0 failed, 0 skipped                         |
+| Package D recovery             | `PASS` — five-file patch verified; auxiliary worktree clean at 0/0         |
 
 ## V2-4 institutional UI foundation verification
 
 Status: `CLOSED`
 
-| Requirement | Result |
-| --- | --- |
-| Approved Design Lock | `PASS` — checked-in SIST logo, existing navy/green identity, existing fonts and theme mechanism |
-| Shared tokens | `PASS` — semantic surface, feedback, header, sidebar, focus, light, and dark tokens centralized |
-| Public/authentication foundations | `PASS` — existing landing, login, registration, pending, unauthorized, and not-found routes migrated |
-| Student foundation | `PASS` — existing `/student` route uses responsive sidebar, topbar, valid dashboard link, theme, and account menu |
-| STAFF foundation | `PASS` — capability-aware navigation and existing `/staff/*` behavior preserved; drawer focus behavior retained |
-| System states | `PASS` — shared loading, empty, error, success, not-found, pending, disabled, session-ended, and access presentations covered |
-| Keyboard and focus | `PASS` — visible focus, Tab/Shift+Tab containment, Escape close, and opener restoration |
-| Theme and contrast | `PASS` — light/dark persistence, unchanged layout, and measured body contrast at least 4.5:1 |
-| Responsive matrix | `PASS` — 360×800, 768×1024, 1024×768, and 1440×900; no horizontal page overflow |
-| Focused Vitest | `PASS` — 9 files, 55 tests |
-| Full Vitest | `PASS` — 52 files, 576 tests; 3 PostgreSQL files and 39 tests intentionally skipped |
-| Production build | `PASS` — Next.js 16.2.12, 13 expected routes |
-| Targeted Playwright | `PASS` — 18 Chromium tests |
-| Database | `NOT APPLICABLE` — no database access or backend-sensitive change |
-| Repository-wide formatting | `LIMITED` — pre-existing 151-file baseline; every V2-4 changed file passes scoped formatting |
-| V2-4 closure | `CLOSED` — technical gates passed; V2-5 not started |
+| Requirement                       | Result                                                                                                                        |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Approved Design Lock              | `PASS` — checked-in SIST logo, existing navy/green identity, existing fonts and theme mechanism                               |
+| Shared tokens                     | `PASS` — semantic surface, feedback, header, sidebar, focus, light, and dark tokens centralized                               |
+| Public/authentication foundations | `PASS` — existing landing, login, registration, pending, unauthorized, and not-found routes migrated                          |
+| Student foundation                | `PASS` — existing `/student` route uses responsive sidebar, topbar, valid dashboard link, theme, and account menu             |
+| STAFF foundation                  | `PASS` — capability-aware navigation and existing `/staff/*` behavior preserved; drawer focus behavior retained               |
+| System states                     | `PASS` — shared loading, empty, error, success, not-found, pending, disabled, session-ended, and access presentations covered |
+| Keyboard and focus                | `PASS` — visible focus, Tab/Shift+Tab containment, Escape close, and opener restoration                                       |
+| Theme and contrast                | `PASS` — light/dark persistence, unchanged layout, and measured body contrast at least 4.5:1                                  |
+| Responsive matrix                 | `PASS` — 360×800, 768×1024, 1024×768, and 1440×900; no horizontal page overflow                                               |
+| Focused Vitest                    | `PASS` — 9 files, 55 tests                                                                                                    |
+| Full Vitest                       | `PASS` — 52 files, 576 tests; 3 PostgreSQL files and 39 tests intentionally skipped                                           |
+| Production build                  | `PASS` — Next.js 16.2.12, 13 expected routes                                                                                  |
+| Targeted Playwright               | `PASS` — 18 Chromium tests                                                                                                    |
+| Database                          | `NOT APPLICABLE` — no database access or backend-sensitive change                                                             |
+| Repository-wide formatting        | `LIMITED` — pre-existing 151-file baseline; every V2-4 changed file passes scoped formatting                                  |
+| V2-4 closure                      | `CLOSED` — technical gates passed; V2-5 not started                                                                           |

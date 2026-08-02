@@ -1,5 +1,13 @@
 # Project 3 Roadmap
 
+## V2-5 closure addendum
+
+V2-5 is verified complete and closed under the owner-approved Product Lock. The
+five student routes and V2-5.1 through V2-5.8 are implemented using the existing
+schema. Authenticated browser, PostgreSQL, security, responsive, theme,
+accessibility, static, build, documentation, and Git delivery gates passed.
+V2-6 has not started.
+
 ## Purpose
 
 Maintain the stable high-level sequence for SIST Portal V2. Current execution state is summarized in [CURRENT_STATE.md](CURRENT_STATE.md); control-package status is recorded in [TASK_PACKAGE.md](TASK_PACKAGE.md).
@@ -178,16 +186,16 @@ without adding business workflows. Verification passed the required 360×800,
 
 ### V2-5 — Student Core Portal
 
-Status: `PLANNED`
+Status: `VERIFIED COMPLETE`
 
-- V2-5.1 Student dashboard
-- V2-5.2 Student profile
-- V2-5.3 Request catalogue
-- V2-5.4 Submit request
-- V2-5.5 Request history
-- V2-5.6 Request details and timeline
-- V2-5.7 Student cancellation
-- V2-5.8 Student portal verification
+- V2-5.1 Student dashboard — Complete
+- V2-5.2 Student profile — Complete
+- V2-5.3 Request catalogue — Complete
+- V2-5.4 Submit request — Complete
+- V2-5.5 Request history — Complete
+- V2-5.6 Request details and timeline — Complete
+- V2-5.7 Student cancellation — Complete
+- V2-5.8 Student portal verification — Complete
 
 ### V2-6 — Administration Portal
 

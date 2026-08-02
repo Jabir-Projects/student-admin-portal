@@ -1,5 +1,28 @@
 # Project 3 Task Package Register
 
+## Closed V2-5 Student Core Portal package
+
+| Field             | Value                                      |
+| ----------------- | ------------------------------------------ |
+| ID                | `V2-5`                                     |
+| Name              | Student Core Portal                        |
+| Status            | `CLOSED â€” VERIFIED`                      |
+| Starting commit   | `c21c17dc86f3365d722f89b998c6b72e798e4459` |
+| Branch            | `codex/v2-5-student-core-portal`           |
+| Database decision | Existing schema only; no migration         |
+
+Implementation and closure verification are complete. The browser root cause
+was a render-prop function crossing the StudentShell Server-to-Client boundary;
+the bounded correction declared StudentShell as the client entry point. The
+Playwright harness now starts webpack against the isolated test database with a
+browser-only signing key and refuses unrelated server reuse. This creates no
+production authentication bypass. Verification passed 58 Vitest files and 635
+tests with zero skips, focused PostgreSQL 5/5, authenticated Chromium 8/8,
+ESLint, strict typecheck, Prisma validation/generation, the 16-route webpack
+build, scoped formatting, documentation links, diff review, and secret scan.
+Implementation commit: `bbf091eba431ed60444d7558c4ae0b0785027ac1`.
+V2-5 is closed and V2-6 has not started.
+
 This file preserves the historical CTRL-001 package record. Its Package C
 restrictions describe CTRL-001 scope and are not the current Package C status.
 See the current authorization addendum at the end of this file.
@@ -173,11 +196,11 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md), and [DECISIO
 
 ## Historical Package D authorization and completion
 
-| Field  | Value                                           |
-| ------ | ----------------------------------------------- |
-| ID     | `V2-3-D`                                        |
-| Name   | Account and Capability Management               |
-| Status | `COMPLETE`                                      |
+| Field  | Value                             |
+| ------ | --------------------------------- |
+| ID     | `V2-3-D`                          |
+| Name   | Account and Capability Management |
+| Status | `COMPLETE`                        |
 
 ### Objective
 
@@ -304,11 +327,11 @@ See [CURRENT_STATE.md](CURRENT_STATE.md), [ROADMAP.md](ROADMAP.md),
 
 ## Closed V2-3 master control package
 
-| Field  | Value                                           |
-| ------ | ----------------------------------------------- |
-| ID     | `V2-3-CF-001`                                   |
-| Name   | Complete and close V2-3 Packages C through F    |
-| Status | `CLOSED`                                        |
+| Field  | Value                                        |
+| ------ | -------------------------------------------- |
+| ID     | `V2-3-CF-001`                                |
+| Name   | Complete and close V2-3 Packages C through F |
+| Status | `CLOSED`                                     |
 
 ### Verified starting state
 
@@ -424,13 +447,13 @@ workflow failures block closure.
 
 ## Closed V2-4 institutional UI foundation package
 
-| Field | Value |
-| --- | --- |
-| ID | `V2-4` |
-| Name | Institutional UI Foundation |
-| Status | `VERIFIED` `CLOSED` |
-| Starting commit | `c7ed77884944663e8bd4ebd6ec837767f483c04c` |
-| Branch | `codex/v2-4-institutional-ui-foundation` |
+| Field               | Value                                                 |
+| ------------------- | ----------------------------------------------------- |
+| ID                  | `V2-4`                                                |
+| Name                | Institutional UI Foundation                           |
+| Status              | `VERIFIED` `CLOSED`                                   |
+| Starting commit     | `c7ed77884944663e8bd4ebd6ec837767f483c04c`            |
+| Branch              | `codex/v2-4-institutional-ui-foundation`              |
 | Database permission | No database access, schema change, migration, or seed |
 
 ### Approved Minimum Closure Scope

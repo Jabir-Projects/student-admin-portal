@@ -1,5 +1,45 @@
 # Project 3 Decisions
 
+### DEC-017 â€” V2-5 browser runtime boundary and isolated harness
+
+- Date: 2026-08-02
+- Status: `APPROVED`
+- Context: Authenticated `/student` requests reached the proxy but failed during
+  React Server Component rendering because StudentShell passed a render-prop
+  function into a Client Component.
+- Decision: StudentShell is the client entry point for its interactive mobile
+  navigation. Server layouts and pages retain authentication, authorization,
+  database access, and server-rendered children. The Playwright web server uses
+  webpack, the isolated test database, a browser-only signing key, and refuses
+  unrelated server reuse.
+- Rationale: Correct the concrete serialization boundary while preserving
+  server-side security and making the standard browser command deterministic.
+- Consequences: No production authentication bypass, role change, capability
+  change, schema change, migration, or dependency change is introduced.
+- Related phase or package: V2-5 â€” Student Core Portal.
+
+### DEC-016 â€” V2-5 Student Core Portal Product Lock
+
+- Date: 2026-08-02
+- Status: `APPROVED`
+- Context: V2-5 required binding student workflow, privacy, delivery, and
+  cancellation rules.
+- Decision: Implement `/student`, `/student/profile`, `/student/requests`,
+  `/student/requests/new`, and `/student/requests/[requestId]` using the existing
+  schema. The profile is read-only. Every enabled category supports the global
+  `CAMPUS_PICKUP` and `DIGITAL_DELIVERY` selector. Copy count is 1â€“5; details are
+  optional and limited to 1000 characters. A student may have at most one
+  non-terminal request per category and may cancel only an owned `SUBMITTED`
+  request. Student timelines expose status transitions and `PUBLIC` messages
+  only.
+- Rationale: Complete essential student services without schema churn or
+  privacy drift.
+- Consequences: Submission and cancellation revalidate the ACTIVE STUDENT in a
+  transaction, enforce ownership, serialize concurrent operations, write
+  required audit and lifecycle records, and roll back on audit failure. No
+  schema change or migration is authorized. V2-6 remains excluded.
+- Related phase or package: V2-5 â€” Student Core Portal.
+
 ## Purpose and usage
 
 This append-oriented register records approved product, architecture, security, and workflow decisions. Add new entries rather than rewriting history. Changes in status or supersession require owner approval and a linked decision.
