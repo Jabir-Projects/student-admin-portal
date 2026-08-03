@@ -1,5 +1,30 @@
 # Project 3 Current State
 
+## V2-8 implementation and closure verification — 2026-08-04
+
+- Phase: `V2-8 — Controlled Excel Imports`.
+- Status: `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`.
+- Controlled registry CSV/XLSX upload, parser preflight, validation preview,
+  valid-only submission, independent approval or rejection, atomic execution,
+  sanitized audit evidence, and expired-staging purge are implemented. Finance
+  import remains excluded.
+- The additive `20260803180000_v2_8_registry_imports` migration created the
+  registry batch and staged-row model. The isolated disposable test target has
+  nine successful migrations, zero failed or pending migrations, the exact
+  enums, 9/9 indexes, 18/18 constraints, and 3/3 foreign keys.
+- The complete serialized Vitest run passed 73 files and 739 tests with zero
+  failures or skips. The focused V2-8 PostgreSQL suite passed 14 tests.
+- Authenticated Chromium verification passed 9 tests with one worker across
+  the upload/approval lifecycle, denial paths, terminal rejection, four
+  responsive viewports, keyboard focus, accessible controls, and light/dark
+  themes.
+- Scoped formatting, ESLint, strict typecheck, Prisma format/validate/generate,
+  migration history, the Next.js 16.2.12 webpack production build, production
+  dependency audit, and dependency runtime probes passed. Documentation, diff,
+  secret, Git delivery, and remote-alignment gates remain in progress.
+- Production was not accessed. Database mutation was confined to the authorized
+  disposable test target. V2-9 has not started.
+
 ## V2-7 final closure — 2026-08-03
 
 - Phase: `V2-7 — Notifications and Audit`.
@@ -78,14 +103,14 @@ Last updated: 2026-08-03
 
 | Item                                                      | State                                              | Evidence                                                                  |
 | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
-| Phase                                                     | V2-7 — Notifications and Audit                     | `VERIFIED COMPLETE`                                                       |
+| Phase                                                     | V2-8 — Controlled Excel Imports                    | `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`                            |
 | Closed control package                                    | V2-4 — Owner-approved Design Lock and phase scope  | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | CTRL-001 — Create Project 3 control documents      | `VERIFIED` `CLOSED`                                                       |
 | V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
-| Current product package                                   | None                                               | V2-7 closed; V2-8 not started                                             |
+| Current product package                                   | V2-8 — Controlled Excel Imports                    | Implementation and technical verification complete                        |
 | Package C1                                                | Repository and route readiness                     | Complete                                                                  |
 | Package C2                                                | Design requirements lock                           | Complete                                                                  |
 | Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
@@ -156,7 +181,8 @@ Last updated: 2026-08-03
 
 ## Current management objective
 
-> V2-7 is verified and closed. V2-8 remains planned and has not started.
+> V2-8 implementation and technical closure verification are complete. Git
+> delivery and synchronized clean-state verification remain in progress.
 
 ## Risks and blockers
 
@@ -221,7 +247,7 @@ Last updated: 2026-08-03
 
 ## Next approved management action
 
-Await explicit authorization for V2-8. Do not begin it automatically.
+Complete the already authorized V2-8 Git delivery and stop before V2-9.
 
 ## Final Hardening Backlog
 

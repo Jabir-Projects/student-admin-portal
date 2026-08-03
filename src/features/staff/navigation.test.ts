@@ -22,8 +22,6 @@ describe("STAFF capability-aware navigation", () => {
     ["REVOKE_DOCUMENTS", "Documents"],
     ["REGISTRY_IMPORT_UPLOAD", "Imports"],
     ["REGISTRY_IMPORT_APPROVE", "Imports"],
-    ["FINANCE_IMPORT_UPLOAD", "Imports"],
-    ["FINANCE_IMPORT_APPROVE", "Imports"],
     ["VIEW_FINANCE", "Finance"],
     ["EXPORT_FINANCE_DATA", "Finance"],
     ["VIEW_AUDIT_LOG", "Audit Log"],

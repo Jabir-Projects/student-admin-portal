@@ -371,7 +371,7 @@ describe("Package B database-owned fingerprint and migration verification", () =
     expect(probe.close).toHaveBeenCalledOnce();
   });
 
-  it("fails closed unless exactly the seven approved migrations are applied", async () => {
+  it("fails closed unless exactly the approved migrations are applied", async () => {
     for (const migrations of [
       migrationRows(PACKAGE_B_EXPECTED_MIGRATIONS.slice(0, 5)),
       migrationRows([...PACKAGE_B_EXPECTED_MIGRATIONS, "unexpected"]),

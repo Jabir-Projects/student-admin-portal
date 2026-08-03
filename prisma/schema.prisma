@@ -84,6 +84,29 @@ enum StudentRegistrySource {
   OFFICIAL_IMPORT
 }
 
+enum ImportType {
+  REGISTRY
+}
+
+enum ImportBatchStatus {
+  UPLOADED
+  VALIDATED
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  FAILED
+}
+
+enum RegistryImportRowValidation {
+  VALID
+  INVALID
+}
+
+enum RegistryImportOperation {
+  CREATE
+  UPDATE
+}
+
 enum NotificationEventType {
   LEGACY
   REQUEST_STATUS_CHANGED
@@ -130,6 +153,8 @@ model User {
   studentRegistryRecord StudentRegistry?           @relation("StudentRegistryRegistration")
   capabilityAssignments UserCapabilityAssignment[] @relation("CapabilitySubject")
   capabilityGrants      UserCapabilityAssignment[] @relation("CapabilityGrantor")
+  registryImportUploads ImportBatch[]              @relation("RegistryImportUploader")
+  registryImportReviews ImportBatch[]              @relation("RegistryImportReviewer")
 
   @@index([role, createdAt])
   @@index([status, role, createdAt])
@@ -179,6 +204,61 @@ model StudentRegistry {
   createdAt          DateTime              @default(now()) @db.Timestamptz(3)
   updatedAt          DateTime              @updatedAt @db.Timestamptz(3)
   registeredUser     User?                 @relation("StudentRegistryRegistration", fields: [registeredUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+}
+
+model ImportBatch {
+  id               String              @id @default(uuid()) @db.Uuid
+  type             ImportType          @default(REGISTRY)
+  status           ImportBatchStatus   @default(UPLOADED)
+  uploaderId       String              @db.Uuid
+  reviewerId       String?             @db.Uuid
+  checksum         String              @db.Char(64)
+  originalFilename String              @db.VarChar(255)
+  originalByteSize Int
+  totalRows        Int
+  validRows        Int
+  invalidRows      Int
+  rejectionReason  String?             @db.VarChar(500)
+  failureCode      String?             @db.VarChar(120)
+  uploadedAt       DateTime            @default(now()) @db.Timestamptz(3)
+  validatedAt      DateTime?           @db.Timestamptz(3)
+  submittedAt      DateTime?           @db.Timestamptz(3)
+  reviewedAt       DateTime?           @db.Timestamptz(3)
+  appliedAt        DateTime?           @db.Timestamptz(3)
+  expiresAt        DateTime            @db.Timestamptz(3)
+  purgedAt         DateTime?           @db.Timestamptz(3)
+  version          Int                 @default(0)
+  updatedAt        DateTime            @updatedAt @db.Timestamptz(3)
+  uploader         User                @relation("RegistryImportUploader", fields: [uploaderId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  reviewer         User?               @relation("RegistryImportReviewer", fields: [reviewerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  rows             RegistryImportRow[]
+
+  @@unique([type, checksum])
+  @@index([uploaderId, uploadedAt, id])
+  @@index([status, submittedAt, id])
+  @@index([reviewerId, reviewedAt, id])
+  @@index([expiresAt, purgedAt, status])
+}
+
+model RegistryImportRow {
+  id                 String                      @id @default(uuid()) @db.Uuid
+  batchId            String                      @db.Uuid
+  rowNumber          Int
+  studentNumber      String?                     @db.VarChar(50)
+  fullName           String?                     @db.VarChar(200)
+  normalizedFullName String?                     @db.VarChar(200)
+  email              String?                     @db.VarChar(320)
+  program            String?                     @db.VarChar(200)
+  academicYear       AcademicYear?
+  status             StudentRegistryStatus?
+  operation          RegistryImportOperation?
+  validation         RegistryImportRowValidation @default(INVALID)
+  errorCodes         String[]                    @default([])
+  createdAt          DateTime                    @default(now()) @db.Timestamptz(3)
+  batch              ImportBatch                 @relation(fields: [batchId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([batchId, rowNumber])
+  @@index([batchId, validation, rowNumber])
 }
 
 model RequestCategory {

@@ -1,5 +1,42 @@
 # Project 3 Decisions
 
+### DEC-020 — V2-8 registry import parser and trust boundary
+
+- Date: 2026-08-03
+- Status: `APPROVED AND IMPLEMENTED`
+- Context: V2-8 accepts untrusted UTF-8 CSV and XLSX registry files while
+  requiring deterministic formula, macro, external-link, encryption, archive,
+  size, worksheet, header, and row-limit rejection.
+- Decision: Use exactly `exceljs@4.4.0` as the server-only XLSX parser. Apply a
+  bounded OOXML ZIP-directory preflight before parsing, reject unsafe package
+  entries and relationships, then inspect the ExcelJS cell model for formulas.
+  Parse CSV through a bounded repository-owned UTF-8 state machine. Never
+  retain uploaded bytes after checksum calculation and staging.
+- Rationale: ExcelJS is MIT-licensed, supports the repository's Node runtime,
+  provides TypeScript declarations and formula-cell visibility, and uses the
+  maintained JSZip 3.10 line. Its only audited production advisory is in a
+  transitive `uuid` buffer-writing path ExcelJS does not call; pin the compatible
+  CommonJS-capable `uuid@11.1.1` fix through npm overrides and verify workbook
+  parsing after resolution. The public npm `xlsx@0.18.5` release has known
+  unpatched parser advisories, while `read-excel-file@9.3.5` does not document
+  the formula, macro, and external-link metadata controls required by the
+  approved trust boundary.
+- Consequences: One exact runtime dependency and its transitive packages are
+  accepted. Parsing remains server-only and is protected by repository-owned
+  limits before workbook interpretation. No second spreadsheet parser,
+  client-side parsing, raw-file persistence, finance import, or production
+  access is introduced.
+- Implementation record: npm install scripts remained blocked because the
+  repository has no `allowScripts` policy and operational probes proved Argon2,
+  esbuild, ExcelJS, and Prisma engines functional without executing them.
+  Production audit findings were corrected with compatible exact `uuid@11.1.1`
+  and `fast-uri@3.1.5` overrides. The isolated test target uses an additive
+  registry-import migration; approval and rejection are independent,
+  transactionally audited, lock-serialized operations. Non-approved staging is
+  retained for 30 days and purged through a bounded idempotent operation;
+  approved import history remains retained.
+- Related phase or package: V2-8 — Controlled Excel Imports.
+
 ### DEC-019 — V2-7 Notifications and Audit Product Lock
 
 - Date: 2026-08-03

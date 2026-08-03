@@ -18,4 +18,28 @@ describe("audit presentation sanitization", () => {
       { label: "has internal note", value: "true" },
     ]);
   });
+
+  it("renders only non-identifying V2-8 import metadata", () => {
+    expect(
+      sanitizeAuditMetadata({
+        sourceType: "CSV",
+        originalByteSize: 512,
+        totalRows: 3,
+        validRows: 2,
+        invalidRows: 1,
+        retentionDays: 30,
+        originalFilename: "private-students.csv",
+        checksum: "forbidden",
+        studentNumber: "forbidden",
+        email: "forbidden@example.test",
+      }),
+    ).toEqual([
+      { label: "source type", value: "CSV" },
+      { label: "original byte size", value: "512" },
+      { label: "total rows", value: "3" },
+      { label: "valid rows", value: "2" },
+      { label: "invalid rows", value: "1" },
+      { label: "retention days", value: "30" },
+    ]);
+  });
 });

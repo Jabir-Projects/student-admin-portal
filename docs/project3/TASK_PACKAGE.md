@@ -1,17 +1,44 @@
 # Project 3 Task Package Register
 
+## V2-8 Controlled Excel Imports delivery checkpoint
+
+| Field               | Value                                                     |
+| ------------------- | --------------------------------------------------------- |
+| ID                  | `V2-8`                                                    |
+| Name                | Controlled Excel Imports                                  |
+| Status              | `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`            |
+| Starting commit     | `09ce708b547e3adecfd5dc67942cbfcb93279bb6`                |
+| Branch              | `codex/v2-8-controlled-excel-imports`                     |
+| Database decision   | One additive migration; disposable test-target mutation   |
+| Dependency decision | Exact ExcelJS plus compatible uuid and fast-uri overrides |
+
+The package implements registry imports only: fixed CSV/XLSX templates,
+bounded safe parsing, validation preview, valid-only submission, four-eyes
+approval or terminal rejection, transactional controlled execution, required
+sanitized audit, and bounded purge of expired non-approved staging. Raw upload
+bytes, original filenames, and row-level personal data are excluded from audit
+metadata. Finance import, production access, deployment, and V2-9 are excluded.
+
+Technical closure passed 73 Vitest files and 739 tests with zero skips, the
+focused 14-test PostgreSQL suite, nine authenticated Chromium tests, Prisma
+format/validate/generate and nine-migration status, ESLint, strict typecheck,
+the Next.js 16.2.12 webpack build, dependency runtime probes, and a zero-finding
+production dependency audit. Documentation, final diff and secret review, the
+two authorized commits, push, upstream configuration, and synchronized clean
+state are the remaining delivery gates.
+
 ## Closed V2-7 Notifications and Audit package
 
-| Field                 | Value                                                              |
-| --------------------- | ------------------------------------------------------------------ |
-| ID                    | `V2-7`                                                             |
-| Name                  | Notifications and Audit                                            |
-| Status                | `CLOSED — VERIFIED`                                                |
-| Starting commit       | `f1c1ed58b1fbdb03ed921261a7286c5b1d336502`                         |
-| Implementation commit | `32c896a17573a081b3a19c59d08e45ae7341e170`                         |
-| Branch                | `codex/v2-7-notifications-audit`                                   |
-| Database decision     | One additive outbox migration; isolated test mutation only         |
-| Provider decision     | Provider-neutral adapter; deterministic fake provider for closure  |
+| Field                 | Value                                                             |
+| --------------------- | ----------------------------------------------------------------- |
+| ID                    | `V2-7`                                                            |
+| Name                  | Notifications and Audit                                           |
+| Status                | `CLOSED — VERIFIED`                                               |
+| Starting commit       | `f1c1ed58b1fbdb03ed921261a7286c5b1d336502`                        |
+| Implementation commit | `32c896a17573a081b3a19c59d08e45ae7341e170`                        |
+| Branch                | `codex/v2-7-notifications-audit`                                  |
+| Database decision     | One additive outbox migration; isolated test mutation only        |
+| Provider decision     | Provider-neutral adapter; deterministic fake provider for closure |
 
 The package implements V2-7.1 through V2-7.5: exact notification events,
 private student and STAFF centres, localized email templates, Resend adapter,

@@ -73,15 +73,10 @@ const staffNavigation: readonly StaffNavigationItem[] = [
   {
     key: "imports",
     label: "Imports",
-    href: "/staff/imports",
+    href: "/staff/imports/registry",
     icon: "imports",
-    available: false,
-    requiredCapabilities: [
-      "REGISTRY_IMPORT_UPLOAD",
-      "REGISTRY_IMPORT_APPROVE",
-      "FINANCE_IMPORT_UPLOAD",
-      "FINANCE_IMPORT_APPROVE",
-    ],
+    available: true,
+    requiredCapabilities: ["REGISTRY_IMPORT_UPLOAD", "REGISTRY_IMPORT_APPROVE"],
   },
   {
     key: "finance",

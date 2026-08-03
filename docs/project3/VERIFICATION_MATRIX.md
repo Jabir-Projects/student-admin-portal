@@ -1,23 +1,47 @@
 # Project 3 Verification Matrix
 
+## V2-8 Controlled Excel Imports closure checkpoint
+
+Status: `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`
+
+| Requirement                    | Result                                                                                             |
+| ------------------------------ | -------------------------------------------------------------------------------------------------- |
+| Parser trust boundary          | `PASS` — strict UTF-8 CSV and bounded OOXML preflight; unsafe formulas/packages rejected           |
+| Size and row bounds            | `PASS` — 5 MiB upload, 5,000 rows, fixed headers, one worksheet, bounded archive expansion         |
+| Authorization and four-eyes    | `PASS` — exact upload/approve capabilities, active current STAFF, self-review and zero-cap denial  |
+| Lifecycle                      | `PASS` — upload, validate, valid-only submit, approve or terminal reject, and safe purge           |
+| Transactions and concurrency   | `PASS` — advisory/row locks, whole-batch atomicity, audit rollback, once-only approval             |
+| Registry data safety           | `PASS` — allowed fields only; registered identity/time preserved; collisions and duplicates denied |
+| Retention and audit privacy    | `PASS` — no raw bytes retained; sanitized allowlist; bounded idempotent non-approved purge         |
+| Migration                      | `PASS` — nine successful, zero failed/pending; 9/9 indexes, 18/18 constraints, 3/3 foreign keys    |
+| Focused PostgreSQL             | `PASS` — 1 file, 14 passed, 0 failed, 0 skipped                                                    |
+| Complete serialized Vitest     | `PASS` — 73 files, 739 passed, 0 failed, 0 skipped                                                 |
+| Static and Prisma              | `PASS` — scoped format, ESLint, strict typecheck, format, validate, and generate                   |
+| Production build               | `PASS` — Next.js 16.2.12 webpack build generated 24/24 pages and both registry routes              |
+| Authenticated browser          | `PASS` — 9 passed, 0 failed, 0 skipped, one Chromium worker                                        |
+| Responsive and accessibility   | `PASS` — four viewports, no overflow, keyboard focus, named controls, and light/dark themes        |
+| Dependency and script security | `PASS` — blocked scripts remained blocked; runtime probes passed; production audit found 0         |
+| Database scope                 | `PASS` — disposable test mutation only; no production access                                       |
+| Git delivery                   | `IN PROGRESS` — documentation, diff/secret review, two commits, push, and alignment remain         |
+
 ## V2-7 Notifications and Audit closure
 
 Status: `CLOSED — VERIFIED`
 
-| Requirement                    | Result                                                                                         |
-| ------------------------------ | ---------------------------------------------------------------------------------------------- |
-| Recipient and privacy rules    | `PASS` — exact owned student events and active PROCESS_REQUESTS STAFF operational recipients   |
+| Requirement                    | Result                                                                                          |
+| ------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Recipient and privacy rules    | `PASS` — exact owned student events and active PROCESS_REQUESTS STAFF operational recipients    |
 | In-portal actions              | `PASS` — 25-row paging, deterministic order, owned mark-one/all, and idempotent repeated action |
-| Email adapter and templates    | `PASS` — EN/FR/AR with English fallback, text/HTML, fake provider, fail-closed live config       |
+| Email adapter and templates    | `PASS` — EN/FR/AR with English fallback, text/HTML, fake provider, fail-closed live config      |
 | Outbox and delivery            | `PASS` — transactional intent, stable keys, processing lease, five retries, terminal failure    |
 | Audit viewer                   | `PASS` — exact VIEW_AUDIT_LOG, filters, bounded paging, append-only rows, allowlisted metadata  |
 | Transactions and concurrency   | `PASS` — audit rollback, event dedupe, delivery claiming, and request-workflow serialization    |
-| Migration                      | `PASS` — eight migrations; fresh chain, upgrade, rollback, rerun, and status all verified        |
+| Migration                      | `PASS` — eight migrations; fresh chain, upgrade, rollback, rerun, and status all verified       |
 | General serialized Vitest      | `PASS` — 68 files, 660 passed; 30 database-gated tests executed separately                      |
 | PostgreSQL gated tests         | `PASS` — 30 passed, 0 failed, 0 skipped across exact isolated runs                              |
 | Static and Prisma              | `PASS` — scoped format, ESLint, strict typecheck, format, validate, and generate                |
 | Production build               | `PASS` — Next.js 16.2.12 webpack build includes all three V2-7 routes                           |
-| Authenticated browser          | `PASS` — 8 passed, 0 failed, 0 skipped, one Chromium worker                                    |
+| Authenticated browser          | `PASS` — 8 passed, 0 failed, 0 skipped, one Chromium worker                                     |
 | Responsive and accessibility   | `PASS` — four viewports, no overflow, named controls, and theme switching                       |
 | Dependency and secret security | `PASS` — production audit found 0 vulnerabilities; staged secret scan found no matches          |
 | Database scope                 | `PASS` — isolated test mutation only; control identity read-only; no production access          |

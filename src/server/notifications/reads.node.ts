@@ -87,6 +87,12 @@ const allowedMetadata = new Set([
   "hasPublicMessage",
   "exportedRows",
   "filtersApplied",
+  "sourceType",
+  "originalByteSize",
+  "totalRows",
+  "validRows",
+  "invalidRows",
+  "retentionDays",
 ]);
 
 export function sanitizeAuditMetadata(

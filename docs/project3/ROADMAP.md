@@ -1,5 +1,16 @@
 # Project 3 Roadmap
 
+## V2-8 closure addendum
+
+V2-8 controlled registry imports are implemented and all technical closure
+checks have passed. The package uses bounded server-only CSV/XLSX parsing,
+fixed templates, validation preview, separate upload and approval capabilities,
+four-eyes review, atomic execution with required audit rollback, safe retention,
+and responsive accessible STAFF routes. Migration, PostgreSQL, authorization,
+malicious-input, concurrency, browser, static, build, dependency, and audit
+checks passed. Authorized Git delivery is in progress. Finance imports remain
+excluded and V2-9 has not started.
+
 ## V2-7 closure addendum
 
 V2-7 is verified complete and closed under the owner-approved Product Lock.
@@ -240,14 +251,14 @@ Status: `VERIFIED COMPLETE`
 
 ### V2-8 — Controlled Excel Imports
 
-Status: `PLANNED`
+Status: `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`
 
-- V2-8.1 Import template definitions
-- V2-8.2 Upload and safe parsing
-- V2-8.3 Validation preview
-- V2-8.4 Approval workflow
-- V2-8.5 Controlled execution and reporting
-- V2-8.6 Import security verification
+- V2-8.1 Import template definitions — Complete
+- V2-8.2 Upload and safe parsing — Complete
+- V2-8.3 Validation preview — Complete
+- V2-8.4 Approval workflow — Complete
+- V2-8.5 Controlled execution and reporting — Complete
+- V2-8.6 Import security verification — Complete
 
 ### V2-9 — Documents and Private Storage
 

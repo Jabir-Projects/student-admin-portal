@@ -46,7 +46,27 @@ raw JSON.
 
 ### Import trust boundary
 
-Registry and finance uploads are untrusted input. Upload and approval are separate capabilities; validation, authorization, deterministic handling, and safe failure are required.
+Registry and finance uploads are untrusted input. V2-8 implements only registry
+imports; finance imports remain outside the boundary. Upload and approval use
+the distinct `REGISTRY_IMPORT_UPLOAD` and `REGISTRY_IMPORT_APPROVE`
+capabilities, and the uploader cannot review the same batch.
+
+The server accepts only bounded UTF-8 CSV or OOXML XLSX input. A fixed template,
+strict MIME and extension agreement, a 5 MiB upload limit, a 5,000-row limit,
+one-worksheet enforcement, ZIP-entry and expanded-size bounds, and rejection of
+formulas, macros, external links, encryption, unsafe archive paths, and malformed
+content apply before staging. Raw upload bytes are discarded after a SHA-256
+checksum is calculated; only normalized rows, field errors, safe metadata, and
+the checksum are persisted.
+
+Registry batches follow `UPLOADED -> VALIDATED -> PENDING_APPROVAL ->
+APPROVED` or terminal `REJECTED` transitions. Only valid batches may be
+submitted. Approval revalidates the actor, batch, rows, exact caps, and allowed
+student-registry field changes inside one serialized transaction. Advisory and
+row locks prevent duplicate or conflicting execution; the registry writes and
+required sanitized audit record succeed or roll back together. Approved
+records are retained, while expired non-approved staging is purged through a
+bounded idempotent operation.
 
 ### Document and private-storage boundary
 
@@ -148,7 +168,7 @@ Vercel is the planned deployment direction. Production deployment, access, monit
 - Required audit failure must roll back protected mutations.
 - Private staff notes never appear to students.
 - Documents remain private unless securely released.
-- Imports are untrusted input.
+- Imports are untrusted input; raw uploaded files are not retained.
 - Destructive operations require explicit approval.
 
 ## Known unverified areas
