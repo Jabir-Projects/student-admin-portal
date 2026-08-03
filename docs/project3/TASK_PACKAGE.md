@@ -1,5 +1,26 @@
 # Project 3 Task Package Register
 
+## Closed V2-7 Notifications and Audit package
+
+| Field                 | Value                                                              |
+| --------------------- | ------------------------------------------------------------------ |
+| ID                    | `V2-7`                                                             |
+| Name                  | Notifications and Audit                                            |
+| Status                | `CLOSED — VERIFIED`                                                |
+| Starting commit       | `f1c1ed58b1fbdb03ed921261a7286c5b1d336502`                         |
+| Implementation commit | `32c896a17573a081b3a19c59d08e45ae7341e170`                         |
+| Branch                | `codex/v2-7-notifications-audit`                                   |
+| Database decision     | One additive outbox migration; isolated test mutation only         |
+| Provider decision     | Provider-neutral adapter; deterministic fake provider for closure  |
+
+The package implements V2-7.1 through V2-7.5: exact notification events,
+private student and STAFF centres, localized email templates, Resend adapter,
+transactional delivery outbox, bounded retry and idempotency controls, and the
+VIEW_AUDIT_LOG-protected sanitized audit viewer. The combined serialized test
+evidence executed all 690 Vitest tests, including all 30 database-gated tests.
+Eight authenticated Chromium tests passed. V2-7 is closed and V2-8 has not
+started.
+
 ## Closed V2-6 Administration Portal package
 
 | Field                 | Value                                                             |

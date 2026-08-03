@@ -1,5 +1,29 @@
 # Project 3 Current State
 
+## V2-7 final closure — 2026-08-03
+
+- Phase: `V2-7 — Notifications and Audit`.
+- Status: `VERIFIED COMPLETE — CLOSED`.
+- Private student and STAFF notification centres, exact event recipient rules,
+  owned idempotent read actions, localized email templates, a provider-neutral
+  Resend adapter, deterministic fake-provider verification, transactional
+  outbox delivery, retry/idempotency controls, and the capability-protected
+  sanitized audit viewer are implemented under the approved Product Lock.
+- One additive migration extends notifications and creates the email outbox.
+  All eight migrations passed fresh-chain, existing-target upgrade, rollback,
+  rerun, and migration-status verification against the isolated test target.
+- Combined serialized Vitest verification executed all 690 tests: the general
+  run passed 660, and the 30 database-gated tests passed in exact isolated
+  PostgreSQL runs. No required test remains skipped.
+- Authenticated Chromium verification passed 8 tests with one worker across
+  ownership, audit authorization, four responsive viewports, accessible
+  controls, and theme behavior.
+- Scoped formatting, ESLint, strict typecheck, Prisma checks, webpack build,
+  production dependency audit, diff, link, and secret checks passed. The
+  repository-wide historical Prettier baseline remains deferred.
+- Implementation commit `32c896a17573a081b3a19c59d08e45ae7341e170`
+  is verified. V2-7 is closed and V2-8 has not started.
+
 ## V2-6 final closure — 2026-08-03
 
 - Phase: `V2-6 — Administration Portal`.
@@ -54,14 +78,14 @@ Last updated: 2026-08-03
 
 | Item                                                      | State                                              | Evidence                                                                  |
 | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
-| Phase                                                     | V2-6 — Administration Portal                       | `VERIFIED COMPLETE`                                                       |
+| Phase                                                     | V2-7 — Notifications and Audit                     | `VERIFIED COMPLETE`                                                       |
 | Closed control package                                    | V2-4 — Owner-approved Design Lock and phase scope  | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | CTRL-001 — Create Project 3 control documents      | `VERIFIED` `CLOSED`                                                       |
 | V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
-| Current product package                                   | None                                               | V2-6 closed; V2-7 not started                                             |
+| Current product package                                   | None                                               | V2-7 closed; V2-8 not started                                             |
 | Package C1                                                | Repository and route readiness                     | Complete                                                                  |
 | Package C2                                                | Design requirements lock                           | Complete                                                                  |
 | Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
@@ -132,7 +156,7 @@ Last updated: 2026-08-03
 
 ## Current management objective
 
-> V2-6 is verified and closed. V2-7 remains planned and has not started.
+> V2-7 is verified and closed. V2-8 remains planned and has not started.
 
 ## Risks and blockers
 
@@ -197,7 +221,7 @@ Last updated: 2026-08-03
 
 ## Next approved management action
 
-Await explicit authorization for V2-7. Do not begin it automatically.
+Await explicit authorization for V2-8. Do not begin it automatically.
 
 ## Final Hardening Backlog
 

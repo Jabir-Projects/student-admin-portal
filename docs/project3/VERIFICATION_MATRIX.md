@@ -1,5 +1,28 @@
 # Project 3 Verification Matrix
 
+## V2-7 Notifications and Audit closure
+
+Status: `CLOSED — VERIFIED`
+
+| Requirement                    | Result                                                                                         |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Recipient and privacy rules    | `PASS` — exact owned student events and active PROCESS_REQUESTS STAFF operational recipients   |
+| In-portal actions              | `PASS` — 25-row paging, deterministic order, owned mark-one/all, and idempotent repeated action |
+| Email adapter and templates    | `PASS` — EN/FR/AR with English fallback, text/HTML, fake provider, fail-closed live config       |
+| Outbox and delivery            | `PASS` — transactional intent, stable keys, processing lease, five retries, terminal failure    |
+| Audit viewer                   | `PASS` — exact VIEW_AUDIT_LOG, filters, bounded paging, append-only rows, allowlisted metadata  |
+| Transactions and concurrency   | `PASS` — audit rollback, event dedupe, delivery claiming, and request-workflow serialization    |
+| Migration                      | `PASS` — eight migrations; fresh chain, upgrade, rollback, rerun, and status all verified        |
+| General serialized Vitest      | `PASS` — 68 files, 660 passed; 30 database-gated tests executed separately                      |
+| PostgreSQL gated tests         | `PASS` — 30 passed, 0 failed, 0 skipped across exact isolated runs                              |
+| Static and Prisma              | `PASS` — scoped format, ESLint, strict typecheck, format, validate, and generate                |
+| Production build               | `PASS` — Next.js 16.2.12 webpack build includes all three V2-7 routes                           |
+| Authenticated browser          | `PASS` — 8 passed, 0 failed, 0 skipped, one Chromium worker                                    |
+| Responsive and accessibility   | `PASS` — four viewports, no overflow, named controls, and theme switching                       |
+| Dependency and secret security | `PASS` — production audit found 0 vulnerabilities; staged secret scan found no matches          |
+| Database scope                 | `PASS` — isolated test mutation only; control identity read-only; no production access          |
+| V2-7 closure                   | `CLOSED` — implementation `32c896a17573a081b3a19c59d08e45ae7341e170`; V2-8 not started          |
+
 ## V2-6 Administration Portal closure
 
 Status: `CLOSED — VERIFIED`

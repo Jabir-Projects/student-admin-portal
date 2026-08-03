@@ -1,5 +1,15 @@
 # Project 3 Roadmap
 
+## V2-7 closure addendum
+
+V2-7 is verified complete and closed under the owner-approved Product Lock.
+Private in-portal notifications, localized student email delivery through a
+transactional outbox, exact staff recipient rules, retry and idempotency
+controls, and the capability-protected sanitized audit viewer are implemented.
+Migration, PostgreSQL, authorization, privacy, fake-provider, browser,
+responsive, theme, accessibility, static, build, documentation, and Git
+delivery gates passed. V2-8 has not started.
+
 ## V2-6 closure addendum
 
 V2-6 is verified complete and closed under the owner-approved Product Lock.
@@ -220,13 +230,13 @@ Status: `VERIFIED COMPLETE`
 
 ### V2-7 — Notifications and Audit
 
-Status: `PLANNED`
+Status: `VERIFIED COMPLETE`
 
-- V2-7.1 Notification event rules
-- V2-7.2 In-portal notifications
-- V2-7.3 Email provider and templates
-- V2-7.4 Delivery, idempotency, and audit viewer
-- V2-7.5 Notification and audit verification
+- V2-7.1 Notification event rules — Complete
+- V2-7.2 In-portal notifications — Complete
+- V2-7.3 Email provider and templates — Complete
+- V2-7.4 Delivery, idempotency, and audit viewer — Complete
+- V2-7.5 Notification and audit verification — Complete
 
 ### V2-8 — Controlled Excel Imports
 

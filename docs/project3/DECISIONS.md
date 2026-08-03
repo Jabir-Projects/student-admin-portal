@@ -1,5 +1,26 @@
 # Project 3 Decisions
 
+### DEC-019 — V2-7 Notifications and Audit Product Lock
+
+- Date: 2026-08-03
+- Status: `APPROVED AND IMPLEMENTED`
+- Context: V2-7 required private notification delivery and safe audit viewing
+  without live email transmission or broader product scope.
+- Decision: Persist exact owned in-portal events; deliver student status and
+  public-message email through a transactional outbox and provider-neutral
+  adapter; notify only active PROCESS_REQUESTS staff of submissions and
+  cancellations; use stable event and delivery idempotency keys, five bounded
+  retries, and processing leases; require VIEW_AUDIT_LOG for a read-only viewer
+  that exposes only allowlisted metadata.
+- Rationale: Domain mutations remain atomic with notification intent while
+  provider failures remain isolated and recoverable. Server-side recipient,
+  ownership, account, session, capability, and privacy checks remain
+  authoritative.
+- Consequences: One additive migration is accepted. No live email, audit
+  export, audit mutation, retention deletion, production access, new role, new
+  capability, or V2-8 work is introduced.
+- Related phase or package: V2-7 — Notifications and Audit.
+
 ### DEC-018 — V2-6 Administration Portal Product Lock
 
 - Date: 2026-08-03

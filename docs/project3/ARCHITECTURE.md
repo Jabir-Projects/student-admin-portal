@@ -29,7 +29,20 @@ Administrative requests must validate actor authority, request state, input, own
 
 ### Notification boundary
 
-Notifications must minimize sensitive content, validate recipients, and avoid treating delivery presentation as authorization. Provider and implementation details are `UNVERIFIED`.
+Notifications minimize sensitive content and validate recipients on the server.
+Owned in-portal records are authoritative for presentation. Student email
+delivery is provider-neutral and starts from a transactional outbox with stable
+idempotency keys, processing leases, five bounded retries, and normalized
+provider results. Provider failure does not roll back an already committed
+domain event. Live provider configuration is server-only and fails closed.
+
+### Audit presentation boundary
+
+Audit history is append-only and remains distinct from user notifications.
+Only an active current STAFF actor with `VIEW_AUDIT_LOG` can read the audit
+viewer. The viewer is read-only, bounded, deterministically ordered, filterable,
+and maps metadata through an explicit display allowlist rather than rendering
+raw JSON.
 
 ### Import trust boundary
 
