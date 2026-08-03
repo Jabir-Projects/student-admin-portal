@@ -113,11 +113,13 @@ describe("V2-6 exact capability boundaries", () => {
         database,
       ),
     ).resolves.toEqual(denied());
-    expect(revalidateActor).toHaveBeenCalledWith(
-      transaction,
+    expect(loadActor).toHaveBeenCalledWith(
       claims,
       "PROCESS_REQUESTS",
+      database,
     );
+    expect(database.$transaction).not.toHaveBeenCalled();
+    expect(revalidateActor).not.toHaveBeenCalled();
     expect(queryRaw).not.toHaveBeenCalled();
     expect(updateMany).not.toHaveBeenCalled();
   });

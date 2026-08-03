@@ -10,7 +10,12 @@ import type {
   ActorSessionClaims,
   AuthorizationFailure,
 } from "@/server/auth/capabilities";
-import { revalidateStudentActorInTransaction } from "@/server/student-portal/authorization.node";
+import { enqueueStaffRequestNotifications } from "@/server/notifications/events.node";
+import { lockRequestWorkflow } from "@/server/requests/workflow-lock.node";
+import {
+  authorizeStudentActor,
+  revalidateStudentActorInTransaction,
+} from "@/server/student-portal/authorization.node";
 
 export type SubmitRequestResult =
   | { ok: true; requestId: string }
@@ -107,6 +112,10 @@ export async function submitRequestAsActor(
         },
       },
     });
+    await enqueueStaffRequestNotifications(transaction, {
+      requestId: request.id,
+      eventType: "REQUEST_SUBMITTED",
+    });
     return { ok: true, requestId: request.id } as const;
   });
 }
@@ -120,8 +129,11 @@ export async function cancelRequestAsActor(
 ): Promise<CancelRequestResult> {
   const parsed = cancelRequestInputSchema.safeParse(input);
   if (!parsed.success) return { ok: false, reason: "INVALID_INPUT" };
+  const initialAuthorization = await authorizeStudentActor(claims, database);
+  if (!initialAuthorization.ok) return initialAuthorization;
 
   return database.$transaction(async (transaction) => {
+    await lockRequestWorkflow(transaction, parsed.data.requestId);
     const authorization = await revalidateStudentActorInTransaction(
       transaction,
       claims,
@@ -167,6 +179,10 @@ export async function cancelRequestAsActor(
         entityId: request.id,
         metadata: { previousStatus: "SUBMITTED", newStatus: "CANCELLED" },
       },
+    });
+    await enqueueStaffRequestNotifications(transaction, {
+      requestId: request.id,
+      eventType: "REQUEST_CANCELLED",
     });
     return { ok: true } as const;
   });

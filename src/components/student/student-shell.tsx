@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   ClipboardList,
+  Bell,
   FilePlus2,
   LayoutDashboard,
   Search,
@@ -96,6 +97,14 @@ export function StudentShell({
             />
           </div>
           <div className="col-start-3 row-start-1 flex items-center justify-end gap-2">
+            <Link
+              aria-label="View notifications"
+              className="border-border bg-background text-foreground hover:bg-muted inline-flex size-10 items-center justify-center rounded-lg border transition-colors"
+              href="/student/notifications"
+              title="Notifications"
+            >
+              <Bell aria-hidden="true" className="size-4.5" />
+            </Link>
             <ThemeToggle />
             <AccountMenu fullName={fullName} roleLabel="STUDENT" />
           </div>

@@ -16,6 +16,7 @@ export const PACKAGE_B_EXPECTED_MIGRATIONS = [
   "20260727121000_v2_3_capability_session_foundation",
   "20260727122000_v2_3_development_admin_capability_backfill",
   "20260731120000_v2_3_admin_to_staff_conversion",
+  "20260803120000_v2_7_notification_outbox",
 ] as const;
 
 export type PackageBTestDatabaseEnvironment = Readonly<

@@ -1,4 +1,5 @@
 import { Bell, Search } from "lucide-react";
+import Link from "next/link";
 
 import { SistBrand } from "@/components/brand/sist-brand";
 import { AccountMenu as PortalAccountMenu } from "@/components/layout/account-menu";
@@ -13,6 +14,12 @@ type StaffShellProps = {
   children: React.ReactNode;
   fullName: string;
   navigation: readonly StaffNavigationItem[];
+  notificationPreview: readonly {
+    id: string;
+    title: string;
+    readAt: Date | null;
+    createdAt: Date;
+  }[];
 };
 
 function StaffBranding() {
@@ -30,7 +37,11 @@ export function AccountMenu({ fullName }: { fullName: string }) {
   return <PortalAccountMenu fullName={fullName} roleLabel="STAFF" />;
 }
 
-function NotificationsPanel() {
+function NotificationsPanel({
+  notifications,
+}: {
+  notifications: StaffShellProps["notificationPreview"];
+}) {
   return (
     <aside
       aria-labelledby="notifications-heading"
@@ -44,21 +55,47 @@ function NotificationsPanel() {
         >
           Notifications
         </h2>
-        <span className="text-muted-foreground text-xs font-medium">
-          Panel shell
-        </span>
+        <Link
+          className="text-sist-green text-xs font-semibold"
+          href="/staff/notifications"
+        >
+          View all
+        </Link>
       </div>
-      <div className="bg-staff-panel-muted mt-5 rounded-lg border border-dashed px-5 py-9 text-center">
-        <span className="bg-secondary text-secondary-foreground mx-auto inline-flex size-11 items-center justify-center rounded-full">
-          <Bell aria-hidden="true" className="size-5" />
-        </span>
-        <p className="mt-4 text-sm font-semibold">
-          No notification data loaded
-        </p>
-        <p className="text-muted-foreground mt-1 text-sm leading-6">
-          Notifications will appear here when that workflow is implemented.
-        </p>
-      </div>
+      {notifications.length === 0 ? (
+        <div className="bg-staff-panel-muted mt-5 rounded-lg border border-dashed px-5 py-9 text-center">
+          <span className="bg-secondary text-secondary-foreground mx-auto inline-flex size-11 items-center justify-center rounded-full">
+            <Bell aria-hidden="true" className="size-5" />
+          </span>
+          <p className="mt-4 text-sm font-semibold">
+            No notification data loaded
+          </p>
+          <p className="text-muted-foreground mt-1 text-sm leading-6">
+            Request activity assigned to your account will appear here.
+          </p>
+        </div>
+      ) : (
+        <ul className="mt-4 space-y-2">
+          {notifications.map((notification) => (
+            <li
+              className="bg-staff-panel-muted rounded-lg border p-3 text-sm"
+              key={notification.id}
+            >
+              <Link
+                className="font-medium hover:underline"
+                href="/staff/notifications"
+              >
+                {notification.title}
+              </Link>
+              {!notification.readAt && (
+                <span className="text-sist-green ml-2 text-xs font-semibold">
+                  Unread
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </aside>
   );
 }
@@ -67,6 +104,7 @@ export function StaffShell({
   children,
   fullName,
   navigation,
+  notificationPreview,
 }: StaffShellProps) {
   return (
     <div className="bg-background min-h-screen lg:pl-64">
@@ -103,14 +141,14 @@ export function StaffShell({
             />
           </div>
           <div className="col-start-3 row-start-1 flex items-center justify-end gap-2">
-            <a
+            <Link
               aria-label="Go to notifications panel"
               className="border-border bg-background text-foreground hover:bg-muted inline-flex size-10 items-center justify-center rounded-lg border transition-colors"
-              href="#notifications"
+              href="/staff/notifications"
               title="Notifications"
             >
               <Bell aria-hidden="true" className="size-4.5" />
-            </a>
+            </Link>
             <ThemeToggle />
             <AccountMenu fullName={fullName} />
           </div>
@@ -119,7 +157,7 @@ export function StaffShell({
 
       <div className="grid gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:px-8">
         <main className="min-w-0">{children}</main>
-        <NotificationsPanel />
+        <NotificationsPanel notifications={notificationPreview} />
       </div>
     </div>
   );

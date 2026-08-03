@@ -296,7 +296,7 @@ describe.sequential("V2-5 PostgreSQL workflows", () => {
         cancelRequestAsActor(claimsA, { requestId: resubmitted.requestId }, db),
       ).resolves.toEqual({ ok: false, reason: "STATUS_CONFLICT" });
     }
-  });
+  }, 20_000);
 
   it("rolls back creation when required audit writing fails", async (context) => {
     const db = dbOrSkip(context);

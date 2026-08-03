@@ -16,7 +16,12 @@ import type {
   ActorSessionClaims,
   AuthorizationFailure,
 } from "@/server/auth/capabilities";
-import { revalidateCapabilityActorInTransaction } from "@/server/auth/capabilities.node";
+import {
+  loadCapabilityActor,
+  revalidateCapabilityActorInTransaction,
+} from "@/server/auth/capabilities.node";
+import { enqueueStudentRequestNotification } from "@/server/notifications/events.node";
+import { lockRequestWorkflow } from "@/server/requests/workflow-lock.node";
 
 type MutationFailure =
   | AuthorizationFailure
@@ -37,16 +42,22 @@ const transitions: Readonly<Record<RequestStatus, readonly RequestStatus[]>> = {
   CANCELLED: [],
 };
 
-type LockedRequest = { id: string; status: RequestStatus };
+type LockedRequest = {
+  id: string;
+  status: RequestStatus;
+  studentUserId: string;
+};
 
 async function lockRequest(
   transaction: Prisma.TransactionClient,
   requestId: string,
 ): Promise<LockedRequest | null> {
   const rows = await transaction.$queryRaw<LockedRequest[]>(Prisma.sql`
-    SELECT "id"::text AS "id", "status"
-    FROM "DocumentRequest"
-    WHERE "id" = CAST(${requestId} AS UUID)
+    SELECT request."id"::text AS "id", request."status",
+           student."userId"::text AS "studentUserId"
+    FROM "DocumentRequest" request
+    JOIN "StudentProfile" student ON student."id" = request."studentId"
+    WHERE request."id" = CAST(${requestId} AS UUID)
     FOR UPDATE
   `);
   return rows[0] ?? null;
@@ -65,7 +76,14 @@ export async function transitionRequestAsActor(
   ) {
     return { ok: false, reason: "INVALID_INPUT" };
   }
+  const initialAuthorization = await loadCapabilityActor(
+    claims,
+    "PROCESS_REQUESTS",
+    database,
+  );
+  if (!initialAuthorization.ok) return initialAuthorization;
   return database.$transaction(async (transaction) => {
+    await lockRequestWorkflow(transaction, parsed.data.requestId);
     const authorization = await revalidateCapabilityActorInTransaction(
       transaction,
       claims,
@@ -83,13 +101,14 @@ export async function transitionRequestAsActor(
     });
     if (changed.count !== 1)
       return { ok: false, reason: "STATUS_CONFLICT" } as const;
-    await transaction.requestStatusHistory.create({
+    const history = await transaction.requestStatusHistory.create({
       data: {
         requestId: request.id,
         fromStatus: request.status,
         toStatus: parsed.data.targetStatus,
         changedById: authorization.actor.id,
       },
+      select: { id: true },
     });
     if (parsed.data.internalNote) {
       await transaction.requestMessage.create({
@@ -102,23 +121,37 @@ export async function transitionRequestAsActor(
       });
     }
     if (parsed.data.targetStatus === "REJECTED") {
-      await transaction.requestMessage.create({
+      const message = await transaction.requestMessage.create({
         data: {
           requestId: request.id,
           authorId: authorization.actor.id,
           visibility: "PUBLIC",
           body: `Request rejected: ${parsed.data.rejectionReason}`,
         },
+        select: { id: true },
+      });
+      await enqueueStudentRequestNotification(transaction, {
+        requestId: request.id,
+        studentUserId: request.studentUserId,
+        eventType: "REQUEST_PUBLIC_MESSAGE_ADDED",
+        eventId: message.id,
       });
     }
     if (parsed.data.publicMessage) {
-      await transaction.requestMessage.create({
+      const message = await transaction.requestMessage.create({
         data: {
           requestId: request.id,
           authorId: authorization.actor.id,
           visibility: "PUBLIC",
           body: parsed.data.publicMessage,
         },
+        select: { id: true },
+      });
+      await enqueueStudentRequestNotification(transaction, {
+        requestId: request.id,
+        studentUserId: request.studentUserId,
+        eventType: "REQUEST_PUBLIC_MESSAGE_ADDED",
+        eventId: message.id,
       });
     }
     await transaction.auditLog.create({
@@ -137,6 +170,13 @@ export async function transitionRequestAsActor(
         },
       },
     });
+    await enqueueStudentRequestNotification(transaction, {
+      requestId: request.id,
+      studentUserId: request.studentUserId,
+      eventType: "REQUEST_STATUS_CHANGED",
+      eventId: history.id,
+      status: parsed.data.targetStatus,
+    });
     return { ok: true } as const;
   });
 }
@@ -148,7 +188,14 @@ export async function addRequestMessageAsActor(
 ): Promise<AdministrationMutationResult> {
   const parsed = requestMessageInputSchema.safeParse(input);
   if (!parsed.success) return { ok: false, reason: "INVALID_INPUT" };
+  const initialAuthorization = await loadCapabilityActor(
+    claims,
+    "PROCESS_REQUESTS",
+    database,
+  );
+  if (!initialAuthorization.ok) return initialAuthorization;
   return database.$transaction(async (transaction) => {
+    await lockRequestWorkflow(transaction, parsed.data.requestId);
     const authorization = await revalidateCapabilityActorInTransaction(
       transaction,
       claims,
@@ -157,13 +204,14 @@ export async function addRequestMessageAsActor(
     if (!authorization.ok) return authorization;
     const request = await lockRequest(transaction, parsed.data.requestId);
     if (!request) return { ok: false, reason: "NOT_FOUND" } as const;
-    await transaction.requestMessage.create({
+    const message = await transaction.requestMessage.create({
       data: {
         requestId: request.id,
         authorId: authorization.actor.id,
         visibility: parsed.data.visibility,
         body: parsed.data.body,
       },
+      select: { id: true },
     });
     await transaction.auditLog.create({
       data: {
@@ -177,6 +225,14 @@ export async function addRequestMessageAsActor(
         metadata: { visibility: parsed.data.visibility },
       },
     });
+    if (parsed.data.visibility === "PUBLIC") {
+      await enqueueStudentRequestNotification(transaction, {
+        requestId: request.id,
+        studentUserId: request.studentUserId,
+        eventType: "REQUEST_PUBLIC_MESSAGE_ADDED",
+        eventId: message.id,
+      });
+    }
     return { ok: true } as const;
   });
 }

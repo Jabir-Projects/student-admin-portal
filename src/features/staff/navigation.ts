@@ -96,7 +96,7 @@ const staffNavigation: readonly StaffNavigationItem[] = [
     label: "Audit Log",
     href: "/staff/audit",
     icon: "audit",
-    available: false,
+    available: true,
     requiredCapabilities: ["VIEW_AUDIT_LOG"],
   },
   {

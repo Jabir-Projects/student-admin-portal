@@ -84,6 +84,25 @@ enum StudentRegistrySource {
   OFFICIAL_IMPORT
 }
 
+enum NotificationEventType {
+  LEGACY
+  REQUEST_STATUS_CHANGED
+  REQUEST_PUBLIC_MESSAGE_ADDED
+  REQUEST_SUBMITTED
+  REQUEST_CANCELLED
+}
+
+enum NotificationDeliveryChannel {
+  EMAIL
+}
+
+enum NotificationDeliveryStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+}
+
 model User {
   id                    String                     @id @default(uuid()) @db.Uuid
   email                 String                     @unique @db.VarChar(320)
@@ -228,19 +247,43 @@ model RequestMessage {
 }
 
 model Notification {
-  id        String           @id @default(uuid()) @db.Uuid
-  userId    String           @db.Uuid
-  requestId String?          @db.Uuid
-  title     String           @db.VarChar(200)
-  body      String
-  readAt    DateTime?        @db.Timestamptz(3)
-  createdAt DateTime         @default(now()) @db.Timestamptz(3)
-  updatedAt DateTime         @updatedAt @db.Timestamptz(3)
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  request   DocumentRequest? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  id         String                 @id @default(uuid()) @db.Uuid
+  userId     String                 @db.Uuid
+  requestId  String?                @db.Uuid
+  eventType  NotificationEventType  @default(LEGACY)
+  eventKey   String                 @unique @db.VarChar(240)
+  title      String                 @db.VarChar(200)
+  body       String
+  readAt     DateTime?              @db.Timestamptz(3)
+  createdAt  DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime               @updatedAt @db.Timestamptz(3)
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  request    DocumentRequest?       @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  deliveries NotificationDelivery[]
 
   @@index([userId, readAt, createdAt])
+  @@index([userId, createdAt, id])
   @@index([requestId, createdAt])
+}
+
+model NotificationDelivery {
+  id                  String                      @id @default(uuid()) @db.Uuid
+  notificationId      String                      @db.Uuid
+  channel             NotificationDeliveryChannel
+  status              NotificationDeliveryStatus  @default(PENDING)
+  idempotencyKey      String                      @unique @db.VarChar(256)
+  attemptCount        Int                         @default(0)
+  nextAttemptAt       DateTime                    @default(now()) @db.Timestamptz(3)
+  processingStartedAt DateTime?                   @db.Timestamptz(3)
+  sentAt              DateTime?                   @db.Timestamptz(3)
+  providerMessageId   String?                     @db.VarChar(200)
+  errorCode           String?                     @db.VarChar(120)
+  createdAt           DateTime                    @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime                    @updatedAt @db.Timestamptz(3)
+  notification        Notification                @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextAttemptAt, id])
+  @@index([notificationId, channel])
 }
 
 model AuditLog {
@@ -254,5 +297,7 @@ model AuditLog {
   actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: Restrict)
 
   @@index([entityType, entityId, createdAt])
+  @@index([action, createdAt, id])
+  @@index([entityType, createdAt, id])
   @@index([actorId, createdAt])
 }
