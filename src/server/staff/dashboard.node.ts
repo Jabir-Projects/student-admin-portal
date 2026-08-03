@@ -23,6 +23,16 @@ export type StaffDashboardData = {
         totalCount: number;
         records: readonly PendingStudentAccount[];
       };
+  requestCounts?:
+    | { status: "hidden" }
+    | {
+        status: "available";
+        totalActive: number;
+        submitted: number;
+        underReview: number;
+        approved: number;
+        ready: number;
+      };
 };
 
 export type StaffDashboardResult =
@@ -45,6 +55,33 @@ export async function getStaffDashboardDataByClaims(
   }
 
   const assignedCount = actor.user.capabilities.length;
+  const canProcessRequests =
+    actor.user.capabilities.includes("PROCESS_REQUESTS");
+  const requestCounts = canProcessRequests
+    ? await database.documentRequest.groupBy({
+        by: ["status"],
+        where: {
+          status: { in: ["SUBMITTED", "UNDER_REVIEW", "APPROVED", "READY"] },
+        },
+        _count: { _all: true },
+      })
+    : null;
+  const requestCountByStatus = new Map(
+    requestCounts?.map((entry) => [entry.status, entry._count._all]) ?? [],
+  );
+  const requestSummary = requestCounts
+    ? {
+        status: "available" as const,
+        submitted: requestCountByStatus.get("SUBMITTED") ?? 0,
+        underReview: requestCountByStatus.get("UNDER_REVIEW") ?? 0,
+        approved: requestCountByStatus.get("APPROVED") ?? 0,
+        ready: requestCountByStatus.get("READY") ?? 0,
+        totalActive: requestCounts.reduce(
+          (total, entry) => total + entry._count._all,
+          0,
+        ),
+      }
+    : ({ status: "hidden" } as const);
   if (!actor.user.capabilities.includes("MANAGE_STUDENT_ACCOUNTS")) {
     return {
       ok: true,
@@ -52,6 +89,7 @@ export async function getStaffDashboardDataByClaims(
         fullName,
         capabilitySummary: { status: "available", assignedCount },
         pendingStudents: { status: "hidden" },
+        requestCounts: requestSummary,
       },
     };
   }
@@ -70,6 +108,7 @@ export async function getStaffDashboardDataByClaims(
               totalCount: pending.totalCount,
               records: pending.records,
             },
+      requestCounts: requestSummary,
     },
   };
 }

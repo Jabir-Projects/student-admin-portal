@@ -37,6 +37,7 @@ describe("Package D authorization composition", () => {
   it.each([
     ["student-accounts", "MANAGE_STUDENT_ACCOUNTS"],
     ["student-accounts", "REACTIVATE_STUDENT_ACCOUNTS"],
+    ["student-accounts", "EXPORT_STUDENT_DATA"],
     ["staff-management", "MANAGE_STAFF_ACCOUNTS"],
     ["staff-management", "MANAGE_STAFF_CAPABILITIES"],
   ] as const)("allows %s entry with %s", async (page, capability) => {
@@ -49,17 +50,15 @@ describe("Package D authorization composition", () => {
     expect(result.ok).toBe(true);
   });
 
-  it("denies zero-capability STAFF and export-only STAFF", async () => {
-    for (const capabilities of [[], ["EXPORT_STUDENT_DATA"]]) {
-      findUnique.mockResolvedValueOnce(actor(capabilities));
-      await expect(
-        authorizePackageDPageEntry(
-          { actorId: "actor-id", claimedSessionVersion: 4 },
-          "student-accounts",
-          database,
-        ),
-      ).resolves.toEqual({ ok: false, reason: "MISSING_CAPABILITY" });
-    }
+  it("denies zero-capability STAFF", async () => {
+    findUnique.mockResolvedValue(actor([]));
+    await expect(
+      authorizePackageDPageEntry(
+        { actorId: "actor-id", claimedSessionVersion: 4 },
+        "student-accounts",
+        database,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "MISSING_CAPABILITY" });
   });
 
   it.each([

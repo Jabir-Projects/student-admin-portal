@@ -310,11 +310,13 @@ function queryHref(query: StudentAccountPageQuery, page: number) {
 export function StudentAccountManagement({
   canManage,
   canReactivate,
+  canExport = false,
   query,
   sections,
 }: {
   canManage: boolean;
   canReactivate: boolean;
+  canExport?: boolean;
   query: StudentAccountPageQuery;
   sections: readonly StudentAccountSection[];
 }) {
@@ -326,17 +328,31 @@ export function StudentAccountManagement({
 
   return (
     <div className="space-y-6">
-      <header>
-        <p className="text-sist-olive-dark text-sm font-semibold">
-          Account management
-        </p>
-        <h1 className="text-sist-navy-dark mt-1 text-3xl font-semibold tracking-tight">
-          Student accounts
-        </h1>
-        <p className="text-muted-foreground mt-2 max-w-3xl leading-7">
-          Search and manage only the student account states authorized for your
-          current STAFF capabilities.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-sist-olive-dark text-sm font-semibold">
+            Account management
+          </p>
+          <h1 className="text-sist-navy-dark mt-1 text-3xl font-semibold tracking-tight">
+            Student accounts
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-3xl leading-7">
+            Search and manage only the student account states authorized for
+            your current STAFF capabilities.
+          </p>
+        </div>
+        {canExport ? (
+          <Button asChild variant="outline">
+            <a
+              href={`/staff/student-accounts/export?${new URLSearchParams({
+                ...(query.search ? { search: query.search } : {}),
+                status: query.status,
+              }).toString()}`}
+            >
+              Export CSV
+            </a>
+          </Button>
+        ) : null}
       </header>
 
       <form

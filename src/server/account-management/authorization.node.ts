@@ -13,7 +13,8 @@ export type PackageDReadCapability =
   | "MANAGE_STUDENT_ACCOUNTS"
   | "REACTIVATE_STUDENT_ACCOUNTS"
   | "MANAGE_STAFF_ACCOUNTS"
-  | "MANAGE_STAFF_CAPABILITIES";
+  | "MANAGE_STAFF_CAPABILITIES"
+  | "EXPORT_STUDENT_DATA";
 
 export type PackageDAuthorizationResult =
   | { ok: true; actor: StaffShellUser }
@@ -23,6 +24,7 @@ const pageCapabilities = {
   "student-accounts": [
     "MANAGE_STUDENT_ACCOUNTS",
     "REACTIVATE_STUDENT_ACCOUNTS",
+    "EXPORT_STUDENT_DATA",
   ],
   "staff-management": ["MANAGE_STAFF_ACCOUNTS", "MANAGE_STAFF_CAPABILITIES"],
 } as const satisfies Record<PackageDPage, readonly PackageDReadCapability[]>;

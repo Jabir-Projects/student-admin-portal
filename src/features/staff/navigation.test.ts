@@ -16,7 +16,6 @@ describe("STAFF capability-aware navigation", () => {
     ["MANAGE_STUDENT_ACCOUNTS", "Student Accounts"],
     ["REACTIVATE_STUDENT_ACCOUNTS", "Student Accounts"],
     ["PROCESS_REQUESTS", "Requests"],
-    ["EXPORT_REQUEST_DATA", "Requests"],
     ["MANAGE_REQUEST_CATEGORIES", "Request Categories"],
     ["GENERATE_DOCUMENTS", "Documents"],
     ["RELEASE_DOCUMENTS", "Documents"],
@@ -42,8 +41,17 @@ describe("STAFF capability-aware navigation", () => {
     },
   );
 
-  it("does not activate student management navigation for export-only access", () => {
+  it("locates the approved student export on the student account module", () => {
     expect(labelsFor(["EXPORT_STUDENT_DATA"])).toEqual([
+      "Dashboard",
+      "Student Accounts",
+      "Profile",
+      "Settings",
+    ]);
+  });
+
+  it("does not expose the PROCESS_REQUESTS queue to request-export-only STAFF", () => {
+    expect(labelsFor(["EXPORT_REQUEST_DATA"])).toEqual([
       "Dashboard",
       "Profile",
       "Settings",

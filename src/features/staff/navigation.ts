@@ -39,6 +39,7 @@ const staffNavigation: readonly StaffNavigationItem[] = [
     requiredCapabilities: [
       "MANAGE_STUDENT_ACCOUNTS",
       "REACTIVATE_STUDENT_ACCOUNTS",
+      "EXPORT_STUDENT_DATA",
     ],
   },
   {
@@ -46,15 +47,15 @@ const staffNavigation: readonly StaffNavigationItem[] = [
     label: "Requests",
     href: "/staff/requests",
     icon: "requests",
-    available: false,
-    requiredCapabilities: ["PROCESS_REQUESTS", "EXPORT_REQUEST_DATA"],
+    available: true,
+    requiredCapabilities: ["PROCESS_REQUESTS"],
   },
   {
     key: "request-categories",
     label: "Request Categories",
     href: "/staff/request-categories",
     icon: "request-categories",
-    available: false,
+    available: true,
     requiredCapabilities: ["MANAGE_REQUEST_CATEGORIES"],
   },
   {

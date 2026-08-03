@@ -70,6 +70,7 @@ export default async function StudentAccountsPage({
   const canReactivate = entry.actor.capabilities.includes(
     "REACTIVATE_STUDENT_ACCOUNTS",
   );
+  const canExport = entry.actor.capabilities.includes("EXPORT_STUDENT_DATA");
   const selectedCapabilityIsMissing =
     ((query.status === "pending" || query.status === "active") && !canManage) ||
     (query.status === "disabled" && !canReactivate);
@@ -116,6 +117,7 @@ export default async function StudentAccountsPage({
     <StudentAccountManagement
       canManage={canManage}
       canReactivate={canReactivate}
+      canExport={canExport}
       query={query}
       sections={sections}
     />

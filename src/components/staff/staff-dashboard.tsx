@@ -135,6 +135,7 @@ function PendingStudentTable({
 export function StaffDashboard({ data }: { data: StaffDashboardData }) {
   const hasCapabilities = data.capabilitySummary.assignedCount > 0;
   const pendingIsVisible = data.pendingStudents.status !== "hidden";
+  const requestCounts = data.requestCounts ?? { status: "hidden" as const };
 
   return (
     <div className="space-y-6">
@@ -202,6 +203,42 @@ export function StaffDashboard({ data }: { data: StaffDashboardData }) {
           </Card>
         ) : null}
       </section>
+
+      {requestCounts.status === "available" ? (
+        <section aria-labelledby="request-counts-heading">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2
+                className="text-sist-navy-dark text-xl font-semibold"
+                id="request-counts-heading"
+              >
+                Active requests
+              </h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Current database-backed request workload.
+              </p>
+            </div>
+            <span className="text-sist-navy-dark text-2xl font-semibold">
+              {requestCounts.totalActive}
+            </span>
+          </div>
+          <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              ["Submitted", requestCounts.submitted],
+              ["Under review", requestCounts.underReview],
+              ["Approved", requestCounts.approved],
+              ["Ready", requestCounts.ready],
+            ].map(([label, count]) => (
+              <div className="bg-staff-panel rounded-xl border p-4" key={label}>
+                <dt className="text-muted-foreground text-sm">{label}</dt>
+                <dd className="text-sist-navy-dark mt-1 text-2xl font-semibold">
+                  {count}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
 
       {!hasCapabilities ? (
         <section

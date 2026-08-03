@@ -8,8 +8,10 @@ import { getStaffDashboardDataByClaims } from "@/server/staff/dashboard.node";
 const findUnique = vi.fn();
 const count = vi.fn();
 const findMany = vi.fn();
+const groupBy = vi.fn();
 const database = {
   user: { findUnique, count, findMany },
+  documentRequest: { groupBy },
 } as unknown as PrismaClient;
 
 function staffUser(
@@ -55,6 +57,8 @@ beforeEach(() => {
   findUnique.mockReset();
   count.mockReset();
   findMany.mockReset();
+  groupBy.mockReset();
+  groupBy.mockResolvedValue([]);
 });
 
 describe("STAFF dashboard data contract", () => {
@@ -105,6 +109,7 @@ describe("STAFF dashboard data contract", () => {
         fullName: "Sara Ali",
         capabilitySummary: { status: "available", assignedCount: 0 },
         pendingStudents: { status: "hidden" },
+        requestCounts: { status: "hidden" },
       },
     });
     expect(count).not.toHaveBeenCalled();
@@ -119,6 +124,10 @@ describe("STAFF dashboard data contract", () => {
     );
     count.mockResolvedValue(2);
     findMany.mockResolvedValue([pendingStudent(1), pendingStudent(2)]);
+    groupBy.mockResolvedValue([
+      { status: "SUBMITTED", _count: { _all: 3 } },
+      { status: "READY", _count: { _all: 1 } },
+    ]);
 
     const result = await getStaffDashboardDataByClaims(
       { actorId: "staff-id", claimedSessionVersion: 7 },
@@ -130,11 +139,20 @@ describe("STAFF dashboard data contract", () => {
       data: {
         capabilitySummary: { status: "available", assignedCount: 2 },
         pendingStudents: { status: "available", totalCount: 2 },
+        requestCounts: {
+          status: "available",
+          totalActive: 4,
+          submitted: 3,
+          underReview: 0,
+          approved: 0,
+          ready: 1,
+        },
       },
     });
     expect(count).toHaveBeenCalledWith({
       where: { role: "STUDENT", status: "PENDING_APPROVAL" },
     });
+    expect(groupBy).toHaveBeenCalledTimes(1);
   });
 
   it("returns a bounded, deterministically ordered, minimized queue", async () => {
@@ -182,6 +200,7 @@ describe("STAFF dashboard data contract", () => {
     expect(JSON.stringify(result.data)).not.toMatch(
       /forbidden-id|forbidden-|passwordHash|email|sessionVersion/u,
     );
+    expect(groupBy).not.toHaveBeenCalled();
   });
 
   it("returns the explicit empty section for an authorized empty queue", async () => {
@@ -202,6 +221,7 @@ describe("STAFF dashboard data contract", () => {
         fullName: "Sara Ali",
         capabilitySummary: { status: "available", assignedCount: 1 },
         pendingStudents: { status: "empty", totalCount: 0, records: [] },
+        requestCounts: { status: "hidden" },
       },
     });
   });
