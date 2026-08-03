@@ -1,5 +1,27 @@
 # Project 3 Verification Matrix
 
+## V2-6 Administration Portal closure
+
+Status: `CLOSED — VERIFIED`
+
+| Requirement                    | Result                                                                                         |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- |
+| Server authorization           | `PASS` — exact capability checks, ACTIVE STAFF, current session, and zero-capability denial    |
+| Request processing             | `PASS` — approved transitions, invalid-skip denial, rejection reason, locking, and concurrency |
+| Category lifecycle             | `PASS` — create/edit and idempotent activate/deactivate with required audit                    |
+| Timeline privacy               | `PASS` — PUBLIC messages student-visible; INTERNAL notes remain staff-only                     |
+| Transactions and audit         | `PASS` — sensitive changes and audit writes are atomic; controlled audit failure rolls back    |
+| Authorized exports             | `PASS` — exact capabilities, allowlisted fields, 10,000-row bound, and formula neutralization  |
+| PostgreSQL integration         | `PASS` — 7 files, 52 passed, 0 failed, 0 skipped, serialized                                   |
+| Remaining Vitest               | `PASS` — 55 files, 617 passed, 0 failed, 0 skipped, serialized                                 |
+| Static and Prisma              | `PASS` — scoped format, ESLint, strict typecheck, format, validate, and generate               |
+| Production build               | `PASS` — Next.js 16.2.12 webpack build includes all five new V2-6 routes                       |
+| Authenticated browser          | `PASS` — 12 passed, 0 failed, 0 skipped, one Chromium worker                                   |
+| Responsive and accessibility   | `PASS` — four viewports, no overflow, named controls, and hydrated theme toggle                |
+| Dependency and secret security | `PASS` — production audit found 0 vulnerabilities; staged secret scan found no matches         |
+| Database scope                 | `PASS` — unchanged schema/seven migrations; isolated test mutations only; no production        |
+| V2-6 closure                   | `CLOSED` — implementation `f28f6a9f8eef087b3a580635d3952b0f3abdc1d9`; V2-7 not started         |
+
 ## V2-5 Student Core Portal closure
 
 Status: `CLOSED â€” VERIFIED`

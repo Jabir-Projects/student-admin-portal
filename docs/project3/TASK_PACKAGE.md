@@ -1,5 +1,32 @@
 # Project 3 Task Package Register
 
+## Closed V2-6 Administration Portal package
+
+| Field                 | Value                                                             |
+| --------------------- | ----------------------------------------------------------------- |
+| ID                    | `V2-6`                                                            |
+| Name                  | Administration Portal                                             |
+| Status                | `CLOSED — VERIFIED`                                               |
+| Starting commit       | `046f57bcb199d763908ee471858a64137221835d`                        |
+| Implementation commit | `f28f6a9f8eef087b3a580635d3952b0f3abdc1d9`                        |
+| Branch                | `codex/v2-6-administration-portal`                                |
+| Database decision     | Existing schema and seven migrations only; isolated test mutation |
+
+Implementation and closure verification are complete. The package delivers
+the capability-aware STAFF dashboard, student administration export, request
+queue and processing, request-category lifecycle, and authorized request CSV
+export. Exact server capabilities, database-authoritative actor checks,
+transactions, locking, audit rollback, privacy boundaries, bounded field
+allowlists, and spreadsheet-injection protection are verified.
+
+The serialized PostgreSQL set passed 7 files and 52 tests. The serialized
+remaining Vitest set passed 55 files and 617 tests. The authenticated Chromium
+suite passed 12 tests with one worker across the four approved viewports,
+denial paths, accessible controls, and theme behavior. Scoped formatting,
+ESLint, strict typecheck, Prisma format/validate/generate, webpack build,
+production dependency audit, documentation links, diff review, and secret scan
+passed. V2-6 is closed and V2-7 has not started.
+
 ## Closed V2-5 Student Core Portal package
 
 | Field             | Value                                      |

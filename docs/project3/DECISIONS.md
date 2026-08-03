@@ -1,5 +1,24 @@
 # Project 3 Decisions
 
+### DEC-018 — V2-6 Administration Portal Product Lock
+
+- Date: 2026-08-03
+- Status: `APPROVED`
+- Context: V2-6 required the approved administration workflows without changing
+  the role, capability, database, or migration models.
+- Decision: Implement capability-aware STAFF dashboard summaries, student CSV
+  export, request queue/detail processing, request-category create/edit and
+  activate/deactivate lifecycle, and request CSV export. Enforce exact
+  capabilities on the server, exclude internal notes from student timelines,
+  serialize sensitive transitions with database locks, require transactional
+  audit writes, and neutralize spreadsheet formulas in bounded allowlisted CSVs.
+- Rationale: Complete the essential administration portal while preserving the
+  existing seven-migration schema and database-authoritative security model.
+- Consequences: No client-controlled privilege, ADMIN bypass, schema change,
+  migration, dependency, production access, notification workflow, or audit-log
+  viewer is introduced. V2-7 remains excluded and has not started.
+- Related phase or package: V2-6 — Administration Portal.
+
 ### DEC-017 â€” V2-5 browser runtime boundary and isolated harness
 
 - Date: 2026-08-02

@@ -1,5 +1,32 @@
 # Project 3 Current State
 
+## V2-6 final closure — 2026-08-03
+
+- Phase: `V2-6 — Administration Portal`.
+- Status: `VERIFIED COMPLETE — CLOSED`.
+- Capability-aware dashboard summaries, student administration export,
+  request queue/detail processing, request-category lifecycle management, and
+  request CSV export are implemented under the approved Product Lock.
+- Exact server-side capabilities guard every read, mutation, and export.
+  Request and category mutations use transactions, database locking, required
+  audit writes, and rollback on audit failure. Internal notes remain staff-only.
+- CSV exports use explicit field allowlists, bounded rows, minimal student data,
+  and spreadsheet-formula neutralization.
+- The existing Prisma schema and all seven migrations are unchanged.
+- Serialized verification passed 7 PostgreSQL files and 52 tests plus 55
+  remaining Vitest files and 617 tests: 62 files, 669 tests, zero failures, and
+  zero skips overall.
+- Authenticated Chromium verification passed 12 tests with one worker,
+  including the 360×800, 768×1024, 1024×768, and 1440×900 responsive matrix,
+  theme behavior, accessible controls, and negative authorization paths.
+- Scoped formatting, ESLint, strict typecheck, Prisma format/validate/generate,
+  webpack production build, production dependency audit, diff, link, and secret
+  checks passed.
+- Implementation commit `f28f6a9f8eef087b3a580635d3952b0f3abdc1d9`
+  is verified. V2-6 is closed and V2-7 has not started.
+
+Last updated: 2026-08-03
+
 ## V2-5 final closure â€” 2026-08-02
 
 - Phase: `V2-5 â€” Student Core Portal`.
@@ -23,20 +50,18 @@
 - Implementation commit `bbf091eba431ed60444d7558c4ae0b0785027ac1`
   is verified. V2-5 is closed and V2-6 has not started.
 
-Last updated: 2026-08-02
-
 ## Current position
 
 | Item                                                      | State                                              | Evidence                                                                  |
 | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
-| Phase                                                     | V2-5 — Student Core Portal                         | `VERIFIED COMPLETE`                                                       |
+| Phase                                                     | V2-6 — Administration Portal                       | `VERIFIED COMPLETE`                                                       |
 | Closed control package                                    | V2-4 — Owner-approved Design Lock and phase scope  | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | CTRL-001 — Create Project 3 control documents      | `VERIFIED` `CLOSED`                                                       |
 | V2-0 through V2-2                                         | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package A — Additive database and session foundation | Complete                                           | `REPORTED`                                                                |
 | V2-3 Package B — Backend capability authorization         | Complete                                           | `REPORTED`                                                                |
-| Current product package                                   | None                                               | V2-5 closed; V2-6 not started                                             |
+| Current product package                                   | None                                               | V2-6 closed; V2-7 not started                                             |
 | Package C1                                                | Repository and route readiness                     | Complete                                                                  |
 | Package C2                                                | Design requirements lock                           | Complete                                                                  |
 | Package C3                                                | Staff application shell                            | Implementation, focused corrections, and focused QA approved and complete |
@@ -107,7 +132,7 @@ Last updated: 2026-08-02
 
 ## Current management objective
 
-> V2-5 is verified and closed. V2-6 remains planned and has not started.
+> V2-6 is verified and closed. V2-7 remains planned and has not started.
 
 ## Risks and blockers
 
@@ -161,10 +186,18 @@ Last updated: 2026-08-02
   tests across the required responsive matrix.
 - No V2-5 schema or migration change was made. No production database or
   production authentication path was accessed or altered.
+- V2-6 passed 7 serialized PostgreSQL files and 52 tests plus 55 remaining
+  serialized Vitest files and 617 tests, with zero failures and zero skips.
+- V2-6 authenticated Chromium verification passed 12 tests with one worker,
+  covering processing, privacy, exports, category lifecycle, denial paths,
+  responsive layout, accessible controls, and theme behavior.
+- No V2-6 schema or migration change was made. The control database was used
+  only for read-only identity verification; all test mutations targeted the
+  distinct isolated database. Production was not accessed.
 
 ## Next approved management action
 
-Await explicit authorization for V2-6. Do not begin it automatically.
+Await explicit authorization for V2-7. Do not begin it automatically.
 
 ## Final Hardening Backlog
 

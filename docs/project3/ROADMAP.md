@@ -1,5 +1,14 @@
 # Project 3 Roadmap
 
+## V2-6 closure addendum
+
+V2-6 is verified complete and closed under the owner-approved Product Lock.
+Capability-aware administration, request processing, category lifecycle, and
+authorized CSV exports are implemented using the existing schema. PostgreSQL,
+security, concurrency, audit rollback, authenticated browser, responsive,
+theme, accessibility, static, build, documentation, and Git delivery gates
+passed. V2-7 has not started.
+
 ## V2-5 closure addendum
 
 V2-5 is verified complete and closed under the owner-approved Product Lock. The
@@ -199,15 +208,15 @@ Status: `VERIFIED COMPLETE`
 
 ### V2-6 — Administration Portal
 
-Status: `PLANNED`
+Status: `VERIFIED COMPLETE`
 
-- V2-6.1 Staff dashboard
-- V2-6.2 Student administration
-- V2-6.3 Request queue
-- V2-6.4 Request processing
-- V2-6.5 Request categories
-- V2-6.6 Authorized exports
-- V2-6.7 Administration verification
+- V2-6.1 Staff dashboard — Complete
+- V2-6.2 Student administration — Complete
+- V2-6.3 Request queue — Complete
+- V2-6.4 Request processing — Complete
+- V2-6.5 Request categories — Complete
+- V2-6.6 Authorized exports — Complete
+- V2-6.7 Administration verification — Complete
 
 ### V2-7 — Notifications and Audit
 
