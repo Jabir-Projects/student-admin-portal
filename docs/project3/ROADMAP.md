@@ -8,8 +8,8 @@ fixed templates, validation preview, separate upload and approval capabilities,
 four-eyes review, atomic execution with required audit rollback, safe retention,
 and responsive accessible STAFF routes. Migration, PostgreSQL, authorization,
 malicious-input, concurrency, browser, static, build, dependency, and audit
-checks passed. Authorized Git delivery is in progress. Finance imports remain
-excluded and V2-9 has not started.
+checks and authorized Git delivery passed. V2-8 is closed. Finance imports
+remain excluded and V2-9 has not started.
 
 ## V2-7 closure addendum
 
@@ -251,7 +251,7 @@ Status: `VERIFIED COMPLETE`
 
 ### V2-8 — Controlled Excel Imports
 
-Status: `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`
+Status: `VERIFIED COMPLETE`
 
 - V2-8.1 Import template definitions — Complete
 - V2-8.2 Upload and safe parsing — Complete

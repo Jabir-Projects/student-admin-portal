@@ -1,9 +1,9 @@
 # Project 3 Current State
 
-## V2-8 implementation and closure verification — 2026-08-04
+## V2-8 final closure — 2026-08-04
 
 - Phase: `V2-8 — Controlled Excel Imports`.
-- Status: `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`.
+- Status: `VERIFIED COMPLETE — CLOSED`.
 - Controlled registry CSV/XLSX upload, parser preflight, validation preview,
   valid-only submission, independent approval or rejection, atomic execution,
   sanitized audit evidence, and expired-staging purge are implemented. Finance
@@ -20,8 +20,12 @@
   themes.
 - Scoped formatting, ESLint, strict typecheck, Prisma format/validate/generate,
   migration history, the Next.js 16.2.12 webpack production build, production
-  dependency audit, and dependency runtime probes passed. Documentation, diff,
-  secret, Git delivery, and remote-alignment gates remain in progress.
+  dependency audit, dependency runtime probes, documentation links, diff, and
+  staged secret checks passed.
+- Implementation commit `885a90bb4692e0d738f5d79b3e5f0912f7100402` is
+  verified. The authorized closure commit carries this exact evidence; final
+  push, upstream, alignment, and clean-state evidence is recorded in the phase
+  handoff.
 - Production was not accessed. Database mutation was confined to the authorized
   disposable test target. V2-9 has not started.
 
@@ -103,7 +107,7 @@ Last updated: 2026-08-03
 
 | Item                                                      | State                                              | Evidence                                                                  |
 | --------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
-| Phase                                                     | V2-8 — Controlled Excel Imports                    | `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`                            |
+| Phase                                                     | V2-8 — Controlled Excel Imports                    | `VERIFIED COMPLETE — CLOSED`                                              |
 | Closed control package                                    | V2-4 — Owner-approved Design Lock and phase scope  | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | V2-3-CF-001 — Complete and close V2-3 Packages C–F | `VERIFIED` `CLOSED`                                                       |
 | Closed control package                                    | CTRL-001 — Create Project 3 control documents      | `VERIFIED` `CLOSED`                                                       |
@@ -181,8 +185,8 @@ Last updated: 2026-08-03
 
 ## Current management objective
 
-> V2-8 implementation and technical closure verification are complete. Git
-> delivery and synchronized clean-state verification remain in progress.
+> V2-8 is verified complete and closed. V2-9 remains planned and has not
+> started.
 
 ## Risks and blockers
 
@@ -247,7 +251,7 @@ Last updated: 2026-08-03
 
 ## Next approved management action
 
-Complete the already authorized V2-8 Git delivery and stop before V2-9.
+Await explicit authorization for V2-9. Do not begin it automatically.
 
 ## Final Hardening Backlog
 

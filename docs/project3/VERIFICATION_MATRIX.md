@@ -1,28 +1,28 @@
 # Project 3 Verification Matrix
 
-## V2-8 Controlled Excel Imports closure checkpoint
+## V2-8 Controlled Excel Imports closure
 
-Status: `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`
+Status: `CLOSED — VERIFIED`
 
-| Requirement                    | Result                                                                                             |
-| ------------------------------ | -------------------------------------------------------------------------------------------------- |
-| Parser trust boundary          | `PASS` — strict UTF-8 CSV and bounded OOXML preflight; unsafe formulas/packages rejected           |
-| Size and row bounds            | `PASS` — 5 MiB upload, 5,000 rows, fixed headers, one worksheet, bounded archive expansion         |
-| Authorization and four-eyes    | `PASS` — exact upload/approve capabilities, active current STAFF, self-review and zero-cap denial  |
-| Lifecycle                      | `PASS` — upload, validate, valid-only submit, approve or terminal reject, and safe purge           |
-| Transactions and concurrency   | `PASS` — advisory/row locks, whole-batch atomicity, audit rollback, once-only approval             |
-| Registry data safety           | `PASS` — allowed fields only; registered identity/time preserved; collisions and duplicates denied |
-| Retention and audit privacy    | `PASS` — no raw bytes retained; sanitized allowlist; bounded idempotent non-approved purge         |
-| Migration                      | `PASS` — nine successful, zero failed/pending; 9/9 indexes, 18/18 constraints, 3/3 foreign keys    |
-| Focused PostgreSQL             | `PASS` — 1 file, 14 passed, 0 failed, 0 skipped                                                    |
-| Complete serialized Vitest     | `PASS` — 73 files, 739 passed, 0 failed, 0 skipped                                                 |
-| Static and Prisma              | `PASS` — scoped format, ESLint, strict typecheck, format, validate, and generate                   |
-| Production build               | `PASS` — Next.js 16.2.12 webpack build generated 24/24 pages and both registry routes              |
-| Authenticated browser          | `PASS` — 9 passed, 0 failed, 0 skipped, one Chromium worker                                        |
-| Responsive and accessibility   | `PASS` — four viewports, no overflow, keyboard focus, named controls, and light/dark themes        |
-| Dependency and script security | `PASS` — blocked scripts remained blocked; runtime probes passed; production audit found 0         |
-| Database scope                 | `PASS` — disposable test mutation only; no production access                                       |
-| Git delivery                   | `IN PROGRESS` — documentation, diff/secret review, two commits, push, and alignment remain         |
+| Requirement                    | Result                                                                                                    |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| Parser trust boundary          | `PASS` — strict UTF-8 CSV and bounded OOXML preflight; unsafe formulas/packages rejected                  |
+| Size and row bounds            | `PASS` — 5 MiB upload, 5,000 rows, fixed headers, one worksheet, bounded archive expansion                |
+| Authorization and four-eyes    | `PASS` — exact upload/approve capabilities, active current STAFF, self-review and zero-cap denial         |
+| Lifecycle                      | `PASS` — upload, validate, valid-only submit, approve or terminal reject, and safe purge                  |
+| Transactions and concurrency   | `PASS` — advisory/row locks, whole-batch atomicity, audit rollback, once-only approval                    |
+| Registry data safety           | `PASS` — allowed fields only; registered identity/time preserved; collisions and duplicates denied        |
+| Retention and audit privacy    | `PASS` — no raw bytes retained; sanitized allowlist; bounded idempotent non-approved purge                |
+| Migration                      | `PASS` — nine successful, zero failed/pending; 9/9 indexes, 18/18 constraints, 3/3 foreign keys           |
+| Focused PostgreSQL             | `PASS` — 1 file, 14 passed, 0 failed, 0 skipped                                                           |
+| Complete serialized Vitest     | `PASS` — 73 files, 739 passed, 0 failed, 0 skipped                                                        |
+| Static and Prisma              | `PASS` — scoped format, ESLint, strict typecheck, format, validate, and generate                          |
+| Production build               | `PASS` — Next.js 16.2.12 webpack build generated 24/24 pages and both registry routes                     |
+| Authenticated browser          | `PASS` — 9 passed, 0 failed, 0 skipped, one Chromium worker                                               |
+| Responsive and accessibility   | `PASS` — four viewports, no overflow, keyboard focus, named controls, and light/dark themes               |
+| Dependency and script security | `PASS` — blocked scripts remained blocked; runtime probes passed; production audit found 0                |
+| Database scope                 | `PASS` — disposable test mutation only; no production access                                              |
+| Git delivery                   | `PASS` — implementation `885a90bb4692e0d738f5d79b3e5f0912f7100402`; closure commit and alignment verified |
 
 ## V2-7 Notifications and Audit closure
 

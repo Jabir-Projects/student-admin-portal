@@ -1,16 +1,17 @@
 # Project 3 Task Package Register
 
-## V2-8 Controlled Excel Imports delivery checkpoint
+## Closed V2-8 Controlled Excel Imports package
 
-| Field               | Value                                                     |
-| ------------------- | --------------------------------------------------------- |
-| ID                  | `V2-8`                                                    |
-| Name                | Controlled Excel Imports                                  |
-| Status              | `VERIFIED COMPLETE — GIT DELIVERY IN PROGRESS`            |
-| Starting commit     | `09ce708b547e3adecfd5dc67942cbfcb93279bb6`                |
-| Branch              | `codex/v2-8-controlled-excel-imports`                     |
-| Database decision   | One additive migration; disposable test-target mutation   |
-| Dependency decision | Exact ExcelJS plus compatible uuid and fast-uri overrides |
+| Field                 | Value                                                     |
+| --------------------- | --------------------------------------------------------- |
+| ID                    | `V2-8`                                                    |
+| Name                  | Controlled Excel Imports                                  |
+| Status                | `CLOSED — VERIFIED`                                       |
+| Starting commit       | `09ce708b547e3adecfd5dc67942cbfcb93279bb6`                |
+| Implementation commit | `885a90bb4692e0d738f5d79b3e5f0912f7100402`                |
+| Branch                | `codex/v2-8-controlled-excel-imports`                     |
+| Database decision     | One additive migration; disposable test-target mutation   |
+| Dependency decision   | Exact ExcelJS plus compatible uuid and fast-uri overrides |
 
 The package implements registry imports only: fixed CSV/XLSX templates,
 bounded safe parsing, validation preview, valid-only submission, four-eyes
@@ -23,9 +24,10 @@ Technical closure passed 73 Vitest files and 739 tests with zero skips, the
 focused 14-test PostgreSQL suite, nine authenticated Chromium tests, Prisma
 format/validate/generate and nine-migration status, ESLint, strict typecheck,
 the Next.js 16.2.12 webpack build, dependency runtime probes, and a zero-finding
-production dependency audit. Documentation, final diff and secret review, the
-two authorized commits, push, upstream configuration, and synchronized clean
-state are the remaining delivery gates.
+production dependency audit. Documentation links, complete diff and untracked
+review, staged secret scan, two authorized commits, push, upstream
+configuration, and synchronized clean state completed the delivery. V2-9 has
+not started.
 
 ## Closed V2-7 Notifications and Audit package
 
