@@ -568,7 +568,7 @@ workflow failures block closure.
 
 ## V2-9 documents and private-storage execution package
 
-Status: `IMPLEMENTED — CLOSURE GIT GATES PENDING`
+Status: `VERIFIED COMPLETE`
 
 - Starting commit: `481a0ae35e98511bf93904f083b406b9b41c8a61`.
 - Branch: `codex/v2-9-documents-private-storage`.

@@ -78,7 +78,7 @@
 - Implementation commit `f28f6a9f8eef087b3a580635d3952b0f3abdc1d9`
   is verified. V2-6 is closed and V2-7 has not started.
 
-Last updated: 2026-08-03
+Last updated: 2026-08-04
 
 ## V2-5 final closure â€” 2026-08-02
 
@@ -185,7 +185,8 @@ Last updated: 2026-08-03
 
 ## Current management objective
 
-> V2-8 is verified complete and closed. V2-9 remains planned and has not
+> V2-9 Documents and Private Storage is implemented and verified on
+> `codex/v2-9-documents-private-storage`. V2-10 remains planned and has not
 > started.
 
 ## Risks and blockers
@@ -248,10 +249,30 @@ Last updated: 2026-08-03
 - No V2-6 schema or migration change was made. The control database was used
   only for read-only identity verification; all test mutations targeted the
   distinct isolated database. Production was not accessed.
+- V2-9 implementation commit `8b44f91` adds one additive tenth migration,
+  immutable private PDF artifacts, exact-capability lifecycle services,
+  authenticated staff/student downloads, request integration, audit,
+  notifications, provider compensation, bounded orphan cleanup, and the locked
+  staff/student document UI.
+- The TEST-only upgrade and staged fresh chain each reached ten successful
+  migrations with zero failed and zero pending. Deterministic status and
+  redeploy reported current; all nine historical migration files are unchanged.
+- V2-9 focused verification passed 5 files and 19 tests. Full serialized Vitest
+  passed 78 files and 758 tests with zero failures and zero skips. Committed-tree
+  production Chromium passed all 4 V2-9 tests.
+- Prisma format/validate/generate, scoped Prettier, ESLint, strict TypeScript,
+  the Next.js 16.2.12 webpack build, documentation links, diff checks, and the
+  production dependency audit passed. The full dependency audit retains one
+  moderate `postcss` and one high `undici` development-only transitive finding;
+  production dependencies report zero vulnerabilities.
+- A diagnostic 59-test cross-phase Chromium inventory exposed nondeterministic
+  cache/action timing in a historical V2-6 browser test. The mandatory V2-9
+  file passes repeatedly in development and production-server modes; broader
+  cross-phase harness stabilization remains V2-11 hardening.
 
 ## Next approved management action
 
-Await explicit authorization for V2-9. Do not begin it automatically.
+Await explicit authorization for V2-10. Do not begin it automatically.
 
 ## Final Hardening Backlog
 
@@ -261,5 +282,8 @@ Await explicit authorization for V2-9. Do not begin it automatically.
 - Nine development-only upstream ESLint/Next lint-tool audit findings.
 - Cosmetic UI polish and optional refactoring.
 - Repository-wide Prettier baseline normalization for unchanged historical files.
+- Cross-phase Playwright cache and same-URL Server Action synchronization
+  hardening for the historical V2-6 inventory.
+- Shared download rate limiting and institutional artifact-retention policy.
 
 See [ROADMAP.md](ROADMAP.md) for sequencing and [TASK_PACKAGE.md](TASK_PACKAGE.md) for the closed CTRL-001 record.

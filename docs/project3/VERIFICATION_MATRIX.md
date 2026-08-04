@@ -422,3 +422,25 @@ Status: `CLOSED`
 | Database                          | `NOT APPLICABLE` — no database access or backend-sensitive change                                                             |
 | Repository-wide formatting        | `LIMITED` — pre-existing 151-file baseline; every V2-4 changed file passes scoped formatting                                  |
 | V2-4 closure                      | `CLOSED` — technical gates passed; V2-5 not started                                                                           |
+
+## V2-9 documents and private-storage verification
+
+Status: `VERIFIED COMPLETE`
+
+| Requirement               | Result                                                                                                                             |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Product Lock              | `PASS` — one trusted English template, private provider-neutral storage, immutable lifecycle                                       |
+| Dependencies              | `PASS` — `@vercel/blob` 2.6.1 and `@react-pdf/renderer` 4.5.1; production audit 0                                                  |
+| Migration                 | `PASS` — fresh and V2-8 upgrade paths; 10 successful, 0 failed, 0 pending; deterministic current rerun                             |
+| Historical migrations     | `PASS` — all 9 earlier migration files unchanged                                                                                   |
+| Lifecycle and concurrency | `PASS` — ordered versions, supersession, release/revoke race, idempotence, rollback, compensation, cleanup                         |
+| Authorization             | `PASS` — exact staff capabilities, active/current account checks, student ownership, digital delivery, non-enumeration             |
+| Private downloads         | `PASS` — authenticated routes, integrity checks, private no-store headers, no provider URL/key exposure                            |
+| Audit and notifications   | `PASS` — transactional required audit and notification rows with sanitized metadata                                                |
+| Focused tests             | `PASS` — 5 files, 19 passed, 0 failed, 0 skipped                                                                                   |
+| Full serialized Vitest    | `PASS` — 78 files, 758 passed, 0 failed, 0 skipped                                                                                 |
+| Focused Chromium          | `PASS` — 4 passed across lifecycle, denial, responsive, keyboard, and theme coverage                                               |
+| Static and build          | `PASS` — scoped Prettier, ESLint, strict TypeScript, Prisma format/validate/generate, webpack build                                |
+| Security scans            | `PASS` — production audit 0, no tracked PDF, no client provider/key exposure, no secret value in diff                              |
+| Deferred hardening        | Production Blob provisioning/scheduler, institutional retention duration, rate limiting, physical-device and real-screen-reader QA |
+| V2-10                     | `NOT STARTED`                                                                                                                      |

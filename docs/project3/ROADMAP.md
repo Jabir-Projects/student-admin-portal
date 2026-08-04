@@ -262,13 +262,13 @@ Status: `VERIFIED COMPLETE`
 
 ### V2-9 — Documents and Private Storage
 
-Status: `PLANNED`
+Status: `VERIFIED COMPLETE`
 
-- V2-9.1 Document model and lifecycle
-- V2-9.2 Template and generation
-- V2-9.3 Staff preview and private storage
-- V2-9.4 Secure download, release, and revoke
-- V2-9.5 Document security verification
+- V2-9.1 Document model and lifecycle — Complete
+- V2-9.2 Template and generation — Complete
+- V2-9.3 Staff preview and private storage — Complete
+- V2-9.4 Secure download, release, and revoke — Complete
+- V2-9.5 Document security verification — Complete
 
 ### V2-10 — Finance
 
