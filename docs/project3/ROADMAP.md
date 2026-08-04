@@ -1,5 +1,9 @@
 # Project 3 Roadmap
 
+## V2-10 — Finance
+
+`COMPLETE — CLOSED`. Finance ledger, imports, approvals, reversals, authoritative reads, student and staff exports, and bounded authenticated smoke coverage are complete. V2-11 is not started; exhaustive verification remains mandatory in V2-11 and Final Hardening.
+
 ## V2-8 closure addendum
 
 V2-8 controlled registry imports are implemented and all technical closure

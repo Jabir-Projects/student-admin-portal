@@ -1,5 +1,9 @@
 # Project 3 Task Package Register
 
+## Closed V2-10 Finance package
+
+The V2-10 Finance package is complete under the owner-approved Minimum Safe Closure. The staff detail-route smoke issue was traced to cold dev-server route initialization; authenticated response and rendered-route regression checks now cover it. No known Finance correctness, authorization, privacy, ownership, or money-integrity defect is deferred.
+
 ## Closed V2-8 Controlled Excel Imports package
 
 | Field                 | Value                                                     |

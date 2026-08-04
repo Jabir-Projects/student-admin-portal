@@ -94,6 +94,8 @@ never cross the server boundary.
 
 Finance data is private. Viewing, upload, approval, and export require their distinct capabilities and appropriate transaction and audit controls.
 
+V2-10 adds immutable posted transactions, student-owned statements, capability-protected staff reads and exports, and controlled finance-import staging. Staff detail routes use the database-authoritative `StudentProfile.id` emitted by Finance search results; denied, malformed, and nonexistent identifiers remain non-enumerating.
+
 ## Application layers
 
 - Next.js App Router presentation and routing

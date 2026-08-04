@@ -1,5 +1,12 @@
 # Project 3 Current State
 
+## V2-10 final closure — 2026-08-04
+
+- Status: `VERIFIED COMPLETE — CLOSED` using the owner-approved Minimum Safe Closure.
+- Eleven migrations are present; the ten historical migrations remain unchanged. No production database was accessed and V2-11 has not started.
+- Focused Finance Vitest passed 3 files / 9 tests; authenticated Chromium Finance smoke passed 8/8. The staff-detail cold-route harness issue is covered by authenticated response and rendered-link regression checks.
+- Prisma format/validate/generate, production dependency audit, documentation-link validation, and the Next.js 16.2.12 production build passed. Exhaustive project-wide QA remains mandatory in V2-11 and Final Hardening.
+
 ## V2-8 final closure — 2026-08-04
 
 - Phase: `V2-8 — Controlled Excel Imports`.

@@ -1,5 +1,18 @@
 # Project 3 Verification Matrix
 
+## V2-10 Finance closure evidence
+
+| Area                                       | Result                                        |
+| ------------------------------------------ | --------------------------------------------- |
+| Focused Finance Vitest                     | PASS — 3 files / 9 tests                      |
+| Authenticated Chromium Finance smoke       | PASS — 8/8                                    |
+| Scoped Prettier, ESLint, strict TypeScript | PASS                                          |
+| Prisma format, validate, generate          | PASS                                          |
+| Production dependency audit                | PASS — 0 vulnerabilities                      |
+| Next.js production build                   | PASS — 31 routes                              |
+| Migration inventory                        | PASS — 11 migrations; historical 10 unchanged |
+| Production access / V2-11                  | NOT PERFORMED / NOT STARTED                   |
+
 ## V2-8 Controlled Excel Imports closure
 
 Status: `CLOSED — VERIFIED`

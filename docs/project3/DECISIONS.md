@@ -1,5 +1,9 @@
 # Project 3 Decisions
 
+### DEC-021 — V2-10 Finance closure
+
+Finance list and detail routes use `StudentProfile.id` as the single authoritative route identifier. The smoke regression validates an authenticated HTTP 200 detail response and the rendered Finance record, preventing cold dev-server route initialization from masking authorization or ownership behavior. Finance exports default absent dates to the current academic period; malformed ranges remain rejected.
+
 ### DEC-020 — V2-8 registry import parser and trust boundary
 
 - Date: 2026-08-03
