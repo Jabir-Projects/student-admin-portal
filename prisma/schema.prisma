@@ -115,6 +115,36 @@ enum NotificationEventType {
   REQUEST_CANCELLED
   DOCUMENT_RELEASED
   DOCUMENT_REVOKED
+  FINANCE_BALANCE_UPDATED
+}
+
+enum FinanceEntryType {
+  CHARGE
+  PAYMENT
+  CREDIT
+  REFUND
+  REVERSAL
+}
+
+enum FinanceTerm {
+  ANNUAL
+  SEMESTER_1
+  SEMESTER_2
+  SUMMER
+}
+
+enum FinanceImportBatchStatus {
+  UPLOADED
+  VALIDATED
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  FAILED
+}
+
+enum FinanceImportRowValidation {
+  VALID
+  INVALID
 }
 
 enum DocumentArtifactType {
@@ -144,37 +174,42 @@ enum NotificationDeliveryStatus {
 }
 
 model User {
-  id                    String                     @id @default(uuid()) @db.Uuid
-  email                 String                     @unique @db.VarChar(320)
-  fullName              String                     @db.VarChar(200)
-  passwordHash          String
-  role                  UserRole
-  status                AccountStatus              @default(PENDING_APPROVAL)
-  sessionVersion        Int                        @default(0)
-  preferredLanguage     PreferredLanguage          @default(ENGLISH)
-  approvedAt            DateTime?                  @db.Timestamptz(3)
-  approvedById          String?                    @db.Uuid
-  disabledAt            DateTime?                  @db.Timestamptz(3)
-  disabledById          String?                    @db.Uuid
-  createdAt             DateTime                   @default(now()) @db.Timestamptz(3)
-  updatedAt             DateTime                   @updatedAt @db.Timestamptz(3)
-  studentProfile        StudentProfile?
-  statusChanges         RequestStatusHistory[]     @relation("StatusChangedBy")
-  messages              RequestMessage[]           @relation("MessageAuthor")
-  notifications         Notification[]
-  auditLogs             AuditLog[]                 @relation("AuditActor")
-  approvedBy            User?                      @relation("AccountApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
-  disabledBy            User?                      @relation("AccountDisabledBy", fields: [disabledById], references: [id], onDelete: Restrict)
-  accountsApproved      User[]                     @relation("AccountApprovedBy")
-  accountsDisabled      User[]                     @relation("AccountDisabledBy")
-  studentRegistryRecord StudentRegistry?           @relation("StudentRegistryRegistration")
-  capabilityAssignments UserCapabilityAssignment[] @relation("CapabilitySubject")
-  capabilityGrants      UserCapabilityAssignment[] @relation("CapabilityGrantor")
-  registryImportUploads ImportBatch[]              @relation("RegistryImportUploader")
-  registryImportReviews ImportBatch[]              @relation("RegistryImportReviewer")
-  generatedDocuments    DocumentArtifact[]         @relation("DocumentGeneratedBy")
-  releasedDocuments     DocumentArtifact[]         @relation("DocumentReleasedBy")
-  revokedDocuments      DocumentArtifact[]         @relation("DocumentRevokedBy")
+  id                         String                     @id @default(uuid()) @db.Uuid
+  email                      String                     @unique @db.VarChar(320)
+  fullName                   String                     @db.VarChar(200)
+  passwordHash               String
+  role                       UserRole
+  status                     AccountStatus              @default(PENDING_APPROVAL)
+  sessionVersion             Int                        @default(0)
+  preferredLanguage          PreferredLanguage          @default(ENGLISH)
+  approvedAt                 DateTime?                  @db.Timestamptz(3)
+  approvedById               String?                    @db.Uuid
+  disabledAt                 DateTime?                  @db.Timestamptz(3)
+  disabledById               String?                    @db.Uuid
+  createdAt                  DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt                  DateTime                   @updatedAt @db.Timestamptz(3)
+  studentProfile             StudentProfile?
+  statusChanges              RequestStatusHistory[]     @relation("StatusChangedBy")
+  messages                   RequestMessage[]           @relation("MessageAuthor")
+  notifications              Notification[]
+  auditLogs                  AuditLog[]                 @relation("AuditActor")
+  approvedBy                 User?                      @relation("AccountApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
+  disabledBy                 User?                      @relation("AccountDisabledBy", fields: [disabledById], references: [id], onDelete: Restrict)
+  accountsApproved           User[]                     @relation("AccountApprovedBy")
+  accountsDisabled           User[]                     @relation("AccountDisabledBy")
+  studentRegistryRecord      StudentRegistry?           @relation("StudentRegistryRegistration")
+  capabilityAssignments      UserCapabilityAssignment[] @relation("CapabilitySubject")
+  capabilityGrants           UserCapabilityAssignment[] @relation("CapabilityGrantor")
+  registryImportUploads      ImportBatch[]              @relation("RegistryImportUploader")
+  registryImportReviews      ImportBatch[]              @relation("RegistryImportReviewer")
+  generatedDocuments         DocumentArtifact[]         @relation("DocumentGeneratedBy")
+  releasedDocuments          DocumentArtifact[]         @relation("DocumentReleasedBy")
+  revokedDocuments           DocumentArtifact[]         @relation("DocumentRevokedBy")
+  financeImportUploads       FinanceImportBatch[]       @relation("FinanceImportUploader")
+  financeImportReviews       FinanceImportBatch[]       @relation("FinanceImportReviewer")
+  financeTransactionsCreated FinanceTransaction[]       @relation("FinanceTransactionCreatedBy")
+  financeTransactionsApplied FinanceTransaction[]       @relation("FinanceTransactionAppliedBy")
+  financeReversals           FinanceTransaction[]       @relation("FinanceTransactionReversedBy")
 
   @@index([role, createdAt])
   @@index([status, role, createdAt])
@@ -196,17 +231,124 @@ model UserCapabilityAssignment {
 }
 
 model StudentProfile {
-  id            String            @id @default(uuid()) @db.Uuid
-  userId        String            @unique @db.Uuid
-  studentNumber String            @unique @db.VarChar(50)
-  program       String            @db.VarChar(200)
-  academicYear  AcademicYear
-  createdAt     DateTime          @default(now()) @db.Timestamptz(3)
-  updatedAt     DateTime          @updatedAt @db.Timestamptz(3)
-  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  requests      DocumentRequest[]
+  id             String                 @id @default(uuid()) @db.Uuid
+  userId         String                 @unique @db.Uuid
+  studentNumber  String                 @unique @db.VarChar(50)
+  program        String                 @db.VarChar(200)
+  academicYear   AcademicYear
+  createdAt      DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime               @updatedAt @db.Timestamptz(3)
+  user           User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requests       DocumentRequest[]
+  financeAccount StudentFinanceAccount?
 
   @@index([program, academicYear])
+}
+
+model StudentFinanceAccount {
+  id           String               @id @default(uuid()) @db.Uuid
+  studentId    String               @unique @db.Uuid
+  createdAt    DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime             @updatedAt @db.Timestamptz(3)
+  student      StudentProfile       @relation(fields: [studentId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  transactions FinanceTransaction[]
+
+  @@index([studentId])
+}
+
+model FinanceTransaction {
+  id                    String                @id @default(uuid()) @db.Uuid
+  accountId             String                @db.Uuid
+  entryType             FinanceEntryType
+  amountMinor           BigInt                @db.BigInt
+  ledgerEffectMinor     BigInt                @db.BigInt
+  currency              String                @default("MAD") @db.Char(3)
+  effectiveDate         DateTime              @db.Date
+  postedAt              DateTime              @default(now()) @db.Timestamptz(3)
+  billingPeriod         String                @db.Char(9)
+  term                  FinanceTerm           @default(ANNUAL)
+  sourceSystem          String                @db.VarChar(64)
+  externalTransactionId String                @db.VarChar(160)
+  sourceReference       String                @db.VarChar(200)
+  description           String                @default("") @db.VarChar(1000)
+  importBatchId         String?               @db.Uuid
+  originalTransactionId String?               @unique @db.Uuid
+  createdById           String                @db.Uuid
+  appliedById           String                @db.Uuid
+  reversedById          String?               @db.Uuid
+  reversalReason        String?               @db.VarChar(1000)
+  createdAt             DateTime              @default(now()) @db.Timestamptz(3)
+  account               StudentFinanceAccount @relation(fields: [accountId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  importBatch           FinanceImportBatch?   @relation(fields: [importBatchId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  originalTransaction   FinanceTransaction?   @relation("FinanceTransactionReversal", fields: [originalTransactionId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  reversal              FinanceTransaction?   @relation("FinanceTransactionReversal")
+  createdBy             User                  @relation("FinanceTransactionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  appliedBy             User                  @relation("FinanceTransactionAppliedBy", fields: [appliedById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  reversedBy            User?                 @relation("FinanceTransactionReversedBy", fields: [reversedById], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([sourceSystem, externalTransactionId])
+  @@index([accountId, postedAt, id])
+  @@index([billingPeriod, effectiveDate, id])
+  @@index([importBatchId, postedAt, id])
+}
+
+model FinanceImportBatch {
+  id               String                   @id @default(uuid()) @db.Uuid
+  status           FinanceImportBatchStatus @default(UPLOADED)
+  uploaderId       String                   @db.Uuid
+  reviewerId       String?                  @db.Uuid
+  checksum         String                   @unique @db.Char(64)
+  originalFilename String                   @db.VarChar(255)
+  originalByteSize Int
+  totalRows        Int
+  validRows        Int
+  invalidRows      Int
+  rejectionReason  String?                  @db.VarChar(1000)
+  failureCode      String?                  @db.VarChar(120)
+  uploadedAt       DateTime                 @default(now()) @db.Timestamptz(3)
+  validatedAt      DateTime?                @db.Timestamptz(3)
+  submittedAt      DateTime?                @db.Timestamptz(3)
+  reviewedAt       DateTime?                @db.Timestamptz(3)
+  appliedAt        DateTime?                @db.Timestamptz(3)
+  expiresAt        DateTime                 @db.Timestamptz(3)
+  purgedAt         DateTime?                @db.Timestamptz(3)
+  version          Int                      @default(0)
+  updatedAt        DateTime                 @updatedAt @db.Timestamptz(3)
+  uploader         User                     @relation("FinanceImportUploader", fields: [uploaderId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  reviewer         User?                    @relation("FinanceImportReviewer", fields: [reviewerId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  rows             FinanceImportRow[]
+  transactions     FinanceTransaction[]
+
+  @@index([uploaderId, uploadedAt, id])
+  @@index([status, submittedAt, id])
+  @@index([expiresAt, purgedAt, status])
+}
+
+model FinanceImportRow {
+  id                    String                     @id @default(uuid()) @db.Uuid
+  batchId               String                     @db.Uuid
+  rowNumber             Int
+  studentNumber         String?                    @db.VarChar(50)
+  studentId             String?                    @db.Uuid
+  entryType             FinanceEntryType?
+  amountMinor           BigInt?                    @db.BigInt
+  currency              String?                    @db.Char(3)
+  effectiveDate         DateTime?                  @db.Date
+  postingDate           DateTime?                  @db.Date
+  billingPeriod         String?                    @db.Char(9)
+  term                  FinanceTerm?
+  sourceSystem          String?                    @db.VarChar(64)
+  externalTransactionId String?                    @db.VarChar(160)
+  sourceReference       String?                    @db.VarChar(200)
+  description           String?                    @db.VarChar(1000)
+  validation            FinanceImportRowValidation @default(INVALID)
+  errorCodes            String[]                   @default([])
+  createdAt             DateTime                   @default(now()) @db.Timestamptz(3)
+  batch                 FinanceImportBatch         @relation(fields: [batchId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([batchId, rowNumber])
+  @@index([batchId, validation, rowNumber])
+  @@index([studentId, batchId])
 }
 
 model StudentRegistry {
