@@ -70,7 +70,25 @@ bounded idempotent operation.
 
 ### Document and private-storage boundary
 
-Generated documents remain private unless securely released to an authorized recipient. Release and revocation are separately authorized operations. Storage provider details are `UNVERIFIED`.
+V2-9 stores PDF artifacts through a server-only, provider-neutral
+`DocumentStorage` interface. The production adapter uses private Vercel Blob
+objects; a deterministic in-memory adapter is available only through explicit
+non-production test configuration and fails closed on Vercel. PostgreSQL stores
+opaque object keys and integrity metadata, never PDF bytes or provider URLs.
+
+The initial trusted server-only template is
+`REQUEST_FULFILMENT_CONFIRMATION`. Artifacts are immutable versions with
+`GENERATED`, `RELEASED`, `REVOKED`, and `SUPERSEDED` states. Request and
+artifact locks serialize version allocation, release supersession, and
+release/revoke races. Required audit and notification records share the
+lifecycle transaction. A database failure after upload triggers provider
+compensation; bounded age-gated cleanup removes only unreferenced orphans.
+
+Staff operations revalidate their exact database capability. Student metadata
+and download access require an active current student, request ownership,
+digital delivery, and a released artifact. Downloads pass through authenticated
+application routes with private no-store headers; provider URLs and object keys
+never cross the server boundary.
 
 ### Finance boundary
 
@@ -177,7 +195,9 @@ Vercel is the planned deployment direction. Production deployment, access, monit
   behavior against an isolated PostgreSQL database
 - Exact route, component, module, and server-action inventory
 - Current production topology and operational controls
-- Notification and private-storage providers
+- Production Vercel Blob provisioning and credentials, deferred to V2-12
+- Institutional artifact-retention duration; V2-9 preserves legitimate
+  artifacts and deletes only unreferenced orphan objects
 - Full implementation coverage of the stated invariants
 
 See [ROADMAP.md](ROADMAP.md), [CURRENT_STATE.md](CURRENT_STATE.md), and [TASK_PACKAGE.md](TASK_PACKAGE.md).

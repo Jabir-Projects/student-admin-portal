@@ -11,20 +11,21 @@ const sql = fs.readFileSync(
   path.join(migrationDirectory, migrationName, "migration.sql"),
   "utf8",
 );
+const normalizedSql = sql.replace(/\r\n/gu, "\n");
 const schema = fs.readFileSync(
   path.resolve(process.cwd(), "prisma/schema.prisma"),
   "utf8",
 );
 
 describe("V2-8 registry import migration", () => {
-  it("is the only additive ninth migration", () => {
+  it("remains the additive ninth migration in the V2-9 chain", () => {
     const migrations = fs
       .readdirSync(migrationDirectory, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
       .sort();
-    expect(migrations).toHaveLength(9);
-    expect(migrations.at(-1)).toBe(migrationName);
+    expect(migrations).toHaveLength(10);
+    expect(migrations.at(8)).toBe(migrationName);
     expect(sql).not.toMatch(/\bDROP\s+(?:TABLE|TYPE|COLUMN)\b/iu);
   });
 
@@ -50,7 +51,7 @@ describe("V2-8 registry import migration", () => {
     expect(sql).toContain('"ImportBatch_purge_check"');
     expect(sql).toContain('"RegistryImportRow_errorCodes_check"');
     expect(sql).toContain('REFERENCES "User"("id")');
-    expect(sql).toContain(
+    expect(normalizedSql).toContain(
       'REFERENCES "ImportBatch"("id")\n  ON DELETE CASCADE ON UPDATE CASCADE',
     );
   });

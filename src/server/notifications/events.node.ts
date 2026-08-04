@@ -113,3 +113,32 @@ export async function enqueueStaffRequestNotifications(
     });
   }
 }
+
+export async function enqueueStudentDocumentNotification(
+  transaction: Transaction,
+  input: {
+    artifactId: string;
+    requestId: string;
+    studentUserId: string;
+    eventType: Extract<
+      NotificationEventType,
+      "DOCUMENT_RELEASED" | "DOCUMENT_REVOKED"
+    >;
+  },
+) {
+  await enqueueNotification(transaction, {
+    userId: input.studentUserId,
+    requestId: input.requestId,
+    eventType: input.eventType,
+    eventKey: `${input.eventType}:${input.artifactId}:${input.studentUserId}`,
+    title:
+      input.eventType === "DOCUMENT_RELEASED"
+        ? "Document available"
+        : "Document unavailable",
+    body:
+      input.eventType === "DOCUMENT_RELEASED"
+        ? "A document is available through your authenticated SIST portal."
+        : "A previously released document is no longer available.",
+    email: true,
+  });
+}

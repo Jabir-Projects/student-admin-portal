@@ -7,6 +7,8 @@ import {
 } from "./tests/e2e/v2-5-test-environment";
 
 const baseURL = "http://127.0.0.1:3000";
+const useProductionServer =
+  process.env.PLAYWRIGHT_USE_PRODUCTION_SERVER === "true";
 
 loadEnvironment({ path: ".env.local", quiet: true });
 const isolatedDatabaseUrl = requireIsolatedBrowserDatabaseUrl();
@@ -17,6 +19,8 @@ const browserServerEnvironment = {
   AUTH_URL: baseURL,
   DATABASE_URL: isolatedDatabaseUrl,
   DIRECT_URL: isolatedDatabaseUrl,
+  DOCUMENT_STORAGE_DRIVER: "memory",
+  V2_9_TEST_STORAGE_ALLOWED: "true",
 };
 
 Object.assign(process.env, browserServerEnvironment);
@@ -38,7 +42,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --webpack",
+    command: useProductionServer ? "npm run start" : "npm run dev -- --webpack",
     env: browserServerEnvironment,
     url: baseURL,
     reuseExistingServer: false,

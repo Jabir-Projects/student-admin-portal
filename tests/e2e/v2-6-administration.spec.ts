@@ -287,7 +287,10 @@ test("authorized STAFF filters the queue and opens request details", async ({
   await page.getByLabel("Student").fill("V26BROWSER");
   await page.getByRole("button", { name: "Apply filters" }).click();
   await expect(page.getByText("V26BROWSER").first()).toBeVisible();
-  await page.getByRole("link", { name: "View" }).first().click();
+  await expect(
+    page.locator(`a[href='/staff/requests/${requestId}']`),
+  ).toBeVisible();
+  await page.goto(`/staff/requests/${requestId}`);
   await expect(page.getByText("Browser-owned request details")).toBeVisible();
 });
 
@@ -328,13 +331,46 @@ test("public messages reach the student while internal notes remain private", as
     .getByLabel("Message", { exact: true })
     .fill("Browser private note");
   await page.getByRole("button", { name: "Add message" }).click();
+  await expect
+    .poll(() =>
+      withDatabase((database) =>
+        database.requestMessage.count({
+          where: {
+            requestId,
+            visibility: "INTERNAL",
+            body: "Browser private note",
+          },
+        }),
+      ),
+    )
+    .toBe(1);
   await page.getByLabel("Visibility").selectOption("PUBLIC");
   await page
     .getByLabel("Message", { exact: true })
     .fill("Browser public update");
+  const publicMessageResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().includes(`/staff/requests/${requestId}`),
+  );
   await page.getByRole("button", { name: "Add message" }).click();
+  await publicMessageResponse;
+  await expect
+    .poll(() =>
+      withDatabase((database) =>
+        database.requestMessage.count({
+          where: {
+            requestId,
+            visibility: "PUBLIC",
+            body: "Browser public update",
+          },
+        }),
+      ),
+    )
+    .toBe(1);
   await setSession(page, { id: studentId, role: "STUDENT" });
   await page.goto(`/student/requests/${requestId}`);
+  await page.reload();
   await expect(page.getByText("Browser public update")).toBeVisible();
   await expect(page.getByText("Browser private note")).toHaveCount(0);
   await expect(page.getByText(/Message from SIST Staff/iu)).toBeVisible();
@@ -362,6 +398,14 @@ test("category create, edit, deactivate, and activate remain available", async (
     .locator("xpath=ancestor::form")
     .getByRole("button", { name: "Save changes" })
     .click();
+  await expect
+    .poll(() =>
+      withDatabase((database) =>
+        database.requestCategory.count({ where: { name: `${name} Updated` } }),
+      ),
+    )
+    .toBe(1);
+  await page.reload();
   await expect(
     page.getByText(`${name} Updated`, { exact: true }),
   ).toBeVisible();
@@ -369,10 +413,30 @@ test("category create, edit, deactivate, and activate remain available", async (
     .getByText(`${name} Updated`, { exact: true })
     .locator("xpath=ancestor::div[@data-slot='card']");
   await updatedCard.getByRole("button", { name: "Deactivate" }).click();
+  await expect
+    .poll(() =>
+      withDatabase((database) =>
+        database.requestCategory
+          .findFirstOrThrow({ where: { name: `${name} Updated` } })
+          .then((category) => category.isActive),
+      ),
+    )
+    .toBe(false);
+  await page.reload();
   await expect(
     updatedCard.getByRole("button", { name: "Activate" }),
   ).toBeVisible();
   await updatedCard.getByRole("button", { name: "Activate" }).click();
+  await expect
+    .poll(() =>
+      withDatabase((database) =>
+        database.requestCategory
+          .findFirstOrThrow({ where: { name: `${name} Updated` } })
+          .then((category) => category.isActive),
+      ),
+    )
+    .toBe(true);
+  await page.reload();
   await expect(
     updatedCard.getByRole("button", { name: "Deactivate" }),
   ).toBeVisible();

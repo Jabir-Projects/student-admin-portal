@@ -113,6 +113,23 @@ enum NotificationEventType {
   REQUEST_PUBLIC_MESSAGE_ADDED
   REQUEST_SUBMITTED
   REQUEST_CANCELLED
+  DOCUMENT_RELEASED
+  DOCUMENT_REVOKED
+}
+
+enum DocumentArtifactType {
+  REQUEST_FULFILMENT_CONFIRMATION
+}
+
+enum DocumentArtifactStatus {
+  GENERATED
+  RELEASED
+  REVOKED
+  SUPERSEDED
+}
+
+enum DocumentStorageProvider {
+  VERCEL_BLOB
 }
 
 enum NotificationDeliveryChannel {
@@ -155,6 +172,9 @@ model User {
   capabilityGrants      UserCapabilityAssignment[] @relation("CapabilityGrantor")
   registryImportUploads ImportBatch[]              @relation("RegistryImportUploader")
   registryImportReviews ImportBatch[]              @relation("RegistryImportReviewer")
+  generatedDocuments    DocumentArtifact[]         @relation("DocumentGeneratedBy")
+  releasedDocuments     DocumentArtifact[]         @relation("DocumentReleasedBy")
+  revokedDocuments      DocumentArtifact[]         @relation("DocumentRevokedBy")
 
   @@index([role, createdAt])
   @@index([status, role, createdAt])
@@ -275,25 +295,63 @@ model RequestCategory {
 }
 
 model DocumentRequest {
-  id              String                 @id @default(uuid()) @db.Uuid
-  referenceNumber String                 @unique @default(dbgenerated("('REQ-'::text || lpad((nextval('document_request_reference_seq'::regclass))::text, 8, '0'::text))")) @db.VarChar(32)
-  studentId       String                 @db.Uuid
-  categoryId      String                 @db.Uuid
-  status          RequestStatus          @default(SUBMITTED)
-  deliveryMethod  DeliveryMethod
-  copyCount       Int                    @default(1)
-  details         String?
-  createdAt       DateTime               @default(now()) @db.Timestamptz(3)
-  updatedAt       DateTime               @updatedAt @db.Timestamptz(3)
-  student         StudentProfile         @relation(fields: [studentId], references: [id], onDelete: Restrict)
-  category        RequestCategory        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  statusHistory   RequestStatusHistory[]
-  messages        RequestMessage[]
-  notifications   Notification[]
+  id                String                 @id @default(uuid()) @db.Uuid
+  referenceNumber   String                 @unique @default(dbgenerated("('REQ-'::text || lpad((nextval('document_request_reference_seq'::regclass))::text, 8, '0'::text))")) @db.VarChar(32)
+  studentId         String                 @db.Uuid
+  categoryId        String                 @db.Uuid
+  status            RequestStatus          @default(SUBMITTED)
+  deliveryMethod    DeliveryMethod
+  copyCount         Int                    @default(1)
+  details           String?
+  createdAt         DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime               @updatedAt @db.Timestamptz(3)
+  student           StudentProfile         @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  category          RequestCategory        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  statusHistory     RequestStatusHistory[]
+  messages          RequestMessage[]
+  notifications     Notification[]
+  documentArtifacts DocumentArtifact[]
 
   @@index([studentId, status, createdAt])
   @@index([categoryId, status, createdAt])
   @@index([status, createdAt])
+}
+
+model DocumentArtifact {
+  id                     String                  @id @default(uuid()) @db.Uuid
+  requestId              String                  @db.Uuid
+  type                   DocumentArtifactType
+  status                 DocumentArtifactStatus  @default(GENERATED)
+  version                Int
+  storageProvider        DocumentStorageProvider @default(VERCEL_BLOB)
+  storageKey             String                  @unique @db.VarChar(300)
+  filename               String                  @db.VarChar(255)
+  mimeType               String                  @db.VarChar(100)
+  byteSize               Int
+  checksum               String                  @db.Char(64)
+  generatedById          String                  @db.Uuid
+  releasedById           String?                 @db.Uuid
+  revokedById            String?                 @db.Uuid
+  supersededByArtifactId String?                 @db.Uuid
+  revocationReason       String?                 @db.VarChar(1000)
+  generatedAt            DateTime                @default(now()) @db.Timestamptz(3)
+  releasedAt             DateTime?               @db.Timestamptz(3)
+  revokedAt              DateTime?               @db.Timestamptz(3)
+  supersededAt           DateTime?               @db.Timestamptz(3)
+  orphanedAt             DateTime?               @db.Timestamptz(3)
+  createdAt              DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime                @updatedAt @db.Timestamptz(3)
+  request                DocumentRequest         @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  generatedBy            User                    @relation("DocumentGeneratedBy", fields: [generatedById], references: [id], onDelete: Restrict)
+  releasedBy             User?                   @relation("DocumentReleasedBy", fields: [releasedById], references: [id], onDelete: Restrict)
+  revokedBy              User?                   @relation("DocumentRevokedBy", fields: [revokedById], references: [id], onDelete: Restrict)
+  supersededByArtifact   DocumentArtifact?       @relation("DocumentSupersession", fields: [supersededByArtifactId], references: [id], onDelete: Restrict)
+  supersededArtifacts    DocumentArtifact[]      @relation("DocumentSupersession")
+
+  @@unique([requestId, version])
+  @@index([requestId, status, generatedAt])
+  @@index([status, releasedAt, id])
+  @@index([orphanedAt, status, id])
 }
 
 model RequestStatusHistory {

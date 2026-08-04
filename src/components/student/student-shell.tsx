@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Bell,
   FilePlus2,
+  FileText,
   LayoutDashboard,
   Search,
   UserRound,
@@ -30,6 +31,7 @@ function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
   const items = [
     { href: "/student", label: "Dashboard", icon: LayoutDashboard },
     { href: "/student/requests", label: "My Requests", icon: ClipboardList },
+    { href: "/student/documents", label: "My Documents", icon: FileText },
     { href: "/student/requests/new", label: "New Request", icon: FilePlus2 },
     { href: "/student/profile", label: "Profile", icon: UserRound },
   ];

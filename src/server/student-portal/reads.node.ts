@@ -155,6 +155,11 @@ export async function getOwnedRequestDetails(
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
         select: { id: true, body: true, createdAt: true },
       },
+      documentArtifacts: {
+        where: { status: { in: ["RELEASED", "REVOKED"] } },
+        orderBy: [{ version: "desc" }],
+        select: { id: true, status: true, version: true },
+      },
     },
   });
   if (!request) return { ok: true as const, request: null };

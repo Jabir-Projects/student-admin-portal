@@ -395,4 +395,27 @@ This append-oriented register records approved product, architecture, security, 
 - Consequences: V2-4 includes no database, migration, role, capability, or new
   business-workflow work. Help & Support and Logout remain absent from sidebars;
   navigation links remain limited to existing routes.
+
 - Related phase or package: V2-4 — Institutional UI Foundation.
+
+### DEC-016 — V2-9 documents and private-storage Product Lock
+
+- Date: 2026-08-04
+- Status: `APPROVED`
+- Context: V2-9 requires immutable private documents without production
+  provider provisioning or public object exposure.
+- Decision: Use `@vercel/blob` 2.6.1 behind a provider-neutral server-only
+  interface and `@react-pdf/renderer` 4.5.1 for one trusted English
+  `REQUEST_FULFILMENT_CONFIRMATION` template. Store only opaque keys and
+  integrity metadata in PostgreSQL. Enforce the four-state immutable lifecycle,
+  exact staff capabilities, student ownership and digital-delivery rules,
+  authenticated private downloads, transactional audit/notifications,
+  provider compensation, and bounded orphan cleanup.
+- Rationale: Preserve provider replaceability, institutional privacy,
+  database-authoritative authorization, immutable version history, and
+  recoverable cross-provider consistency.
+- Consequences: Production credentials and scheduling remain deferred to
+  V2-12. Legitimate artifacts have no automatic retention deletion in V2-9;
+  institutional retention duration remains owner policy. Shared rate limiting
+  is deferred to V2-11.
+- Related phase or package: V2-9 — Documents and Private Storage.

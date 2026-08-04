@@ -259,7 +259,7 @@ test("uploads, validates, submits, and applies a batch through an independent re
   );
 
   await setSession(page, ids.reviewer);
-  await page.goto(batchUrl);
+  await page.goto(`${batchUrl}?review=independent`);
   await expect(
     page.getByRole("heading", { name: "Independent review" }),
   ).toBeVisible({ timeout: 60_000 });

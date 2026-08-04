@@ -15,6 +15,7 @@ import {
   addRequestMessageAction,
   transitionRequestAction,
 } from "@/app/staff/requests/actions";
+import { generateDocumentAction } from "@/app/staff/documents/actions";
 
 const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   dateStyle: "medium",
@@ -114,6 +115,58 @@ export default async function StaffRequestDetailsPage({
               </dl>
             </CardContent>
           </Card>
+          {result.actor.capabilities.some((capability) =>
+            [
+              "GENERATE_DOCUMENTS",
+              "RELEASE_DOCUMENTS",
+              "REVOKE_DOCUMENTS",
+            ].includes(capability),
+          ) ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Request documents</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {request.documentArtifacts.length === 0 ? (
+                  <p className="text-muted-foreground">
+                    No document versions have been generated.
+                  </p>
+                ) : (
+                  <ul className="space-y-2">
+                    {request.documentArtifacts.map((artifact) => (
+                      <li
+                        className="flex items-center justify-between gap-3 rounded-md border p-3"
+                        key={artifact.id}
+                      >
+                        <span>Version {artifact.version}</span>
+                        <Badge variant="outline">
+                          {formatEnumLabel(artifact.status)}
+                        </Badge>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {request.status === "READY" &&
+                  result.actor.capabilities.includes("GENERATE_DOCUMENTS") ? (
+                    <form action={generateDocumentAction}>
+                      <input
+                        name="requestId"
+                        type="hidden"
+                        value={request.id}
+                      />
+                      <Button type="submit">Generate PDF</Button>
+                    </form>
+                  ) : null}
+                  <Button asChild variant="outline">
+                    <Link href="/staff/documents">
+                      Manage document versions
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : null}
           {nextStatuses.length > 0 ? (
             <Card>
               <CardHeader>

@@ -63,7 +63,7 @@ const staffNavigation: readonly StaffNavigationItem[] = [
     label: "Documents",
     href: "/staff/documents",
     icon: "documents",
-    available: false,
+    available: true,
     requiredCapabilities: [
       "GENERATE_DOCUMENTS",
       "RELEASE_DOCUMENTS",

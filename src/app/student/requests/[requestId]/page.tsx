@@ -125,6 +125,35 @@ export default async function StudentRequestDetailsPage({
             )}
           </CardContent>
         </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Documents</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {request.deliveryMethod !== "DIGITAL_DELIVERY" ? (
+              <p className="text-muted-foreground">
+                This request is configured for campus pickup. No digital
+                download will be provided.
+              </p>
+            ) : request.documentArtifacts.length === 0 ? (
+              <p className="text-muted-foreground">
+                No released documents are available yet.
+              </p>
+            ) : (
+              request.documentArtifacts.map((artifact) => (
+                <div
+                  className="flex items-center justify-between gap-3 rounded-md border p-3"
+                  key={artifact.id}
+                >
+                  <span>Version {artifact.version}</span>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href={`/student/documents/${artifact.id}`}>View</Link>
+                  </Button>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

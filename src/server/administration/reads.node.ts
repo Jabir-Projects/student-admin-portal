@@ -187,6 +187,10 @@ export async function getStaffRequestDetails(
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
         select: { id: true, visibility: true, body: true, createdAt: true },
       },
+      documentArtifacts: {
+        orderBy: [{ version: "desc" }],
+        select: { id: true, status: true, version: true, generatedAt: true },
+      },
     },
   });
   if (!request) return { ok: true as const, request: null };
@@ -206,6 +210,7 @@ export async function getStaffRequestDetails(
   );
   return {
     ok: true as const,
+    actor: authorization.actor,
     request: {
       ...request,
       statusHistory: undefined,

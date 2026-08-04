@@ -565,3 +565,29 @@ workflow failures block closure.
 - Scoped formatting, secret scan, diff check, documentation links, final Git
   synchronization, and cleanliness are required final delivery gates.
 - V2-5 remains planned and was not started.
+
+## V2-9 documents and private-storage execution package
+
+Status: `IMPLEMENTED — CLOSURE GIT GATES PENDING`
+
+- Starting commit: `481a0ae35e98511bf93904f083b406b9b41c8a61`.
+- Branch: `codex/v2-9-documents-private-storage`.
+- Scope: one additive `DocumentArtifact` migration; private storage and trusted
+  PDF generation; lifecycle, authorization, downloads, audit, notifications,
+  request integration, staff/student UI, and high-risk verification.
+- Dependencies: `@vercel/blob` 2.6.1 (Apache-2.0, Node >=20) and
+  `@react-pdf/renderer` 4.5.1 (MIT). Production audit: zero findings.
+- Database authorization: migration and mutable tests target only the isolated
+  disposable `TEST_DATABASE_URL`; the distinct control target remains
+  read-only; production access is prohibited.
+- Migration evidence: upgrade and staged fresh chain both reached ten
+  successful migrations, zero failed, zero pending; deterministic redeploy
+  reported current. All nine historical migration files remain unchanged.
+- Required verification: 5 focused V2-9 files/19 tests, full serialized 78
+  files/758 tests with zero skips, 4 focused authenticated Chromium tests,
+  Prisma format/validate/generate, ESLint, strict TypeScript, scoped Prettier,
+  webpack build, production dependency audit, diff and security scans.
+- Deferred: production Blob provisioning/scheduler, institutional retention
+  duration, shared rate limiting, physical-device and real-screen-reader QA.
+- Prohibited and not performed: lifecycle-script approval, `npm ci` rerun,
+  `prisma db push`, production access, deployment, and V2-10 work.

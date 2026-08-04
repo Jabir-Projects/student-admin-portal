@@ -83,8 +83,15 @@ export async function dispatchNotificationDeliveries(
     const delivery = await claimDelivery(database, now);
     if (!delivery) break;
     const requestId = delivery.notification.request?.id;
+    const documentEvent =
+      delivery.notification.eventType === "DOCUMENT_RELEASED" ||
+      delivery.notification.eventType === "DOCUMENT_REVOKED";
     const portalUrl = new URL(
-      requestId ? `/student/requests/${requestId}` : "/student/notifications",
+      documentEvent
+        ? "/student/documents"
+        : requestId
+          ? `/student/requests/${requestId}`
+          : "/student/notifications",
       base,
     ).toString();
     const rendered = renderNotificationEmail({

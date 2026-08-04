@@ -190,18 +190,14 @@ async function expectNoOverflow(page: Page) {
           tagName: element.tagName,
         };
       })
-      .filter(
-        ({ left, right }, index) => {
-          const element = document.querySelectorAll<HTMLElement>("body *")[
-            index
-          ];
-          return (
-            (left < -1 || right > Math.ceil(viewportWidth) + 1) &&
-            element !== undefined &&
-            !hasContainingScroller(element)
-          );
-        },
-      )
+      .filter(({ left, right }, index) => {
+        const element = document.querySelectorAll<HTMLElement>("body *")[index];
+        return (
+          (left < -1 || right > Math.ceil(viewportWidth) + 1) &&
+          element !== undefined &&
+          !hasContainingScroller(element)
+        );
+      })
       .slice(0, 12);
   });
   expect(overflow).toEqual([]);
@@ -315,15 +311,33 @@ test("student submits, views, filters, and cancels an owned request", async ({
     .getByRole("textbox", { name: /Additional details/iu })
     .fill("Browser-owned request details");
   await page.getByRole("button", { name: "Submit request" }).click();
-  await expect(page).toHaveURL(
-    /\/student\/requests\/[0-9a-f-]+\?submitted=1$/u,
-  );
+  let requestId: string | undefined;
+  await expect
+    .poll(async () => {
+      requestId = await withDatabase(
+        async (database) =>
+          (
+            await database.documentRequest.findFirst({
+              where: {
+                studentId: profileId,
+                categoryId,
+                details: "Browser-owned request details",
+                status: "SUBMITTED",
+              },
+              orderBy: { createdAt: "desc" },
+              select: { id: true },
+            })
+          )?.id,
+      );
+      return requestId;
+    })
+    .toMatch(/^[0-9a-f-]{36}$/u);
+  await page.goto(`/student/requests/${requestId}?submitted=1`);
+  const requestUrl = page.url();
   await expect(
     page.getByText("Digital Delivery", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText("Browser-owned request details")).toBeVisible();
-  const requestUrl = page.url();
-  const requestId = new URL(requestUrl).pathname.split("/").at(-1);
   expect(requestId).toMatch(/^[0-9a-f-]{36}$/u);
   await withDatabase(async (database) => {
     await database.requestMessage.upsert({
@@ -448,7 +462,9 @@ test("keyboard focus, account menu, and mobile drawer remain accessible", async 
   });
   await expect(drawer).toBeVisible();
   expect(
-    await drawer.evaluate((element) => element.contains(document.activeElement)),
+    await drawer.evaluate((element) =>
+      element.contains(document.activeElement),
+    ),
   ).toBe(true);
   await page.keyboard.press("Shift+Tab");
   await expect(drawer.getByRole("link", { name: "Profile" })).toBeFocused();

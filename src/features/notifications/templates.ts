@@ -94,7 +94,13 @@ export function renderNotificationEmail(
     },
   }[selected];
   const summary =
-    input.eventType === "REQUEST_STATUS_CHANGED" ? copy.status : copy.message;
+    input.eventType === "REQUEST_STATUS_CHANGED"
+      ? copy.status
+      : input.eventType === "DOCUMENT_RELEASED"
+        ? "A document is available through your authenticated SIST portal."
+        : input.eventType === "DOCUMENT_REVOKED"
+          ? "A previously released document is no longer available."
+          : copy.message;
   const direction = selected === "ARABIC" ? "rtl" : "ltr";
   return {
     subject: copy.subject,
