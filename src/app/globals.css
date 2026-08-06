@@ -2,6 +2,9 @@
 
 :root {
   color-scheme: light;
+  --font-inter: ui-sans-serif, system-ui, "Segoe UI", Arial, sans-serif;
+  --font-ibm-plex-mono:
+    ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
   --paper: #fbfcfb;
   --paper-secondary: #f1f3ef;
   --ink: #141b22;
