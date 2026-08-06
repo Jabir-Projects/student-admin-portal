@@ -1,5 +1,15 @@
 # Project 3 Architecture
 
+## V2-11 closure review
+
+The V2-11 review reconfirmed server-side ownership, exact-capability, and
+private no-store boundaries through the preserved regression suite, source
+review, and completed authenticated Chromium coverage. The earlier browser-only
+Prisma `EACCES` condition was a sandbox process-network restriction rather than
+a database schema or grant defect; approved elevated Chromium execution passed
+the remaining V2-5 through V2-10 coverage. No database mutation or production
+environment access occurred, and V2-12 was not started.
+
 ## Purpose
 
 Document stable system boundaries and security invariants without duplicating implementation detail or the Prisma schema. Workflow decisions are in [DECISIONS.md](DECISIONS.md); verification expectations are in [VERIFICATION_MATRIX.md](VERIFICATION_MATRIX.md).

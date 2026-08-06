@@ -1,5 +1,19 @@
 # Project 3 Decisions
 
+## DEC-022 — V2-11 closure evidence boundary
+
+- Date: 2026-08-04
+- Status: `IMPLEMENTED`
+- Decision: Retain the existing development-only transitive audit findings
+  without a forced upgrade, because production audit is clean and the complete
+  audit paths are jsdom/Vitest and Vite. Classify the earlier Prisma `EACCES`
+  condition as a browser-process sandbox network restriction after identical
+  test-target fingerprints and elevated execution succeeded.
+- Consequences: The remaining authenticated browser cases passed under the
+  approved elevated execution boundary (49 passed, 0 failed, one worker, zero
+  retries). No database grant, schema, migration, seed, or production action
+  was needed; V2-12 was not begun.
+
 ### DEC-021 — V2-10 Finance closure
 
 Finance list and detail routes use `StudentProfile.id` as the single authoritative route identifier. The smoke regression validates an authenticated HTTP 200 detail response and the rendered Finance record, preventing cold dev-server route initialization from masking authorization or ownership behavior. Finance exports default absent dates to the current academic period; malformed ranges remain rejected.

@@ -1,5 +1,35 @@
 # Project 3 Task Package Register
 
+## V2-11 final closure — current evidence
+
+Status: `CLOSED — VERIFIED`.
+
+- Preserved corrections: client-side accessible English registration feedback
+  while retaining server Zod validation; finance navigation includes
+  `EXPORT_FINANCE_DATA`; migration regressions accept the eleven-migration
+  chain.
+- Prior verification: 82 Vitest files, 731 passed, 38 skipped, zero failed;
+  login Chromium 10/10; production build passed with 31 routes.
+- The sandbox-only browser Prisma `EACCES` diagnosis was confirmed with an
+  identical test target and successful approved elevated execution. No database
+  permission, schema, migration, seed, or production action was performed.
+- Authenticated Chromium V2-5 through V2-10 verification passed 49/49 with one
+  worker and zero retries. This includes V2-5 request submission/cancellation,
+  V2-6 administration, V2-7 notifications/audit, V2-8 registry imports, V2-9
+  document generation/release/download/revocation, and V2-10 finance.
+- Skip assessment: all 38 skipped Vitest tests are gated isolated PostgreSQL
+  integration tests; classify as environment-dependent / V2-12 infrastructure
+  dependency, not an accepted authorization, ownership, privacy, migration,
+  finance, or data-integrity defect.
+- Security review: production dependency audit zero; complete audit one high
+  `undici` and one moderate `postcss`, development-only. No tracked raw import
+  or document artifacts, unsafe debug logging, or committed secret value was
+  identified by bounded scans.
+- Manual Final Hardening remains unperformed: real screen-reader, physical
+  phone/tablet, human keyboard, manual contrast, non-Chromium, and production
+  accessibility checks.
+- V2-12 was not started.
+
 ## Closed V2-10 Finance package
 
 The V2-10 Finance package is complete under the owner-approved Minimum Safe Closure. The staff detail-route smoke issue was traced to cold dev-server route initialization; authenticated response and rendered-route regression checks now cover it. No known Finance correctness, authorization, privacy, ownership, or money-integrity defect is deferred.

@@ -1,5 +1,17 @@
 # Project 3 Roadmap
 
+## V2-11 current execution state
+
+Status: `COMPLETE — CLOSED`.
+
+The prior browser-only Prisma `EACCES` condition was an execution-sandbox
+network boundary, not a test-database schema or grant defect. Owner-approved
+elevated Chromium execution completed all remaining authenticated V2-5 through
+V2-10 coverage with one worker and zero retries: 49 passed, 0 failed. The
+targeted V2-5 timing and V2-9 native-download fixes are included in this
+closure; no database mutation or production access occurred. V2-12 has not
+started.
+
 ## V2-10 — Finance
 
 `COMPLETE — CLOSED`. Finance ledger, imports, approvals, reversals, authoritative reads, student and staff exports, and bounded authenticated smoke coverage are complete. V2-11 is not started; exhaustive verification remains mandatory in V2-11 and Final Hardening.

@@ -1,5 +1,29 @@
 # Project 3 Current State
 
+## V2-11 QA, Security, and Accessibility closure
+
+Status: `VERIFIED COMPLETE — CLOSED`.
+
+- Preserved V2-11 corrections cover accessible English registration validation,
+  finance navigation for `EXPORT_FINANCE_DATA`, and historical migration-test
+  expectations.
+- The prior isolated-browser Prisma `EACCES` condition was confirmed as a
+  sandbox process-network authorization boundary: the identical hashed test
+  target and Node runtime succeeded with approved elevated Chromium access. No
+  database grant, schema, migration, seed, or production action occurred.
+- Serialized authenticated Chromium V2-5 through V2-10 verification passed
+  49/49 with one worker and zero retries, including V2-9 student download.
+- The V2-5 workflow waits follow the repository's long-workflow policy after
+  trace evidence showed a roughly four-second mutation and successful redirect.
+  The V2-9 download control uses a native anchor so client navigation does not
+  intercept the authenticated PDF attachment response.
+- Production dependency audit has zero findings. Complete audit has one high
+  `undici` and one moderate `postcss`, both development-only via jsdom/Vitest
+  and Vite; no safe compatible change was applied.
+- Physical-device, real screen-reader, human keyboard, manual contrast,
+  non-Chromium, and production accessibility checks remain unperformed.
+- V2-12 was not started.
+
 ## V2-10 final closure — 2026-08-04
 
 - Status: `VERIFIED COMPLETE — CLOSED` using the owner-approved Minimum Safe Closure.

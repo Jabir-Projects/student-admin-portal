@@ -1,5 +1,20 @@
 # Project 3 Verification Matrix
 
+## V2-11 closure evidence
+
+| Area                          | Result                                                                                                            |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Preserved regression evidence | PASS — 82 Vitest files / 731 passed / 38 skipped / 0 failed                                                       |
+| Login Chromium                | PASS — 10/10, responsive, keyboard, light and dark themes                                                         |
+| Remaining Chromium            | PASS — V2-5 through V2-10: 49 passed / 0 failed / one worker / zero retries                                       |
+| Browser database diagnosis    | PASS — sandbox process-network restriction; approved elevated execution only, no database mutation                 |
+| Skipped Vitest review         | ENVIRONMENT-DEPENDENT — isolated PostgreSQL integration guards only                                               |
+| Production dependency audit   | PASS — 0 vulnerabilities                                                                                          |
+| Complete dependency audit     | LIMITED — development-only `undici` high and `postcss` moderate                                                   |
+| Bounded sensitive-data scan   | PASS — no tracked raw import/document artifacts or unsafe debug logging identified                                |
+| Manual Final Hardening        | NOT RUN — screen reader, physical devices, keyboard walkthrough, contrast, non-Chromium, production accessibility |
+| V2-12                         | NOT STARTED                                                                                                       |
+
 ## V2-10 Finance closure evidence
 
 | Area                                       | Result                                        |
