@@ -55,9 +55,9 @@ export default async function StudentDocumentPage({
           </dl>
           {artifact.status === "RELEASED" ? (
             <Button asChild className="mt-6">
-              <Link href={`/api/student/documents/${artifact.id}/download`}>
+              <a href={`/api/student/documents/${artifact.id}/download`}>
                 Download PDF
-              </Link>
+              </a>
             </Button>
           ) : (
             <p className="text-muted-foreground mt-6" role="status">

@@ -8,14 +8,15 @@ import { listAvailableRequestCategories } from "@/server/student-portal/reads.no
 export default async function NewStudentRequestPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; result?: string }>;
 }) {
   const result = await listAvailableRequestCategories(
     await getActorSessionClaims(),
     db,
   );
   if (!result.ok) redirectForAuthorizationFailure(result.reason);
-  const requested = (await searchParams).category;
+  const query = await searchParams;
+  const requested = query.category;
   const selectedCategoryId = result.categories.some(
     (category) => category.id === requested,
   )
@@ -73,6 +74,7 @@ export default async function NewStudentRequestPage({
             {result.categories.length ? (
               <RequestForm
                 categories={result.categories}
+                result={query.result}
                 selectedCategoryId={selectedCategoryId}
               />
             ) : (

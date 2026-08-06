@@ -18,13 +18,13 @@ const schema = fs.readFileSync(
 );
 
 describe("V2-8 registry import migration", () => {
-  it("remains the additive ninth migration in the V2-9 chain", () => {
+  it("remains the additive ninth migration as later migrations are added", () => {
     const migrations = fs
       .readdirSync(migrationDirectory, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
       .sort();
-    expect(migrations).toHaveLength(10);
+    expect(migrations.length).toBeGreaterThanOrEqual(9);
     expect(migrations.at(8)).toBe(migrationName);
     expect(sql).not.toMatch(/\bDROP\s+(?:TABLE|TYPE|COLUMN)\b/iu);
   });

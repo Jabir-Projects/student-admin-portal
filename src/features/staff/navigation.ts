@@ -84,7 +84,7 @@ const staffNavigation: readonly StaffNavigationItem[] = [
     href: "/staff/finance",
     icon: "finance",
     available: true,
-    requiredCapabilities: ["VIEW_FINANCE"],
+    requiredCapabilities: ["VIEW_FINANCE", "EXPORT_FINANCE_DATA"],
   },
   {
     key: "finance-imports",

@@ -1,44 +1,50 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-import {
-  submitStudentRequestAction,
-  type SubmitRequestState,
-} from "@/app/student/requests/new/actions";
+import { submitStudentRequestAction } from "@/app/student/requests/new/actions";
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { Button } from "@/components/ui/button";
 
 const fieldClass =
   "bg-background border-input min-h-11 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
+const submissionErrorMessages: Readonly<Record<string, string>> = {
+  CATEGORY_UNAVAILABLE: "That request category is no longer available.",
+  DISABLED_ACCOUNT:
+    "Your session cannot submit this request. Sign in again or contact administration.",
+  DUPLICATE_OPEN_REQUEST:
+    "You already have an open request in this category.",
+  INACTIVE_ACCOUNT:
+    "Your session cannot submit this request. Sign in again or contact administration.",
+  INVALID_INPUT: "Check the request fields and try again.",
+  STALE_SESSION:
+    "Your session cannot submit this request. Sign in again or contact administration.",
+  UNAUTHENTICATED:
+    "Your session cannot submit this request. Sign in again or contact administration.",
+  WRONG_ROLE:
+    "Your session cannot submit this request. Sign in again or contact administration.",
+};
+
+function getSubmissionErrorMessage(result: string) {
+  return (
+    submissionErrorMessages[result] ??
+    "The request could not be submitted. Check the fields and try again."
+  );
+}
+
 export function RequestForm({
   categories,
   selectedCategoryId,
+  result,
 }: {
   categories: readonly { id: string; name: string }[];
   selectedCategoryId?: string;
+  result?: string;
 }) {
-  const router = useRouter();
-  const [state, formAction, pending] = useActionState(
-    submitStudentRequestAction,
-    {
-      status: "idle",
-      message: "",
-    } satisfies SubmitRequestState,
-  );
-
-  useEffect(() => {
-    if (state.status === "success" && state.requestId)
-      router.push(`/student/requests/${state.requestId}?submitted=1`);
-  }, [router, state]);
-
-  const hasError = !["idle", "success"].includes(state.status);
+  const pending = false;
   return (
     <form
-      action={formAction}
-      aria-describedby={hasError ? "request-form-error" : undefined}
+      action={submitStudentRequestAction}
+      aria-describedby={result ? "request-form-error" : undefined}
       className="grid gap-5"
     >
       <label className="grid gap-2 text-sm font-medium">
@@ -98,12 +104,12 @@ export function RequestForm({
           name="details"
         />
       </label>
-      {hasError ? (
+      {result ? (
         <FeedbackBanner id="request-form-error" tone="error">
-          {state.message}
+          {getSubmissionErrorMessage(result)}
         </FeedbackBanner>
       ) : null}
-      <Button className="w-fit" disabled={pending} type="submit">
+      <Button className="w-fit" type="submit">
         {pending ? "Submitting…" : "Submit request"}
       </Button>
     </form>

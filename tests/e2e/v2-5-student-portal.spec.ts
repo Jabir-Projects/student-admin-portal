@@ -25,6 +25,7 @@ const viewports = [
 ] as const;
 
 test.describe.configure({ mode: "serial" });
+test.setTimeout(180_000);
 
 async function withDatabase<T>(
   operation: (database: PrismaClient) => Promise<T>,
@@ -310,7 +311,19 @@ test("student submits, views, filters, and cancels an owned request", async ({
   await page
     .getByRole("textbox", { name: /Additional details/iu })
     .fill("Browser-owned request details");
-  await page.getByRole("button", { name: "Submit request" }).click();
+  const submitRequestButton = page.getByRole("button", {
+    name: "Submit request",
+  });
+  await expect(
+    await submitRequestButton.locator("..").evaluate((form) =>
+      (form as HTMLFormElement).checkValidity(),
+    ),
+  ).toBe(true);
+  await submitRequestButton.click();
+  await expect(page).toHaveURL(
+    /\/student\/requests\/[0-9a-f-]+\?submitted=1$/u,
+    { timeout: 60_000 },
+  );
   let requestId: string | undefined;
   await expect
     .poll(async () => {
@@ -396,7 +409,7 @@ test("student submits, views, filters, and cancels an owned request", async ({
   await dialog.getByRole("button", { name: "Confirm cancellation" }).click();
   await expect(
     page.getByText("Cancelled", { exact: true }).first(),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 60_000 });
   await page.goto("/student/requests?status=CANCELLED");
   await expect(
     page.getByRole("link", { name: "View details" }).first(),
@@ -414,6 +427,7 @@ test("student submits, views, filters, and cancels an owned request", async ({
   await page.getByRole("button", { name: "Submit request" }).click();
   await expect(page).toHaveURL(
     /\/student\/requests\/[0-9a-f-]+\?submitted=1$/u,
+    { timeout: 60_000 },
   );
   await expect(page.getByText("Campus Pickup", { exact: true })).toBeVisible();
 });

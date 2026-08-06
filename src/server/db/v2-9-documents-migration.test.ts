@@ -13,14 +13,14 @@ const sql = fs.readFileSync(
 );
 
 describe("V2-9 document artifact migration", () => {
-  it("is the only additive tenth migration", () => {
+  it("remains the additive tenth migration as later migrations are added", () => {
     const migrations = fs
       .readdirSync(migrationDirectory, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
       .sort();
-    expect(migrations).toHaveLength(10);
-    expect(migrations.at(-1)).toBe(migrationName);
+    expect(migrations.length).toBeGreaterThanOrEqual(10);
+    expect(migrations.at(9)).toBe(migrationName);
     expect(sql).not.toMatch(/\b(?:DROP|TRUNCATE|DELETE\s+FROM)\b/iu);
   });
 

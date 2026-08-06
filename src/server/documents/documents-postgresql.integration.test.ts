@@ -215,7 +215,7 @@ afterAll(async () => {
 });
 
 describe("V2-9 PostgreSQL document lifecycle", () => {
-  it("verifies the ten-migration document catalog", async () => {
+  it("verifies the current document catalog after later migrations", async () => {
     const [migrationCounts, enums, constraints, indexes, foreignKeys] =
       await Promise.all([
         db.$queryRaw<
@@ -257,7 +257,7 @@ describe("V2-9 PostgreSQL document lifecycle", () => {
             AND contype = 'f'
         `,
       ]);
-    expect(migrationCounts).toEqual([{ total: 10, successful: 10, failed: 0 }]);
+    expect(migrationCounts).toEqual([{ total: 11, successful: 11, failed: 0 }]);
     expect(enums).toEqual([{ count: 3 }]);
     expect(constraints[0]?.count).toBeGreaterThanOrEqual(10);
     expect(indexes[0]?.count).toBeGreaterThanOrEqual(5);
