@@ -16,18 +16,18 @@ database migration, requires separate owner authorization.
 
 ## Status vocabulary
 
-| Status | Meaning |
-| --- | --- |
-| `NOT STARTED` | No work in the item is authorized or evidenced. |
-| `PLANNING` | Scope or operational decisions are being defined; no capability is implied. |
-| `IN PROGRESS` | An authorized package is underway; only its evidenced work is complete. |
-| `BLOCKED` | A required decision, dependency, or safety condition prevents progress. |
-| `VERIFIED` | The stated evidence has been executed or inspected; closure may still require approval. |
-| `CLOSED` | Required evidence and authorized delivery for the item are recorded. |
+| Status        | Meaning                                                                                 |
+| ------------- | --------------------------------------------------------------------------------------- |
+| `NOT STARTED` | No work in the item is authorized or evidenced.                                         |
+| `PLANNING`    | Scope or operational decisions are being defined; no capability is implied.             |
+| `IN PROGRESS` | An authorized package is underway; only its evidenced work is complete.                 |
+| `BLOCKED`     | A required decision, dependency, or safety condition prevents progress.                 |
+| `VERIFIED`    | The stated evidence has been executed or inspected; closure may still require approval. |
+| `CLOSED`      | Required evidence and authorized delivery for the item are recorded.                    |
 
 ## Current roadmap summary
 
-| Item | Status | Canonical record |
-| --- | --- | --- |
-| V2-11 — QA, Security, and Accessibility Closure | `CLOSED` | [V2-11](items/V2-11.md) |
-| V2-12 — DevOps, Production Readiness, and Deployment Governance | `IN PROGRESS — V2-12.1` | [V2-12](items/V2-12.md) |
+| Item                                                            | Status                         | Canonical record        |
+| --------------------------------------------------------------- | ------------------------------ | ----------------------- |
+| V2-11 — QA, Security, and Accessibility Closure                 | `CLOSED`                       | [V2-11](items/V2-11.md) |
+| V2-12 — DevOps, Production Readiness, and Deployment Governance | `IN PROGRESS — V2-12.2 CLOSED` | [V2-12](items/V2-12.md) |

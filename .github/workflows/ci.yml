@@ -1,0 +1,105 @@
+name: CI Quality Gates
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: "true"
+  APP_URL: https://ci.invalid
+  DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci
+  DIRECT_URL: postgresql://ci:ci@127.0.0.1:5432/ci
+  TEST_DATABASE_URL: ""
+  AUTH_SECRET: ci-placeholder-auth-secret-32-bytes
+  DOCUMENT_STORAGE_DRIVER: memory
+  V2_9_TEST_STORAGE_ALLOWED: "false"
+  REGISTRATION_VERIFICATION_MODE: MANUAL_APPROVAL
+  ALLOW_DEVELOPMENT_SEED: "false"
+
+jobs:
+  quality:
+    name: Quality gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npm run db:generate
+
+      - name: Resolve formatting comparison base
+        id: formatting-base
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            base="$PR_BASE"
+          elif [ "$EVENT_NAME" = "push" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ] && git cat-file -e "$PUSH_BEFORE^{commit}" 2>/dev/null; then
+            base="$PUSH_BEFORE"
+          else
+            base="$(git merge-base HEAD origin/main)"
+          fi
+          git cat-file -e "$base^{commit}"
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+
+      - name: Check changed-file formatting
+        run: npm run format:check:changed -- --base "${{ steps.formatting-base.outputs.base }}"
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run typecheck
+        run: npm run typecheck
+
+      - name: Validate Prisma schema
+        run: npm run db:validate
+
+      - name: Run secret-free unit and component tests
+        run: npm run test:ci
+
+  build:
+    name: Production build
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build production application
+        run: npm run build
