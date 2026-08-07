@@ -14,6 +14,15 @@ import {
 } from "@/features/auth/session-marker";
 import { getAuthenticationSecret } from "@/server/auth/env";
 
+function getCredentialsSignInErrorCode(
+  destination: string,
+): string | undefined {
+  const url = new URL(destination, "https://portal.sist.example");
+  return url.searchParams.get("error") === "CredentialsSignin"
+    ? (url.searchParams.get("code") ?? undefined)
+    : undefined;
+}
+
 export async function loginAction(formData: FormData): Promise<void> {
   const parsed = loginSchema.safeParse({
     email: formData.get("email"),
@@ -33,6 +42,11 @@ export async function loginAction(formData: FormData): Promise<void> {
       redirect: false,
       redirectTo,
     });
+    const code = getCredentialsSignInErrorCode(destination);
+    if (code === "pending_approval") redirect("/pending-approval");
+    if (code === "account_disabled") redirect("/login?error=disabled");
+    if (code) redirect("/login?error=invalid");
+
     const secret = getAuthenticationSecret(process.env);
     if (!secret) {
       throw new Error("Invalid session history marker configuration.");

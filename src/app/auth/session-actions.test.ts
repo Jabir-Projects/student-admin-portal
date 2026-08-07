@@ -108,6 +108,34 @@ describe("authentication session history lifecycle", () => {
   });
 
   it.each([
+    [
+      "pending account",
+      "https://portal.sist.example/login?error=CredentialsSignin&code=pending_approval",
+      "/pending-approval",
+    ],
+    [
+      "disabled account",
+      "https://portal.sist.example/login?error=CredentialsSignin&code=account_disabled",
+      "/login?error=disabled",
+    ],
+    [
+      "invalid credentials",
+      "https://portal.sist.example/login?error=CredentialsSignin&code=credentials",
+      "/login?error=invalid",
+    ],
+  ])(
+    "routes Auth.js %s response without creating a session marker",
+    async (_case, destination, expectedRedirect) => {
+      mocks.signIn.mockResolvedValue(destination);
+
+      await expect(loginAction(loginFormData())).rejects.toBe(redirectSignal);
+
+      expect(mocks.redirect).toHaveBeenCalledExactlyOnceWith(expectedRedirect);
+      expect(mocks.cookieSet).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
     "/student/%252f..%252fadmin",
     "/student/%25%32%66..%25%32%66admin",
     "/student/%25%32%65%25%32%65/admin",
