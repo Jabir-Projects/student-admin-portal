@@ -38,6 +38,14 @@ const redirectSignal = new Error("NEXT_REDIRECT_TEST_SIGNAL");
 const authenticationSecret = "test-authentication-secret-value-1234";
 const previousAuthenticationSecret = process.env.AUTH_SECRET;
 
+class ForeignCredentialsSignin extends Error {
+  type = "CredentialsSignin";
+
+  constructor(readonly code: string) {
+    super("Credentials sign-in failed.");
+  }
+}
+
 function loginFormData(): FormData {
   const formData = new FormData();
   formData.set("email", "student@example.com");
@@ -108,25 +116,13 @@ describe("authentication session history lifecycle", () => {
   });
 
   it.each([
-    [
-      "pending account",
-      "https://portal.sist.example/login?error=CredentialsSignin&code=pending_approval",
-      "/pending-approval",
-    ],
-    [
-      "disabled account",
-      "https://portal.sist.example/login?error=CredentialsSignin&code=account_disabled",
-      "/login?error=disabled",
-    ],
-    [
-      "invalid credentials",
-      "https://portal.sist.example/login?error=CredentialsSignin&code=credentials",
-      "/login?error=invalid",
-    ],
+    ["pending account", "pending_approval", "/pending-approval"],
+    ["disabled account", "account_disabled", "/login?error=disabled"],
+    ["invalid credentials", "credentials", "/login?error=invalid"],
   ])(
-    "routes Auth.js %s response without creating a session marker",
-    async (_case, destination, expectedRedirect) => {
-      mocks.signIn.mockResolvedValue(destination);
+    "routes a CredentialsSignin rejection from another module instance for a %s without creating a session marker",
+    async (_case, code, expectedRedirect) => {
+      mocks.signIn.mockRejectedValue(new ForeignCredentialsSignin(code));
 
       await expect(loginAction(loginFormData())).rejects.toBe(redirectSignal);
 

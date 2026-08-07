@@ -14,13 +14,26 @@ import {
 } from "@/features/auth/session-marker";
 import { getAuthenticationSecret } from "@/server/auth/env";
 
-function getCredentialsSignInErrorCode(
-  destination: string,
-): string | undefined {
-  const url = new URL(destination, "https://portal.sist.example");
-  return url.searchParams.get("error") === "CredentialsSignin"
-    ? (url.searchParams.get("code") ?? undefined)
-    : undefined;
+function getCredentialsSignInErrorCode(value: unknown): string | undefined {
+  if (typeof value === "string") {
+    const url = new URL(value, "https://portal.sist.example");
+    return url.searchParams.get("error") === "CredentialsSignin"
+      ? (url.searchParams.get("code") ?? undefined)
+      : undefined;
+  }
+
+  if (
+    value &&
+    typeof value === "object" &&
+    "type" in value &&
+    value.type === "CredentialsSignin" &&
+    "code" in value &&
+    typeof value.code === "string"
+  ) {
+    return value.code;
+  }
+
+  return undefined;
 }
 
 export async function loginAction(formData: FormData): Promise<void> {
@@ -62,10 +75,12 @@ export async function loginAction(formData: FormData): Promise<void> {
     });
     redirect(destination);
   } catch (error) {
+    const code = getCredentialsSignInErrorCode(error);
+    if (code === "pending_approval") redirect("/pending-approval");
+    if (code === "account_disabled") redirect("/login?error=disabled");
+    if (code) redirect("/login?error=invalid");
+
     if (error instanceof AuthError) {
-      const code = "code" in error ? error.code : undefined;
-      if (code === "pending_approval") redirect("/pending-approval");
-      if (code === "account_disabled") redirect("/login?error=disabled");
       redirect("/login?error=invalid");
     }
     throw error;
