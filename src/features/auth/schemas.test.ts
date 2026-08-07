@@ -61,5 +61,12 @@ describe("authentication validation", () => {
     expect(
       loginSchema.safeParse({ email: "invalid", password: "x" }).success,
     ).toBe(false);
+    expect(
+      loginSchema.safeParse({
+        callbackUrl: "/auth/continue",
+        email: "student@example.com",
+        password: "x",
+      }).success,
+    ).toBe(false);
   });
 });

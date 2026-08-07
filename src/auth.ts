@@ -33,7 +33,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Credentials({
       credentials: { email: {}, password: {} },
       async authorize(rawCredentials) {
-        const parsed = loginSchema.safeParse(rawCredentials);
+        const parsed = loginSchema.safeParse({
+          email: rawCredentials?.email,
+          password: rawCredentials?.password,
+        });
         if (!parsed.success) return null;
 
         const user = await db.user.findUnique({
