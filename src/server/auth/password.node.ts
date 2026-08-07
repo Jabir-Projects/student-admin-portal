@@ -1,5 +1,7 @@
 import { argon2id, hash, verify } from "argon2";
 
+import { emitAuthenticationDiagnostic } from "@/server/auth/diagnostics";
+
 const PASSWORD_MAX_LENGTH = 128;
 const ARGON2_OPTIONS = {
   type: argon2id,
@@ -26,8 +28,13 @@ export async function verifyPassword(
 ): Promise<boolean> {
   assertBoundedPassword(password);
   try {
-    return await verify(passwordHash, password);
+    const passwordIsValid = await verify(passwordHash, password);
+    if (!passwordIsValid) {
+      emitAuthenticationDiagnostic("password_verify_false");
+    }
+    return passwordIsValid;
   } catch {
+    emitAuthenticationDiagnostic("password_verify_exception");
     return false;
   }
 }

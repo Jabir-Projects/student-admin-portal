@@ -8,6 +8,8 @@ export type AuthenticationDiagnosticStage =
   | "login_action_credentials_error_disabled"
   | "login_action_credentials_error_invalid"
   | "login_action_auth_error"
+  | "password_verify_false"
+  | "password_verify_exception"
   | "authorize_entered"
   | "authorize_schema_invalid"
   | "authorize_schema_valid"

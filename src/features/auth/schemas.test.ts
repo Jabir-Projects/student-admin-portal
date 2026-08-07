@@ -27,6 +27,26 @@ describe("authentication validation", () => {
     expect(result.email).toBe("student@example.com");
     expect(result.studentNumber).toBe("SIST-123");
   });
+  it("preserves password bytes through registration and login validation", () => {
+    const password = "  Preserve é́ 🔒 value  ";
+    const expectedBytes = [...new TextEncoder().encode(password)];
+    const registration = registrationSchema.parse({
+      ...validRegistration,
+      password,
+      confirmPassword: password,
+    });
+    const login = loginSchema.parse({
+      email: validRegistration.email,
+      password,
+    });
+
+    expect([...new TextEncoder().encode(registration.password)]).toEqual(
+      expectedBytes,
+    );
+    expect([...new TextEncoder().encode(login.password)]).toEqual(
+      expectedBytes,
+    );
+  });
   it("rejects unofficial programs, academic years, mismatched and oversized passwords", () => {
     expect(
       registrationSchema.safeParse({
