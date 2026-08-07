@@ -13,7 +13,6 @@ import {
   SESSION_HISTORY_MAX_AGE_SECONDS,
 } from "@/features/auth/session-marker";
 import { getAuthenticationSecret } from "@/server/auth/env";
-import { emitAuthenticationDiagnostic } from "@/server/auth/diagnostics";
 
 function getCredentialsSignInErrorCode(value: unknown): string | undefined {
   if (typeof value === "string") {
@@ -42,11 +41,7 @@ export async function loginAction(formData: FormData): Promise<void> {
     email: formData.get("email"),
     password: formData.get("password"),
   });
-  if (!parsed.success) {
-    emitAuthenticationDiagnostic("login_action_schema_invalid");
-    redirect("/login?error=invalid");
-  }
-  emitAuthenticationDiagnostic("login_action_schema_valid");
+  if (!parsed.success) redirect("/login?error=invalid");
   const requestedCallbackUrl = formData.get("callbackUrl");
   const redirectTo =
     typeof requestedCallbackUrl === "string" &&
@@ -55,27 +50,15 @@ export async function loginAction(formData: FormData): Promise<void> {
       ? getSafeCallbackPath(requestedCallbackUrl)
       : "/auth/continue";
   try {
-    emitAuthenticationDiagnostic("login_action_signin_dispatched");
     const destination = await signIn("credentials", {
       ...parsed.data,
       redirect: false,
       redirectTo,
     });
     const code = getCredentialsSignInErrorCode(destination);
-    if (code === "pending_approval") {
-      emitAuthenticationDiagnostic(
-        "login_action_credentials_error_pending_approval",
-      );
-      redirect("/pending-approval");
-    }
-    if (code === "account_disabled") {
-      emitAuthenticationDiagnostic("login_action_credentials_error_disabled");
-      redirect("/login?error=disabled");
-    }
-    if (code) {
-      emitAuthenticationDiagnostic("login_action_credentials_error_invalid");
-      redirect("/login?error=invalid");
-    }
+    if (code === "pending_approval") redirect("/pending-approval");
+    if (code === "account_disabled") redirect("/login?error=disabled");
+    if (code) redirect("/login?error=invalid");
 
     const secret = getAuthenticationSecret(process.env);
     if (!secret) {
@@ -93,23 +76,11 @@ export async function loginAction(formData: FormData): Promise<void> {
     redirect(destination);
   } catch (error) {
     const code = getCredentialsSignInErrorCode(error);
-    if (code === "pending_approval") {
-      emitAuthenticationDiagnostic(
-        "login_action_credentials_error_pending_approval",
-      );
-      redirect("/pending-approval");
-    }
-    if (code === "account_disabled") {
-      emitAuthenticationDiagnostic("login_action_credentials_error_disabled");
-      redirect("/login?error=disabled");
-    }
-    if (code) {
-      emitAuthenticationDiagnostic("login_action_credentials_error_invalid");
-      redirect("/login?error=invalid");
-    }
+    if (code === "pending_approval") redirect("/pending-approval");
+    if (code === "account_disabled") redirect("/login?error=disabled");
+    if (code) redirect("/login?error=invalid");
 
     if (error instanceof AuthError) {
-      emitAuthenticationDiagnostic("login_action_auth_error");
       redirect("/login?error=invalid");
     }
     throw error;
