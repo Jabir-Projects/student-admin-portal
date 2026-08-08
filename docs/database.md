@@ -69,11 +69,16 @@ triggers, foreign keys, and deletion rules. Commit the complete
 `prisma/migrations` directory. Apply checked-in migrations in production with:
 
 ```bash
-npx prisma migrate deploy
+npm run db:deploy
 ```
 
 Never use `prisma db push` as the production migration strategy. Never run a
 destructive database reset against shared or production data.
+
+The Production procedure requires an approved database identity check, a
+verified pre-migration backup reference, an approved `npm run db:status` before
+and after `npm run db:deploy`, and a recorded forward-fix versus restoration
+decision. See [`operations/production-readiness.md`](operations/production-readiness.md).
 
 ## Development seed
 

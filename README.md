@@ -31,8 +31,11 @@ npm run db:status
 ```
 
 Use checked-in Prisma migrations for schema changes. Production environments
-apply them with `npx prisma migrate deploy`; `prisma db push` and destructive
+apply them with `npm run db:deploy`; `prisma db push` and destructive
 database reset commands are not production migration strategies.
+
+The Production database, secrets, migration, deployment, and recovery procedure
+is documented in [`docs/operations/production-readiness.md`](docs/operations/production-readiness.md).
 
 ## Quality checks
 

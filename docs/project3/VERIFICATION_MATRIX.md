@@ -1,18 +1,32 @@
 # Project 3 Verification Matrix
 
+## V2-12.4 repository readiness evidence
+
+| Area                              | Result                                                                                                                                 |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Production configuration verifier | PASS — focused Vitest: 1 file / 2 tests; no remote access                                                                              |
+| Unconfigured local invocation     | PASS — fail-closed with missing field names only                                                                                       |
+| Production database               | PASS — owner-reported Neon `neondb` identity, separate pooled runtime/direct migration roles, and runtime least-privilege verification |
+| Production secrets                | PASS — owner reports Production `DATABASE_URL`, `DIRECT_URL`, `AUTH_SECRET`, and `APP_URL` configured; no values recorded              |
+| Test isolation                    | PASS — owner reports Production `TEST_DATABASE_URL` absent                                                                             |
+| Backup/recovery                   | PASS — owner reports six-hour Neon PITR, manual restore/snapshot availability, and named restore responsibility                        |
+| Deployment control                | PASS — owner reports protected GitHub `main`, Vercel Production tracking `main`, and the Production domain                             |
+| Actual Production release         | OWNER-DEFERRED — no deployment, migration status, backup/restore, or Production connection executed                                    |
+| V2-12.4 acceptance criteria       | SATISFIED — CLOSED; readiness complete and live release deferred to Final Release/Handoff                                              |
+
 ## V2-12.3 closure evidence
 
-| Area | Result |
-| --- | --- |
-| Production E2E runtime | PASS — built Next.js application + Playwright-managed `next start`; no Fast Refresh in final gate |
-| Focused production checks | PASS — Finance 8/8; Administration 12/12; Registry Import 9/9; Documents 4/4 |
-| Full serialized Playwright | PASS — 70/70; 0 failed; 0 skipped; 0 timed out; 0 aborted |
-| Database isolation | PASS — isolated test database only |
-| Preview database | UNTOUCHED |
-| Production database | UNTOUCHED |
-| Category-create completion | PASS — confirmed server action retains validation, authorization, transaction, and revalidation; client navigates after success |
-| Security diff review | PASS — 15 changed files reviewed; 0 reportable findings |
-| V2-12.3 acceptance criteria | SATISFIED — CLOSED |
+| Area                        | Result                                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Production E2E runtime      | PASS — built Next.js application + Playwright-managed `next start`; no Fast Refresh in final gate                               |
+| Focused production checks   | PASS — Finance 8/8; Administration 12/12; Registry Import 9/9; Documents 4/4                                                    |
+| Full serialized Playwright  | PASS — 70/70; 0 failed; 0 skipped; 0 timed out; 0 aborted                                                                       |
+| Database isolation          | PASS — isolated test database only                                                                                              |
+| Preview database            | UNTOUCHED                                                                                                                       |
+| Production database         | UNTOUCHED                                                                                                                       |
+| Category-create completion  | PASS — confirmed server action retains validation, authorization, transaction, and revalidation; client navigates after success |
+| Security diff review        | PASS — 15 changed files reviewed; 0 reportable findings                                                                         |
+| V2-12.3 acceptance criteria | SATISFIED — CLOSED                                                                                                              |
 
 ## V2-11 closure evidence
 
@@ -21,13 +35,13 @@
 | Preserved regression evidence | PASS — 82 Vitest files / 731 passed / 38 skipped / 0 failed                                                       |
 | Login Chromium                | PASS — 10/10, responsive, keyboard, light and dark themes                                                         |
 | Remaining Chromium            | PASS — V2-5 through V2-10: 49 passed / 0 failed / one worker / zero retries                                       |
-| Browser database diagnosis    | PASS — sandbox process-network restriction; approved elevated execution only, no database mutation                 |
+| Browser database diagnosis    | PASS — sandbox process-network restriction; approved elevated execution only, no database mutation                |
 | Skipped Vitest review         | ENVIRONMENT-DEPENDENT — isolated PostgreSQL integration guards only                                               |
 | Production dependency audit   | PASS — 0 vulnerabilities                                                                                          |
 | Complete dependency audit     | LIMITED — development-only `undici` high and `postcss` moderate                                                   |
 | Bounded sensitive-data scan   | PASS — no tracked raw import/document artifacts or unsafe debug logging identified                                |
 | Manual Final Hardening        | NOT RUN — screen reader, physical devices, keyboard walkthrough, contrast, non-Chromium, production accessibility |
-| V2-12                         | V2-12.3 CLOSED; V2-12.4 NOT STARTED                                                                              |
+| V2-12                         | V2-12.3 CLOSED; V2-12.4 NOT STARTED                                                                               |
 
 ## V2-10 Finance closure evidence
 

@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:ci": "vitest run --exclude src/**/*.integration.test.ts",
     "preview:verify": "node scripts/preview/verify-preview-environment.mjs",
+    "production:verify": "node scripts/production/verify-production-environment.mjs",
     "test:integration:postgresql": "vitest run --maxWorkers=1 --testTimeout=30000 --hookTimeout=60000 src/server/student-portal/student-portal-postgresql.integration.test.ts src/server/registry-import/registry-import-postgresql.integration.test.ts src/server/notifications/notifications-postgresql.integration.test.ts src/server/documents/documents-postgresql.integration.test.ts src/server/administration/administration-postgresql.integration.test.ts src/server/db/student-registry-demo.integration.test.ts src/server/db/database.integration.test.ts src/server/auth/registration-registry.integration.test.ts src/server/auth/package-b-postgresql.integration.test.ts src/server/auth/phase-3.integration.test.ts",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -24,6 +25,7 @@
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:status": "prisma migrate status",
+    "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build"
   },

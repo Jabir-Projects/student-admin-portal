@@ -27,7 +27,7 @@ database migration, requires separate owner authorization.
 
 ## Current roadmap summary
 
-| Item                                                            | Status                                 | Canonical record        |
-| --------------------------------------------------------------- | -------------------------------------- | ----------------------- |
-| V2-11 — QA, Security, and Accessibility Closure                 | `CLOSED`                               | [V2-11](items/V2-11.md) |
-| V2-12 — DevOps, Production Readiness, and Deployment Governance | `IN PROGRESS — V2-12.3 CLOSED` | [V2-12](items/V2-12.md) |
+| Item                                                            | Status                         | Canonical record        |
+| --------------------------------------------------------------- | ------------------------------ | ----------------------- |
+| V2-11 — QA, Security, and Accessibility Closure                 | `CLOSED`                       | [V2-11](items/V2-11.md) |
+| V2-12 — DevOps, Production Readiness, and Deployment Governance | `IN PROGRESS — V2-12.4 CLOSED` | [V2-12](items/V2-12.md) |

@@ -1,5 +1,22 @@
 # Project 3 Roadmap
 
+## V2-12.4 — Production readiness closure
+
+Status: `COMPLETE — CLOSED; LIVE RELEASE DEFERRED BY OWNER`.
+
+- Production database, secret, recovery, deployment, and ownership readiness is
+  recorded from the completed owner checkpoint.
+- The Production domain is `student-admin-portal-phi.vercel.app`; Vercel
+  Production tracks protected GitHub `main`.
+- The Production database uses the pooled `sist_runtime` role and direct
+  `neondb_owner` migration role; owner-reported least-privilege verification
+  covered 19 public tables.
+- Neon PITR is six hours and manual snapshot/restore is available to the project
+  owner / Neon administrator.
+- No live Production deployment, database connection, migration, backup, or
+  restore occurred. The owner deferred the first release to Final Release/Handoff.
+- V2-12.5 is next and remains unstarted.
+
 ## V2-12.3 — Vercel and preview preparation closure
 
 Status: `COMPLETE — CLOSED`.
@@ -18,8 +35,7 @@ Status: `COMPLETE — CLOSED`.
   deterministic navigation only after confirmed action success.
 - Security diff review covered all 15 changed files and found zero reportable
   findings.
-- V2-12.3 acceptance criteria are satisfied. V2-12.4 is the next planned
-  roadmap item and has not started.
+- V2-12.3 acceptance criteria are satisfied.
 
 ## V2-11 current execution state
 
@@ -331,13 +347,13 @@ Status: `PLANNED`
 
 ### V2-12 — DevOps and Production
 
-Status: `IN PROGRESS — V2-12.3 CLOSED`
+Status: `IN PROGRESS — V2-12.4 CLOSED; V2-12.5 NEXT`
 
 - V2-12.1 Environment plan
 - V2-12.2 Git governance and CI
 - V2-12.3 Vercel and preview preparation — `COMPLETE — CLOSED`
-- V2-12.4 Production database, storage, and email
-- V2-12.5 Monitoring, backup, recovery, and rollback
+- V2-12.4 Production database, secrets, and deployment runbooks — `COMPLETE — CLOSED; RELEASE DEFERRED`
+- V2-12.5 Storage, email, observability, and incident readiness — `NOT STARTED`
 - V2-12.6 Production readiness and controlled release
 
 ## Completion rules

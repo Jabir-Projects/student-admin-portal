@@ -1,5 +1,24 @@
 # Project 3 Current State
 
+## V2-12.4 Production readiness closure
+
+Status: `VERIFIED COMPLETE — CLOSED; LIVE RELEASE DEFERRED BY OWNER`.
+
+- The repository now provides a fail-closed `npm run production:verify` command
+  that validates required Production application configuration without network
+  access or secret output.
+- A single runbook records the database ownership, secret inventory, migration,
+  backup/recovery, deployment, verification, rollback, and rotation procedures.
+- Owner-reported external evidence confirms isolated Production pooled runtime
+  and direct migration connections, `sist_runtime` least privilege, a distinct
+  Production auth secret, absent Production `TEST_DATABASE_URL`, six-hour Neon
+  PITR, restore ownership, protected GitHub `main`, and Vercel Production
+  tracking `main` for `student-admin-portal-phi.vercel.app`.
+- Production infrastructure is ready. The first live Production deployment is
+  expressly deferred to Final Release/Handoff; no Production resource was
+  accessed or changed by this repository session.
+- V2-12.5 is next and has not started.
+
 ## V2-12.3 Vercel and preview preparation closure
 
 Status: `VERIFIED COMPLETE — CLOSED`.
