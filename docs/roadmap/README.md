@@ -30,4 +30,4 @@ database migration, requires separate owner authorization.
 | Item                                                            | Status                                 | Canonical record        |
 | --------------------------------------------------------------- | -------------------------------------- | ----------------------- |
 | V2-11 — QA, Security, and Accessibility Closure                 | `CLOSED`                               | [V2-11](items/V2-11.md) |
-| V2-12 — DevOps, Production Readiness, and Deployment Governance | `IN PROGRESS — V2-12.3 PACK 3A CLOSED` | [V2-12](items/V2-12.md) |
+| V2-12 — DevOps, Production Readiness, and Deployment Governance | `IN PROGRESS — V2-12.3 CLOSED` | [V2-12](items/V2-12.md) |

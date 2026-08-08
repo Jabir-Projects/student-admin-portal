@@ -16,6 +16,8 @@ Status: `COMPLETE — CLOSED`.
 - Category creation now retains server-side validation, authorization,
   transactional mutation, and revalidation, while the client performs a
   deterministic navigation only after confirmed action success.
+- Security diff review covered all 15 changed files and found zero reportable
+  findings.
 - V2-12.3 acceptance criteria are satisfied. V2-12.4 is the next planned
   roadmap item and has not started.
 

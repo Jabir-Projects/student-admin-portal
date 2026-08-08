@@ -14,6 +14,8 @@ Status: `VERIFIED COMPLETE — CLOSED`.
   accessed or mutated.
 - The category-create client completion issue is resolved without moving
   validation, authorization, or transactional work from the server action.
+- Security diff review covered the 15-file V2-12.3 change set and reported no
+  findings.
 - V2-12.4 is next and remains unstarted.
 
 ## V2-11 QA, Security, and Accessibility closure
