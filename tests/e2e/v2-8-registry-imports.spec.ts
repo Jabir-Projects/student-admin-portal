@@ -108,10 +108,11 @@ async function uploadCsv(page: Page, filename: string, row: string) {
     mimeType: "text/csv",
     buffer: Buffer.from(`${csvHeader}${row}\r\n`, "utf8"),
   });
+  const detailNavigation = page.waitForURL(
+    /\/staff\/imports\/registry\/[0-9a-f-]+/u,
+  );
   await page.getByRole("button", { name: "Upload and validate" }).click();
-  await expect(page).toHaveURL(/\/staff\/imports\/registry\/[0-9a-f-]+/u, {
-    timeout: 60_000,
-  });
+  await detailNavigation;
   await expect(page.getByRole("heading", { name: filename })).toBeVisible({
     timeout: 60_000,
   });

@@ -287,10 +287,14 @@ test("authorized STAFF filters the queue and opens request details", async ({
   await page.getByLabel("Student").fill("V26BROWSER");
   await page.getByRole("button", { name: "Apply filters" }).click();
   await expect(page.getByText("V26BROWSER").first()).toBeVisible();
-  await expect(
-    page.locator(`a[href='/staff/requests/${requestId}']`),
-  ).toBeVisible();
-  await page.goto(`/staff/requests/${requestId}`);
+  const requestDetailsLink = page.locator(
+    `a[href='/staff/requests/${requestId}']`,
+  );
+  await expect(requestDetailsLink).toBeVisible();
+  await Promise.all([
+    page.waitForURL((url) => url.pathname === `/staff/requests/${requestId}`),
+    requestDetailsLink.click(),
+  ]);
   await expect(page.getByText("Browser-owned request details")).toBeVisible();
 });
 
@@ -300,7 +304,13 @@ test("valid transition succeeds and tampered skipped transition fails safely", a
   await setSession(page, { id: staffId, role: "STAFF" });
   await page.goto(`/staff/requests/${requestId}`);
   await page.getByLabel("Next status").selectOption("UNDER_REVIEW");
+  const transitionResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === "POST" &&
+      response.url().includes(`/staff/requests/${requestId}`),
+  );
   await page.getByRole("button", { name: "Update status" }).click();
+  await transitionResponse;
   await expect(page.getByText("The request status was updated.")).toBeVisible();
   await page.evaluate(() => {
     const select = document.querySelector<HTMLSelectElement>(
@@ -344,17 +354,12 @@ test("public messages reach the student while internal notes remain private", as
       ),
     )
     .toBe(1);
+  await expect(page.getByText("The message was added.")).toBeVisible();
   await page.getByLabel("Visibility").selectOption("PUBLIC");
   await page
     .getByLabel("Message", { exact: true })
     .fill("Browser public update");
-  const publicMessageResponse = page.waitForResponse(
-    (response) =>
-      response.request().method() === "POST" &&
-      response.url().includes(`/staff/requests/${requestId}`),
-  );
   await page.getByRole("button", { name: "Add message" }).click();
-  await publicMessageResponse;
   await expect
     .poll(() =>
       withDatabase((database) =>

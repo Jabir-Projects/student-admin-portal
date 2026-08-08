@@ -1,5 +1,24 @@
 # Project 3 Roadmap
 
+## V2-12.3 — Vercel and preview preparation closure
+
+Status: `COMPLETE — CLOSED`.
+
+- The final browser gate uses the built Next.js application with Playwright-managed
+  `next start`; Fast Refresh and development-server nondeterminism are excluded
+  from the release gate.
+- Focused production-mode verification passed: Finance 8/8, Administration
+  12/12, Registry Import 9/9, and Documents 4/4.
+- The complete serialized production-mode Playwright suite passed 70/70 with
+  zero failures, skips, timeouts, or aborted tests.
+- The isolated test database remained the only test target. Preview and
+  Production databases were not accessed or mutated.
+- Category creation now retains server-side validation, authorization,
+  transactional mutation, and revalidation, while the client performs a
+  deterministic navigation only after confirmed action success.
+- V2-12.3 acceptance criteria are satisfied. V2-12.4 is the next planned
+  roadmap item and has not started.
+
 ## V2-11 current execution state
 
 Status: `COMPLETE — CLOSED`.
@@ -310,11 +329,11 @@ Status: `PLANNED`
 
 ### V2-12 — DevOps and Production
 
-Status: `PLANNED`
+Status: `IN PROGRESS — V2-12.3 CLOSED`
 
 - V2-12.1 Environment plan
 - V2-12.2 Git governance and CI
-- V2-12.3 Vercel and preview preparation
+- V2-12.3 Vercel and preview preparation — `COMPLETE — CLOSED`
 - V2-12.4 Production database, storage, and email
 - V2-12.5 Monitoring, backup, recovery, and rollback
 - V2-12.6 Production readiness and controlled release

@@ -11,6 +11,10 @@ import {
 import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { db } from "@/server/db";
 
+export type CreateCategoryActionState = {
+  status: "idle" | "success" | "error";
+};
+
 function finish(result: { ok: boolean; reason?: string }): never {
   if (result.ok) revalidatePath("/staff/request-categories");
   redirect(
@@ -18,17 +22,22 @@ function finish(result: { ok: boolean; reason?: string }): never {
   );
 }
 
-export async function createCategoryAction(formData: FormData) {
-  finish(
-    await createRequestCategoryAsActor(
-      await getActorSessionClaims(),
-      {
-        name: formData.get("name"),
-        description: formData.get("description") ?? "",
-      },
-      db,
-    ),
+export async function createCategoryAction(
+  _previousState: CreateCategoryActionState,
+  formData: FormData,
+): Promise<CreateCategoryActionState> {
+  const result = await createRequestCategoryAsActor(
+    await getActorSessionClaims(),
+    {
+      name: formData.get("name"),
+      description: formData.get("description") ?? "",
+    },
+    db,
   );
+  if (!result.ok) return { status: "error" };
+
+  revalidatePath("/staff/request-categories");
+  return { status: "success" };
 }
 
 export async function updateCategoryAction(formData: FormData) {

@@ -19,6 +19,7 @@ export const PACKAGE_B_EXPECTED_MIGRATIONS = [
   "20260803120000_v2_7_notification_outbox",
   "20260803180000_v2_8_registry_imports",
   "20260804120000_v2_9_documents_private_storage",
+  "20260804180000_v2_10_finance",
 ] as const;
 
 export type PackageBTestDatabaseEnvironment = Readonly<

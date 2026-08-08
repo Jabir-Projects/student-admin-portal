@@ -1,3 +1,4 @@
+import { CreateCategoryForm } from "./create-category-form";
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,6 @@ import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
 import {
-  createCategoryAction,
   setCategoryActiveAction,
   updateCategoryAction,
 } from "./actions";
@@ -46,32 +46,7 @@ export default async function RequestCategoriesPage({
           <CardTitle>Create category</CardTitle>
         </CardHeader>
         <CardContent>
-          <form
-            action={createCategoryAction}
-            className="grid gap-4 md:grid-cols-2"
-          >
-            <label className="grid gap-1.5">
-              <span className="text-sm font-semibold">Name</span>
-              <input
-                className="border-input bg-background h-10 rounded-md border px-3"
-                maxLength={120}
-                minLength={2}
-                name="name"
-                required
-              />
-            </label>
-            <label className="grid gap-1.5 md:col-span-2">
-              <span className="text-sm font-semibold">Description</span>
-              <textarea
-                className="border-input bg-background min-h-24 rounded-md border p-3"
-                maxLength={1000}
-                name="description"
-              />
-            </label>
-            <Button className="w-fit" type="submit">
-              Create category
-            </Button>
-          </form>
+          <CreateCategoryForm />
         </CardContent>
       </Card>
       <section aria-labelledby="categories-heading">

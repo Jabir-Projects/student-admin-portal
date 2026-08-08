@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 
+import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type { PrismaClient } from "@/generated/prisma/client";
@@ -27,6 +28,8 @@ import {
   openVerifiedIsolatedTestDatabase,
   type VerifiedIsolatedTestDatabase,
 } from "@/test/isolated-database.node";
+
+dotenv.config({ path: ".env.local", quiet: true });
 
 const ids = {
   generate: randomUUID(),

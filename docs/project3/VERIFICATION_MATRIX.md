@@ -1,5 +1,18 @@
 # Project 3 Verification Matrix
 
+## V2-12.3 closure evidence
+
+| Area | Result |
+| --- | --- |
+| Production E2E runtime | PASS — built Next.js application + Playwright-managed `next start`; no Fast Refresh in final gate |
+| Focused production checks | PASS — Finance 8/8; Administration 12/12; Registry Import 9/9; Documents 4/4 |
+| Full serialized Playwright | PASS — 70/70; 0 failed; 0 skipped; 0 timed out; 0 aborted |
+| Database isolation | PASS — isolated test database only |
+| Preview database | UNTOUCHED |
+| Production database | UNTOUCHED |
+| Category-create completion | PASS — confirmed server action retains validation, authorization, transaction, and revalidation; client navigates after success |
+| V2-12.3 acceptance criteria | SATISFIED — CLOSED |
+
 ## V2-11 closure evidence
 
 | Area                          | Result                                                                                                            |
@@ -13,7 +26,7 @@
 | Complete dependency audit     | LIMITED — development-only `undici` high and `postcss` moderate                                                   |
 | Bounded sensitive-data scan   | PASS — no tracked raw import/document artifacts or unsafe debug logging identified                                |
 | Manual Final Hardening        | NOT RUN — screen reader, physical devices, keyboard walkthrough, contrast, non-Chromium, production accessibility |
-| V2-12                         | NOT STARTED                                                                                                       |
+| V2-12                         | V2-12.3 CLOSED; V2-12.4 NOT STARTED                                                                              |
 
 ## V2-10 Finance closure evidence
 

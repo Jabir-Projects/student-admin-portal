@@ -1,5 +1,21 @@
 # Project 3 Current State
 
+## V2-12.3 Vercel and preview preparation closure
+
+Status: `VERIFIED COMPLETE — CLOSED`.
+
+- Production-mode Playwright uses a built Next.js application with
+  Playwright-managed `next start`; the final gate does not use Fast Refresh.
+- Targeted production verification passed: Finance 8/8, Administration 12/12,
+  Registry Import 9/9, and Documents 4/4.
+- Full serialized production Playwright passed 70/70 with zero failures, skips,
+  timeouts, or aborted tests.
+- Test database isolation passed. Preview and Production databases were not
+  accessed or mutated.
+- The category-create client completion issue is resolved without moving
+  validation, authorization, or transactional work from the server action.
+- V2-12.4 is next and remains unstarted.
+
 ## V2-11 QA, Security, and Accessibility closure
 
 Status: `VERIFIED COMPLETE — CLOSED`.
@@ -22,7 +38,7 @@ Status: `VERIFIED COMPLETE — CLOSED`.
   and Vite; no safe compatible change was applied.
 - Physical-device, real screen-reader, human keyboard, manual contrast,
   non-Chromium, and production accessibility checks remain unperformed.
-- V2-12 was not started.
+- V2-12.3 is closed; V2-12.4 remains unstarted.
 
 ## V2-10 final closure — 2026-08-04
 

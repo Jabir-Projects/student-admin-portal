@@ -106,7 +106,7 @@ async function setSession(
 }
 
 async function expectNoBlockingOverflow(page: Page) {
-  const defects = await page.evaluate(() => {
+  const evaluate = () => page.evaluate(() => {
     const viewportWidth = document.documentElement.clientWidth;
     return Array.from(document.querySelectorAll<HTMLElement>("body *"))
       .filter((element) => {
@@ -128,6 +128,19 @@ async function expectNoBlockingOverflow(page: Page) {
       .map((element) => element.tagName)
       .slice(0, 10);
   });
+  let defects: string[];
+  try {
+    defects = await evaluate();
+  } catch (error) {
+    if (
+      !(error instanceof Error) ||
+      !error.message.includes("Execution context was destroyed")
+    ) {
+      throw error;
+    }
+    await page.waitForLoadState("domcontentloaded");
+    defects = await evaluate();
+  }
   expect(defects).toEqual([]);
 }
 
@@ -452,6 +465,7 @@ test("finance theme controls and primary focus remain usable", async ({
   const toggle = page.getByRole("button", {
     name: "Toggle light and dark theme",
   });
+  await expect(toggle).toBeEnabled({ timeout: 60_000 });
   await toggle.click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(

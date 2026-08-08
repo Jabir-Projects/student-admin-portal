@@ -9,8 +9,7 @@ export function ThemeToggle() {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setIsHydrated(true), 0);
-    return () => window.clearTimeout(timer);
+    setIsHydrated(true);
   }, []);
 
   function toggleTheme() {
