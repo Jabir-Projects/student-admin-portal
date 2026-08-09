@@ -15,6 +15,7 @@ import { reconcileStudentRegistryDemo } from "./student-registry-demo";
 
 const ids = {
   staff: "10000000-0000-4000-8000-000000000001",
+  staffReviewer: "10000000-0000-4000-8000-000000000004",
   studentOne: "10000000-0000-4000-8000-000000000002",
   studentTwo: "10000000-0000-4000-8000-000000000003",
   profileOne: "20000000-0000-4000-8000-000000000001",
@@ -31,6 +32,9 @@ const ids = {
   internalMessage: "60000000-0000-4000-8000-000000000002",
   notificationOne: "70000000-0000-4000-8000-000000000001",
   notificationTwo: "70000000-0000-4000-8000-000000000002",
+  financeAccountOne: "80000000-0000-4000-8000-000000000001",
+  financeChargeOne: "80000000-0000-4000-8000-000000000002",
+  financePaymentOne: "80000000-0000-4000-8000-000000000003",
 } as const;
 
 const seededAt = new Date("2026-01-15T09:00:00.000Z");
@@ -69,6 +73,9 @@ async function reusablePasswordHash(
 
 async function seed(): Promise<void> {
   const staffPassword = requireSeedPassword("SEED_STAFF_PASSWORD");
+  const staffReviewerPassword = requireSeedPassword(
+    "SEED_STAFF_REVIEWER_PASSWORD",
+  );
   const studentOnePassword = requireSeedPassword("SEED_STUDENT_ONE_PASSWORD");
   const studentTwoPassword = requireSeedPassword("SEED_STUDENT_TWO_PASSWORD");
   const users = [
@@ -77,6 +84,18 @@ async function seed(): Promise<void> {
       email: "admin.dev@example.invalid",
       fullName: "Development Staff Manager",
       passwordHash: await reusablePasswordHash(ids.staff, staffPassword),
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+    },
+    {
+      id: ids.staffReviewer,
+      email: "reviewer.dev@example.invalid",
+      fullName: "Development Staff Reviewer",
+      passwordHash: await reusablePasswordHash(
+        ids.staffReviewer,
+        staffReviewerPassword,
+      ),
       role: UserRole.STAFF,
       status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.ENGLISH,
@@ -115,18 +134,29 @@ async function seed(): Promise<void> {
     });
   }
 
-  const staffCapabilities = [
-    Capability.MANAGE_STUDENT_ACCOUNTS,
-    Capability.REACTIVATE_STUDENT_ACCOUNTS,
-    Capability.MANAGE_STAFF_ACCOUNTS,
-    Capability.MANAGE_STAFF_CAPABILITIES,
-  ] as const;
-  for (const capability of staffCapabilities) {
+  for (const capability of Object.values(Capability)) {
     await prisma.userCapabilityAssignment.upsert({
       where: {
         userId_capability: { userId: ids.staff, capability },
       },
       create: { userId: ids.staff, capability, grantedById: null },
+      update: {},
+    });
+  }
+
+  for (const capability of [
+    Capability.REGISTRY_IMPORT_APPROVE,
+    Capability.FINANCE_IMPORT_APPROVE,
+  ] as const) {
+    await prisma.userCapabilityAssignment.upsert({
+      where: {
+        userId_capability: { userId: ids.staffReviewer, capability },
+      },
+      create: {
+        userId: ids.staffReviewer,
+        capability,
+        grantedById: null,
+      },
       update: {},
     });
   }
@@ -305,6 +335,57 @@ async function seed(): Promise<void> {
       where: { id: notification.id },
       create: { ...notification, createdAt: seededAt },
       update: notification,
+    });
+  }
+
+  await prisma.studentFinanceAccount.upsert({
+    where: { id: ids.financeAccountOne },
+    create: { id: ids.financeAccountOne, studentId: ids.profileOne },
+    update: { studentId: ids.profileOne },
+  });
+
+  const financeTransactions = [
+    {
+      id: ids.financeChargeOne,
+      accountId: ids.financeAccountOne,
+      entryType: "CHARGE" as const,
+      amountMinor: BigInt(125000),
+      ledgerEffectMinor: BigInt(125000),
+      currency: "MAD",
+      effectiveDate: new Date("2026-01-15T00:00:00.000Z"),
+      billingPeriod: "2025-2026",
+      term: "ANNUAL" as const,
+      sourceSystem: "DEVELOPMENT_DEMO",
+      externalTransactionId: "DEV-DEMO-CHARGE-001",
+      sourceReference: "DEMO-ANNUAL-FEE",
+      description: "Development demonstration annual fee.",
+      createdById: ids.staff,
+      appliedById: ids.staff,
+    },
+    {
+      id: ids.financePaymentOne,
+      accountId: ids.financeAccountOne,
+      entryType: "PAYMENT" as const,
+      amountMinor: BigInt(50000),
+      ledgerEffectMinor: BigInt(-50000),
+      currency: "MAD",
+      effectiveDate: new Date("2026-01-20T00:00:00.000Z"),
+      billingPeriod: "2025-2026",
+      term: "ANNUAL" as const,
+      sourceSystem: "DEVELOPMENT_DEMO",
+      externalTransactionId: "DEV-DEMO-PAYMENT-001",
+      sourceReference: "DEMO-PAYMENT-001",
+      description: "Development demonstration payment.",
+      createdById: ids.staff,
+      appliedById: ids.staff,
+    },
+  ] as const;
+
+  for (const transaction of financeTransactions) {
+    await prisma.financeTransaction.upsert({
+      where: { id: transaction.id },
+      create: transaction,
+      update: transaction,
     });
   }
 

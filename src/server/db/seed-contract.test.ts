@@ -30,18 +30,16 @@ describe("development seed safety contract", () => {
     );
   });
 
-  it("seeds only the deterministic STAFF manager with the four approved bootstrap capabilities", () => {
+  it("seeds deterministic development-only demo actors without an ADMIN role", () => {
     expect(source).toContain('requireSeedPassword("SEED_STAFF_PASSWORD")');
+    expect(source).toMatch(
+      /requireSeedPassword\(\s*"SEED_STAFF_REVIEWER_PASSWORD"\s*,?\s*\)/u,
+    );
     expect(source).not.toContain("SEED_ADMIN_PASSWORD");
     expect(source).toContain("role: UserRole.STAFF");
     expect(source).not.toContain("UserRole.ADMIN");
-    for (const capability of [
-      "MANAGE_STUDENT_ACCOUNTS",
-      "REACTIVATE_STUDENT_ACCOUNTS",
-      "MANAGE_STAFF_ACCOUNTS",
-      "MANAGE_STAFF_CAPABILITIES",
-    ]) {
-      expect(source).toContain(`Capability.${capability}`);
-    }
+    expect(source).toContain("Object.values(Capability)");
+    expect(source).toContain("Capability.REGISTRY_IMPORT_APPROVE");
+    expect(source).toContain("Capability.FINANCE_IMPORT_APPROVE");
   });
 });

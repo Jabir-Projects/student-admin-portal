@@ -1,8 +1,10 @@
 # Student Administration Portal
 
 A production-oriented university portal connecting students with administration.
-Phase 2 adds the Neon PostgreSQL and Prisma database foundation. Authentication,
-student workflows, and administrator workflows remain intentionally unimplemented.
+It includes public registration, student self-service, capability-authorized
+STAFF operations, Registry/Finance imports, documents, notifications, and audit
+workflows. See [the Monday demo and handoff guide](docs/operations/monday-demo-handoff.md)
+for the verified demonstration setup and deferred institutional dependencies.
 
 ## Local development
 

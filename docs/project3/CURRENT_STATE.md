@@ -2,7 +2,7 @@
 
 ## V2-12.5 storage, email, observability, and incident readiness
 
-Status: `MANUAL ACTION REQUIRED — INSTITUTIONAL SENDER DOMAIN CHECKPOINT`.
+Status: `DEMO/HANDOFF READY — EXTERNAL DNS DEFERRED POST-HANDOFF`.
 
 - Repository-controlled storage/email readiness, scheduled delivery, liveness,
   redacted logs, monitoring inputs, and incident documentation are implemented
@@ -11,10 +11,11 @@ Status: `MANUAL ACTION REQUIRED — INSTITUTIONAL SENDER DOMAIN CHECKPOINT`.
   Production Resend API keys and scheduler secrets are separate; the rotated
   Preview key completed a direct synthetic Resend delivery; and UptimeRobot is
   Up at a five-minute interval with a tested email alert.
-- V2-12.5 cannot close until an authorized DNS owner can access the existing
+- The external DNS item is formally deferred to post-handoff: an authorized DNS
+  owner must access the existing
   `sist.ac.ma` Cloudflare zone and Resend verifies `updates.sist.ac.ma` after
-  its required DNS records are installed. Production was not accessed or
-  changed.
+  its required DNS records are installed before arbitrary production email
+  sending. Production was not accessed or changed.
 
 ## V2-12.4 Production readiness closure
 

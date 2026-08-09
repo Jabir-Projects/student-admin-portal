@@ -2,14 +2,14 @@
 
 ## V2-12.5 — Storage, email, observability, and incident readiness
 
-Status: `MANUAL ACTION REQUIRED — INSTITUTIONAL SENDER DOMAIN CHECKPOINT`.
+Status: `DEMO/HANDOFF READY — EXTERNAL DNS DEFERRED POST-HANDOFF`.
 
 - Repository-controlled provider readiness verification, protected scheduled
   outbox dispatch, redacted operational logging, liveness response, and the
   incident/monitoring control record are complete and verified locally.
 - Owner-reported Preview deployment, synthetic email, credential separation,
-  and UptimeRobot alert evidence are recorded. The sole remaining checkpoint is
-  institutional DNS access and Resend verification for `updates.sist.ac.ma`;
+  and UptimeRobot alert evidence are recorded. Institutional DNS access and
+  Resend verification for `updates.sist.ac.ma` are deferred post-handoff;
   Production release remains deferred.
 
 ## V2-12.4 — Production readiness closure
@@ -359,13 +359,13 @@ Status: `PLANNED`
 
 ### V2-12 — DevOps and Production
 
-Status: `IN PROGRESS — V2-12.4 CLOSED; V2-12.5 BLOCKED`
+Status: `DEMO/HANDOFF READY — PRODUCTION ACTIVITIES DEFERRED`
 
 - V2-12.1 Environment plan
 - V2-12.2 Git governance and CI
 - V2-12.3 Vercel and preview preparation — `COMPLETE — CLOSED`
 - V2-12.4 Production database, secrets, and deployment runbooks — `COMPLETE — CLOSED; RELEASE DEFERRED`
-- V2-12.5 Storage, email, observability, and incident readiness — `MANUAL ACTION REQUIRED — DNS CHECKPOINT`
+- V2-12.5 Storage, email, observability, and incident readiness — `DEFERRED — EXTERNAL DNS / POST-HANDOFF`
 - V2-12.6 Production readiness and controlled release
 
 ## Completion rules

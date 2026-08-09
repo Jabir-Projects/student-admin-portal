@@ -2,7 +2,7 @@
 
 ## V2-12.5 repository readiness evidence
 
-Status: `MANUAL ACTION REQUIRED — INSTITUTIONAL SENDER DOMAIN CHECKPOINT`.
+Status: `DEMO/HANDOFF READY — EXTERNAL DNS DEFERRED POST-HANDOFF`.
 
 | Area                                   | Result                                                                                                                 |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -11,9 +11,10 @@ Status: `MANUAL ACTION REQUIRED — INSTITUTIONAL SENDER DOMAIN CHECKPOINT`.
 | Liveness and redacted logging          | PASS — focused health/logger tests; no sensitive fields accepted by logger metadata                                    |
 | Incident and monitoring control record | PASS — documented provider, alert, containment, recovery, and ownership procedure                                      |
 | Static/build checks                    | PASS — scoped Prettier/ESLint, strict TypeScript, Prisma validation, production build                                  |
-| Repository-wide lint                   | LIMITED — unchanged `src/components/staff/theme-toggle.tsx:12` rule violation                                          |
+| Repository-wide lint                   | PASS — `npm run lint` completed with zero errors and warnings                                                          |
 | Preview owner evidence                 | RECORDED — deployment Ready, synthetic Resend delivery, environment separation, UptimeRobot Up and tested email alert  |
-| Institutional sender domain            | MANUAL ACTION REQUIRED — Cloudflare account lacks `sist.ac.ma` zone access for Resend DNS verification                 |
+| Institutional sender domain            | DEFERRED POST-HANDOFF — Cloudflare account lacks `sist.ac.ma` zone access for Resend DNS verification                  |
+| Monday handoff/demo guide              | PASS — deterministic development-only actors/data and a safe presenter procedure are documented                        |
 
 ## V2-12.4 repository readiness evidence
 
