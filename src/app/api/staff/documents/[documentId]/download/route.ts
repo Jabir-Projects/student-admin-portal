@@ -5,6 +5,10 @@ import {
   privatePdfResponse,
 } from "@/server/documents/downloads.node";
 import { createRuntimeDocumentStorage } from "@/server/documents/runtime.node";
+import {
+  createRequestId,
+  logOperationalEvent,
+} from "@/server/observability/logger.node";
 
 export async function GET(
   _request: Request,
@@ -25,6 +29,12 @@ export async function GET(
       );
     return privatePdfResponse(result.download);
   } catch {
+    logOperationalEvent({
+      event: "document.download.unavailable",
+      level: "warn",
+      metadata: { operation: "staff-download", result: "unavailable" },
+      requestId: createRequestId(),
+    });
     return Response.json(
       { error: "The document is not available." },
       { status: 503 },

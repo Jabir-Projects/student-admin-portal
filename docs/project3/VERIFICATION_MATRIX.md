@@ -1,5 +1,20 @@
 # Project 3 Verification Matrix
 
+## V2-12.5 repository readiness evidence
+
+Status: `MANUAL ACTION REQUIRED — INSTITUTIONAL SENDER DOMAIN CHECKPOINT`.
+
+| Area                                   | Result                                                                                                                 |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Provider configuration verifier        | PASS — focused test plus synthetic, non-network `operations:verify`; validates a 32-character minimum scheduler secret |
+| Protected scheduled email dispatch     | PASS — scheduler authorization and existing outbox/provider contracts covered by focused tests                         |
+| Liveness and redacted logging          | PASS — focused health/logger tests; no sensitive fields accepted by logger metadata                                    |
+| Incident and monitoring control record | PASS — documented provider, alert, containment, recovery, and ownership procedure                                      |
+| Static/build checks                    | PASS — scoped Prettier/ESLint, strict TypeScript, Prisma validation, production build                                  |
+| Repository-wide lint                   | LIMITED — unchanged `src/components/staff/theme-toggle.tsx:12` rule violation                                          |
+| Preview owner evidence                 | RECORDED — deployment Ready, synthetic Resend delivery, environment separation, UptimeRobot Up and tested email alert  |
+| Institutional sender domain            | MANUAL ACTION REQUIRED — Cloudflare account lacks `sist.ac.ma` zone access for Resend DNS verification                 |
+
 ## V2-12.4 repository readiness evidence
 
 | Area                              | Result                                                                                                                                 |

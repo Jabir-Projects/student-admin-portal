@@ -1,5 +1,21 @@
 # Project 3 Current State
 
+## V2-12.5 storage, email, observability, and incident readiness
+
+Status: `MANUAL ACTION REQUIRED — INSTITUTIONAL SENDER DOMAIN CHECKPOINT`.
+
+- Repository-controlled storage/email readiness, scheduled delivery, liveness,
+  redacted logs, monitoring inputs, and incident documentation are implemented
+  and locally verified.
+- Owner-reported external evidence: Preview is deployed and Ready; Preview and
+  Production Resend API keys and scheduler secrets are separate; the rotated
+  Preview key completed a direct synthetic Resend delivery; and UptimeRobot is
+  Up at a five-minute interval with a tested email alert.
+- V2-12.5 cannot close until an authorized DNS owner can access the existing
+  `sist.ac.ma` Cloudflare zone and Resend verifies `updates.sist.ac.ma` after
+  its required DNS records are installed. Production was not accessed or
+  changed.
+
 ## V2-12.4 Production readiness closure
 
 Status: `VERIFIED COMPLETE — CLOSED; LIVE RELEASE DEFERRED BY OWNER`.
