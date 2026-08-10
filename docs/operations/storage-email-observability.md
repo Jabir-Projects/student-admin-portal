@@ -34,11 +34,14 @@ application configuration. A successful verifier result is structural evidence,
 not proof of provider identity, sender-domain verification, storage privacy, or
 delivery.
 
-The Vercel schedule in `vercel.json` invokes the protected internal delivery
-route every five minutes. The route returns `404` for absent or invalid scheduler
-credentials, `503` for configuration/dependency failure, and a count-only
-summary after a successful bounded outbox run. It must not be called from a
-browser or exposed as an application API. The existing outbox remains the
+For the Monday/V2 Preview, the Vercel Hobby-compatible schedule in `vercel.json`
+invokes the protected internal delivery route daily at `0 0 * * *` (UTC). This is
+a demo constraint: do not rely on immediate scheduled email dispatch during the
+live demo. Higher-frequency dispatch can be restored later with appropriate
+infrastructure or a Vercel plan. The route returns `404` for absent or invalid
+scheduler credentials, `503` for configuration/dependency failure, and a
+count-only summary after a successful bounded outbox run. It must not be called
+from a browser or exposed as an application API. The existing outbox remains the
 authoritative retry, idempotency, and terminal-failure record.
 
 ## Monitoring and logs

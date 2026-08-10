@@ -6,6 +6,15 @@ Repository work is ready for university demonstration and handoff. Preview is
 deployed and monitored. Production deployment, promotion, migration, and access
 were not performed.
 
+For the Monday/V2 Preview, `vercel.json` uses the Vercel Hobby-compatible daily
+Cron schedule `0 0 * * *` (UTC) for the protected outbox dispatcher. Do not rely
+on immediate scheduled email dispatch during the live demo. The previously
+verified Resend Preview synthetic delivery remains valid infrastructure evidence,
+and the portal's in-app notifications and workflow remain demonstrable.
+Higher-frequency scheduled dispatch can be restored when an appropriate
+infrastructure or Vercel plan is available. Official institutional email/domain
+work remains deferred to V3. Production remains untouched.
+
 `updates.sist.ac.ma` is **DEFERRED — EXTERNAL INSTITUTIONAL DEPENDENCY /
 POST-HANDOFF**. Repository implementation is complete, but an authorized
 institutional DNS owner must access the existing `sist.ac.ma` Cloudflare zone and
@@ -64,6 +73,11 @@ owner-supplied only and are never committed.
    reviewer to demonstrate independent four-eyes approval and Finance export.
 7. Close with `/api/health`, Preview/UptimeRobot evidence, and environment
    separation. Never call the protected scheduler endpoint from a browser.
+
+There is no repository-provided manual or browser-controlled dispatcher trigger
+for the demo. The scheduled route remains internal and requires its protected
+`CRON_SECRET` bearer authorization; do not create or use an unprotected
+workaround.
 
 ## Handoff scope and limitations
 
