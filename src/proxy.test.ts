@@ -52,6 +52,7 @@ describe("capability-scoped staff proxy", () => {
     "/staff/staff-capabilities",
     "/staff/imports/registry",
     "/staff/finance/imports",
+    "/staff/documents",
   ])("redirects a capability-less STAFF actor from %s", async (pathname) => {
     mocks.authorizeSession.mockResolvedValue(true);
     mocks.getStaff.mockResolvedValue(activeStaff([]));

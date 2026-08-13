@@ -27,6 +27,14 @@ const protectedRouteCapabilities = [
     pathname: "/staff/finance/imports",
     capabilities: ["FINANCE_IMPORT_UPLOAD", "FINANCE_IMPORT_APPROVE"],
   },
+  {
+    pathname: "/staff/documents",
+    capabilities: [
+      "GENERATE_DOCUMENTS",
+      "RELEASE_DOCUMENTS",
+      "REVOKE_DOCUMENTS",
+    ],
+  },
 ] as const;
 
 function capabilitiesForPathname(pathname: string) {
