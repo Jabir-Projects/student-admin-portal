@@ -41,10 +41,17 @@ describe("server-only architecture", () => {
     expect(source(relativePath)).toMatch(/^import "server-only";/u);
   });
 
-  it("keeps Proxy and lightweight auth configuration database-free", () => {
-    const proxySource = `${source("src/proxy.ts")}\n${source("src/auth.config.ts")}`;
-    expect(proxySource).not.toMatch(
+  it("keeps auth configuration lightweight and Proxy database access bounded", () => {
+    const authConfigSource = source("src/auth.config.ts");
+    const proxySource = source("src/proxy.ts");
+
+    expect(authConfigSource).not.toMatch(
       /@\/server|prisma|adapter-pg|argon2|password|registration|account-management|DATABASE_URL|DIRECT_URL/iu,
+    );
+    expect(proxySource).toContain("@\/server\/auth\/dal.node");
+    expect(proxySource).toContain("@\/server\/db");
+    expect(proxySource).not.toMatch(
+      /prisma|adapter-pg|argon2|password|registration|account-management|DATABASE_URL|DIRECT_URL/iu,
     );
   });
 

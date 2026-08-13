@@ -15,11 +15,11 @@ import {
 
 import { StudentRegistryStatus } from "@/generated/prisma/client";
 import {
-  hasIsolatedTestDatabaseConfiguration,
-  openVerifiedIsolatedTestDatabase,
-  type VerifiedIsolatedTestDatabase,
-  type VerifiedTestDatabaseClient,
-} from "@/test/isolated-database.node";
+  hasPackageBTestDatabaseConfiguration,
+  tryOpenPackageBTestDatabase,
+  type VerifiedPackageBTestDatabase,
+  type VerifiedPackageBTestDatabaseClient,
+} from "@/test/package-b-test-database.node";
 import {
   reconcileStudentRegistryDemo,
   studentRegistryDemoFixtures,
@@ -27,11 +27,11 @@ import {
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
 
-const hasSafeIsolatedDatabase = hasIsolatedTestDatabaseConfiguration(
+const hasSafeIsolatedDatabase = hasPackageBTestDatabaseConfiguration(
   process.env,
 );
-let verifiedDatabase: VerifiedIsolatedTestDatabase | undefined;
-let isolatedDb: VerifiedTestDatabaseClient | undefined;
+let verifiedDatabase: VerifiedPackageBTestDatabase | undefined;
+let isolatedDb: VerifiedPackageBTestDatabaseClient | undefined;
 const reservedFixtureIds = [
   "90000000-0000-4000-8000-000000000001",
   "90000000-0000-4000-8000-000000000002",
@@ -103,8 +103,10 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
   "Student Registry demo reconciliation (requires a distinct, prepared TEST_DATABASE_URL)",
   () => {
     beforeAll(async () => {
-      verifiedDatabase = await openVerifiedIsolatedTestDatabase(process.env);
-      isolatedDb = verifiedDatabase.database;
+      const readiness = await tryOpenPackageBTestDatabase(process.env);
+      if (!readiness.ready) return;
+      verifiedDatabase = readiness.verified;
+      isolatedDb = readiness.verified.database;
     });
 
     beforeEach(cleanupReservedFixtures);
@@ -165,10 +167,9 @@ describe.skipIf(!hasSafeIsolatedDatabase)(
         where: { id: linkedFixtureId },
         data: { registeredUserId: linkedUserId, registeredAt: linkedAt },
       });
-      const linkedUserCountBeforeReconciliation =
-        await isolatedDb!.user.count({
-          where: { id: linkedUserId, email: linkedUserEmail },
-        });
+      const linkedUserCountBeforeReconciliation = await isolatedDb!.user.count({
+        where: { id: linkedUserId, email: linkedUserEmail },
+      });
 
       await expect(
         reconcileStudentRegistryDemo(isolatedDb!, "test"),

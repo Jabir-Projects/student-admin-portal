@@ -25,9 +25,11 @@ import {
   checksumDocument,
 } from "@/server/documents/storage.node";
 import {
-  openVerifiedIsolatedTestDatabase,
-  type VerifiedIsolatedTestDatabase,
-} from "@/test/isolated-database.node";
+  hasPackageBTestDatabaseConfiguration,
+  tryOpenPackageBTestDatabase,
+  type VerifiedPackageBTestDatabase,
+  type VerifiedPackageBTestDatabaseClient,
+} from "@/test/package-b-test-database.node";
 
 dotenv.config({ path: ".env.local", quiet: true });
 
@@ -52,8 +54,11 @@ const claims = (actorId: string, claimedSessionVersion = 0) => ({
 const storage = new InMemoryDocumentStorage();
 let lastGenerationFailure:
   { name: string; code?: string; constraint?: string } | undefined;
-let verified: VerifiedIsolatedTestDatabase;
-let db: PrismaClient;
+const hasSafeIsolatedDatabase = hasPackageBTestDatabaseConfiguration(
+  process.env,
+);
+let verified: VerifiedPackageBTestDatabase | undefined;
+let db!: VerifiedPackageBTestDatabaseClient;
 
 async function fakePdf(input: { referenceNumber: string; version: number }) {
   const bytes = new TextEncoder().encode(
@@ -111,8 +116,11 @@ async function generate(requestId: string, actorId = ids.all) {
 }
 
 beforeAll(async () => {
-  verified = await openVerifiedIsolatedTestDatabase(process.env);
-  db = verified.database;
+  if (!hasSafeIsolatedDatabase) return;
+  const readiness = await tryOpenPackageBTestDatabase(process.env);
+  if (!readiness.ready) return;
+  verified = readiness.verified;
+  db = readiness.verified.database;
   await db.user.createMany({
     data: [
       {
@@ -214,10 +222,12 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await verified.close();
+  await verified?.close();
 });
 
-describe("V2-9 PostgreSQL document lifecycle", () => {
+const documentDescribe = hasSafeIsolatedDatabase ? describe : describe.skip;
+
+documentDescribe("V2-9 PostgreSQL document lifecycle", () => {
   it("verifies the current document catalog after later migrations", async () => {
     const [migrationCounts, enums, constraints, indexes, foreignKeys] =
       await Promise.all([

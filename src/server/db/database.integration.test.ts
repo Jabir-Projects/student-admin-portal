@@ -3,25 +3,39 @@
 import path from "node:path";
 
 import dotenv from "dotenv";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { createPrismaClient } from "@/server/db/factory.node";
+import {
+  hasPackageBTestDatabaseConfiguration,
+  tryOpenPackageBTestDatabase,
+  type VerifiedPackageBTestDatabase,
+  type VerifiedPackageBTestDatabaseClient,
+} from "@/test/package-b-test-database.node";
 
 dotenv.config({
   path: path.resolve(process.cwd(), ".env.local"),
   quiet: true,
 });
 
-const testDatabaseUrl = process.env.TEST_DATABASE_URL;
-const isolatedClient = testDatabaseUrl
-  ? createPrismaClient(testDatabaseUrl)
-  : undefined;
+const hasSafeIsolatedDatabase = hasPackageBTestDatabaseConfiguration(
+  process.env,
+);
+let verifiedDatabase: VerifiedPackageBTestDatabase | undefined;
+let isolatedClient: VerifiedPackageBTestDatabaseClient | undefined;
 
-afterAll(async () => {
-  await isolatedClient?.$disconnect();
+beforeAll(async () => {
+  if (!hasSafeIsolatedDatabase) return;
+  const readiness = await tryOpenPackageBTestDatabase(process.env);
+  if (!readiness.ready) return;
+  verifiedDatabase = readiness.verified;
+  isolatedClient = readiness.verified.database;
 });
 
-describe.skipIf(!isolatedClient)("isolated test database", () => {
+afterAll(async () => {
+  await verifiedDatabase?.close();
+});
+
+describe.skipIf(!hasSafeIsolatedDatabase)("isolated test database", () => {
   it("reads the converted STAFF fixture baseline without mutating data", async () => {
     const users = await isolatedClient!.user.findMany({
       where: {

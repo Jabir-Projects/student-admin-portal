@@ -35,10 +35,11 @@ import {
   listAvailableRequestCategories,
 } from "@/server/student-portal/reads.node";
 import {
-  openVerifiedIsolatedTestDatabase,
-  type VerifiedIsolatedTestDatabase,
-  type VerifiedTestDatabaseClient,
-} from "@/test/isolated-database.node";
+  hasPackageBTestDatabaseConfiguration,
+  tryOpenPackageBTestDatabase,
+  type VerifiedPackageBTestDatabase,
+  type VerifiedPackageBTestDatabaseClient,
+} from "@/test/package-b-test-database.node";
 
 dotenv.config({ path: ".env.local", quiet: true });
 
@@ -48,8 +49,11 @@ const profileId = "99600000-0000-4000-8000-000000000003";
 const categoryId = "99600000-0000-4000-8000-000000000004";
 const staffClaims = { actorId: staffId, claimedSessionVersion: 0 } as const;
 const studentClaims = { actorId: studentId, claimedSessionVersion: 0 } as const;
-let verified: VerifiedIsolatedTestDatabase | undefined;
-let database: VerifiedTestDatabaseClient | undefined;
+const hasSafeIsolatedDatabase = hasPackageBTestDatabaseConfiguration(
+  process.env,
+);
+let verified: VerifiedPackageBTestDatabase | undefined;
+let database: VerifiedPackageBTestDatabaseClient | undefined;
 
 function dbOrSkip(context: TestContext) {
   if (database) return database;
@@ -59,7 +63,7 @@ function dbOrSkip(context: TestContext) {
 }
 
 async function createRequest(
-  db: VerifiedTestDatabaseClient,
+  db: VerifiedPackageBTestDatabaseClient,
   status: "SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "READY" = "SUBMITTED",
 ) {
   const request = await db.documentRequest.create({
@@ -98,12 +102,11 @@ function databaseWithAuditFailure(db: PrismaClient): PrismaClient {
 }
 
 beforeAll(async () => {
-  try {
-    verified = await openVerifiedIsolatedTestDatabase(process.env);
-  } catch {
-    return;
-  }
-  database = verified.database;
+  if (!hasSafeIsolatedDatabase) return;
+  const readiness = await tryOpenPackageBTestDatabase(process.env);
+  if (!readiness.ready) return;
+  verified = readiness.verified;
+  database = readiness.verified.database;
   await database.user.upsert({
     where: { id: staffId },
     create: {
@@ -338,7 +341,7 @@ describe.sequential("V2-6 PostgreSQL administration workflows", () => {
     const db = dbOrSkip(context);
     if (!db) return;
     const requestId = await createRequest(db);
-    const independent = await openVerifiedIsolatedTestDatabase(process.env);
+    const independent = await verified!.openIndependentConnection();
     try {
       const results = await Promise.all([
         transitionRequestAsActor(
@@ -346,11 +349,7 @@ describe.sequential("V2-6 PostgreSQL administration workflows", () => {
           { requestId, targetStatus: "UNDER_REVIEW" },
           db,
         ),
-        cancelRequestAsActor(
-          studentClaims,
-          { requestId },
-          independent.database,
-        ),
+        cancelRequestAsActor(studentClaims, { requestId }, independent),
       ]);
       expect(results.filter((result) => result.ok)).toHaveLength(1);
       expect(results.filter((result) => !result.ok)).toHaveLength(1);
@@ -358,7 +357,7 @@ describe.sequential("V2-6 PostgreSQL administration workflows", () => {
         db.requestStatusHistory.count({ where: { requestId } }),
       ).resolves.toBe(2);
     } finally {
-      await independent.close();
+      await verified!.closeIndependentConnection(independent);
     }
   });
 

@@ -23,11 +23,11 @@ import {
 import { PROGRAMS } from "@/features/auth/constants";
 import { registerStudentWithDatabase } from "@/server/auth/registration.node";
 import {
-  hasIsolatedTestDatabaseConfiguration,
-  openVerifiedIsolatedTestDatabase,
-  type VerifiedIsolatedTestDatabase,
-  type VerifiedTestDatabaseClient,
-} from "@/test/isolated-database.node";
+  hasPackageBTestDatabaseConfiguration,
+  tryOpenPackageBTestDatabase,
+  type VerifiedPackageBTestDatabase,
+  type VerifiedPackageBTestDatabaseClient,
+} from "@/test/package-b-test-database.node";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local"), quiet: true });
 
@@ -40,7 +40,7 @@ const internalRegistryOptions = {
   verificationMode: "INTERNAL_REGISTRY",
   runtime: "test",
 } as const;
-const hasSafeIsolatedDatabase = hasIsolatedTestDatabaseConfiguration(
+const hasSafeIsolatedDatabase = hasPackageBTestDatabaseConfiguration(
   process.env,
 );
 const transactionOptions = { maxWait: 5_000, timeout: 15_000 } as const;
@@ -108,8 +108,8 @@ type Settled<Result> =
   | { status: "fulfilled"; value: Result }
   | { status: "rejected"; reason: unknown };
 
-let verifiedDatabase: VerifiedIsolatedTestDatabase | undefined;
-let isolatedDb: VerifiedTestDatabaseClient | undefined;
+let verifiedDatabase: VerifiedPackageBTestDatabase | undefined;
+let isolatedDb: VerifiedPackageBTestDatabaseClient | undefined;
 
 function createDeferred(): Deferred {
   let resolve = () => {};
@@ -399,8 +399,10 @@ isolatedDescribe(
   "INTERNAL_REGISTRY registration against strongly verified PostgreSQL",
   () => {
     beforeAll(async () => {
-      verifiedDatabase = await openVerifiedIsolatedTestDatabase(process.env);
-      isolatedDb = verifiedDatabase.database;
+      const readiness = await tryOpenPackageBTestDatabase(process.env);
+      if (!readiness.ready) return;
+      verifiedDatabase = readiness.verified;
+      isolatedDb = readiness.verified.database;
     });
 
     beforeEach(cleanupScenarioRecords);
@@ -589,9 +591,8 @@ isolatedDescribe(
         const fixture = registryFixture("0004");
         const payload = registrationPayload("0004");
         const barrier = createTwoPartyBarrier();
-        const secondVerified = await openVerifiedIsolatedTestDatabase(
-          process.env,
-        );
+        const secondDatabase =
+          await verifiedDatabase!.openIndependentConnection();
         try {
           const auditBaseline = await captureAuditBaseline([
             userIds.raceOne,
@@ -609,7 +610,7 @@ isolatedDescribe(
             ),
             registerStudentWithDatabase(
               payload,
-              databaseWithHooks(secondVerified.database, {
+              databaseWithHooks(secondDatabase, {
                 userId: userIds.raceTwo,
                 afterSuccessfulPrecheck: barrier.arrive,
               }),
@@ -660,7 +661,7 @@ isolatedDescribe(
           ]);
         } finally {
           barrier.release();
-          await secondVerified.close();
+          await verifiedDatabase!.closeIndependentConnection(secondDatabase);
         }
       },
       integrationTestTimeout,
@@ -673,7 +674,7 @@ isolatedDescribe(
         const payload = registrationPayload("0005");
         const claimReached = createDeferred();
         const releaseClaim = createDeferred();
-        const coordinator = await openVerifiedIsolatedTestDatabase(process.env);
+        const coordinator = await verifiedDatabase!.openIndependentConnection();
         try {
           const auditBaseline = await captureAuditBaseline([userIds.claimLoss]);
           await isolatedDb!.studentRegistry.create({ data: fixture });
@@ -701,7 +702,7 @@ isolatedDescribe(
               "Registry claim interception timed out.",
             );
             await withTimeout(
-              coordinator.database.studentRegistry.update({
+              coordinator.studentRegistry.update({
                 where: { id: fixture.id },
                 data: { status: StudentRegistryStatus.INACTIVE },
               }),
@@ -737,7 +738,7 @@ isolatedDescribe(
           await expectSafeAuditDelta(auditBaseline, 0, []);
         } finally {
           releaseClaim.resolve();
-          await coordinator.close();
+          await verifiedDatabase!.closeIndependentConnection(coordinator);
         }
       },
       integrationTestTimeout,
