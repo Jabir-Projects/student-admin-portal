@@ -14,6 +14,8 @@ import {
 } from "@/server/account-management/reads";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 
+export const dynamic = "force-dynamic";
+
 type StudentAccountSearchParams = Promise<
   Record<string, string | string[] | undefined>
 >;

@@ -8,6 +8,9 @@ import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
 import { listFinanceImportBatches } from "@/server/finance/reads.node";
 import { uploadFinanceImportAction } from "../actions";
+
+export const dynamic = "force-dynamic";
+
 export default async function FinanceImportsPage({
   searchParams,
 }: {

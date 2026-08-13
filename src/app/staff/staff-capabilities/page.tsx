@@ -14,6 +14,8 @@ import {
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { TriangleAlert } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 type StaffAccountSearchParams = Promise<
   Record<string, string | string[] | undefined>
 >;

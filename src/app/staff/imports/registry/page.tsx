@@ -11,6 +11,8 @@ import { db } from "@/server/db";
 import { listRegistryImportBatches } from "@/server/registry-import/reads.node";
 import { uploadRegistryImportAction } from "./actions";
 
+export const dynamic = "force-dynamic";
+
 const feedbackMessages: Record<string, string> = {
   INVALID_FILE: "The file could not be accepted. Check its format and limits.",
   DUPLICATE_FILE: "This exact file has already been uploaded.",
