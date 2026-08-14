@@ -1,4 +1,4 @@
-import { Bell, Search } from "lucide-react";
+import { Bell } from "lucide-react";
 import Link from "next/link";
 
 import { SistBrand } from "@/components/brand/sist-brand";
@@ -13,6 +13,7 @@ import type { StaffNavigationItem } from "@/features/staff/navigation";
 type StaffShellProps = {
   children: React.ReactNode;
   fullName: string;
+  staffLabel: string;
   navigation: readonly StaffNavigationItem[];
   notificationPreview: readonly {
     id: string;
@@ -33,8 +34,14 @@ function StaffBranding() {
   );
 }
 
-export function AccountMenu({ fullName }: { fullName: string }) {
-  return <PortalAccountMenu fullName={fullName} roleLabel="STAFF" />;
+export function AccountMenu({
+  fullName,
+  staffLabel = "Staff member",
+}: {
+  fullName: string;
+  staffLabel?: string;
+}) {
+  return <PortalAccountMenu fullName={fullName} roleLabel={staffLabel} />;
 }
 
 function NotificationsPanel({
@@ -67,9 +74,7 @@ function NotificationsPanel({
           <span className="bg-secondary text-secondary-foreground mx-auto inline-flex size-11 items-center justify-center rounded-full">
             <Bell aria-hidden="true" className="size-5" />
           </span>
-          <p className="mt-4 text-sm font-semibold">
-            No notification data loaded
-          </p>
+          <p className="mt-4 text-sm font-semibold">No notifications yet</p>
           <p className="text-muted-foreground mt-1 text-sm leading-6">
             Request activity assigned to your account will appear here.
           </p>
@@ -103,6 +108,7 @@ function NotificationsPanel({
 export function StaffShell({
   children,
   fullName,
+  staffLabel,
   navigation,
   notificationPreview,
 }: StaffShellProps) {
@@ -119,7 +125,7 @@ export function StaffShell({
       </aside>
 
       <header className="bg-staff-topbar border-border sticky top-0 z-30 border-b backdrop-blur">
-        <div className="grid min-h-20 grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 sm:px-6 xl:px-8">
+        <div className="flex min-h-20 items-center justify-between gap-3 px-4 py-3 sm:px-6 xl:px-8">
           <MobileStaffNavigation
             branding={<StaffBranding />}
             items={navigation}
@@ -127,20 +133,7 @@ export function StaffShell({
           <p className="text-sist-navy-dark hidden text-xl font-semibold lg:block">
             Dashboard
           </p>
-          <div className="relative col-span-3 row-start-2 lg:col-span-1 lg:row-start-1 lg:ml-5">
-            <Search
-              aria-hidden="true"
-              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2"
-            />
-            <input
-              aria-label="Staff portal search is not available yet"
-              className="border-input bg-background text-muted-foreground h-11 w-full rounded-lg border pr-4 pl-10 text-sm disabled:cursor-not-allowed disabled:opacity-100"
-              disabled
-              placeholder="Search will be available in a later package"
-              type="search"
-            />
-          </div>
-          <div className="col-start-3 row-start-1 flex items-center justify-end gap-2">
+          <div className="ml-auto flex items-center justify-end gap-2">
             <Link
               aria-label="Go to notifications panel"
               className="border-border bg-background text-foreground hover:bg-muted inline-flex size-10 items-center justify-center rounded-lg border transition-colors"
@@ -150,7 +143,7 @@ export function StaffShell({
               <Bell aria-hidden="true" className="size-4.5" />
             </Link>
             <ThemeToggle />
-            <AccountMenu fullName={fullName} />
+            <AccountMenu fullName={fullName} staffLabel={staffLabel} />
           </div>
         </div>
       </header>

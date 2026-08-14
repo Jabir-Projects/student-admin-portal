@@ -105,7 +105,10 @@ export default async function StudentPage() {
               <Link href="/student/requests/new">Request a document</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/student/requests">View request history</Link>
+              <Link href="/student/requests">My requests</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/student/documents">My documents</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/student/profile">View profile</Link>

@@ -118,14 +118,14 @@ const staffNavigation: readonly StaffNavigationItem[] = [
     label: "Profile",
     href: "/staff/profile",
     icon: "profile",
-    available: false,
+    available: true,
   },
   {
     key: "settings",
     label: "Settings",
     href: "/staff/settings",
     icon: "settings",
-    available: false,
+    available: true,
   },
 ];
 

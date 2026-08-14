@@ -12,10 +12,10 @@ function getInitials(fullName: string): string {
 
 export function AccountMenu({
   fullName,
-  roleLabel,
+  roleLabel = "Staff member",
 }: {
   fullName: string;
-  roleLabel: "STAFF" | "STUDENT";
+  roleLabel?: string;
 }) {
   return (
     <details className="group relative">

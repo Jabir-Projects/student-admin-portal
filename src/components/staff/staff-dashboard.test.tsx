@@ -16,6 +16,7 @@ function dashboardData(
 ): StaffDashboardData {
   return {
     fullName: "Sara Ali",
+    capabilities: [],
     capabilitySummary: { status: "available", assignedCount: 0 },
     pendingStudents: { status: "hidden" },
     ...overrides,

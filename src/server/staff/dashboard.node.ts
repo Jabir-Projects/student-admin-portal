@@ -3,6 +3,7 @@ import "server-only";
 import type { PrismaClient } from "@/generated/prisma/client";
 import type { SessionAuthorizationFailure } from "@/features/auth/session-ux";
 import type { ActorSessionClaims } from "@/server/auth/capabilities";
+import type { CapabilityValue } from "@/features/auth/constants";
 import { getStaffShellUserByClaims } from "@/server/auth/dal.node";
 import {
   loadPendingStudentAccountSummary,
@@ -11,6 +12,7 @@ import {
 
 export type StaffDashboardData = {
   fullName: string;
+  capabilities: readonly CapabilityValue[];
   capabilitySummary: {
     status: "available";
     assignedCount: number;
@@ -87,6 +89,7 @@ export async function getStaffDashboardDataByClaims(
       ok: true,
       data: {
         fullName,
+        capabilities: actor.user.capabilities,
         capabilitySummary: { status: "available", assignedCount },
         pendingStudents: { status: "hidden" },
         requestCounts: requestSummary,
@@ -99,6 +102,7 @@ export async function getStaffDashboardDataByClaims(
     ok: true,
     data: {
       fullName,
+      capabilities: actor.user.capabilities,
       capabilitySummary: { status: "available", assignedCount },
       pendingStudents:
         pending.totalCount === 0

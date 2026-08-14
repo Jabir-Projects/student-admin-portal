@@ -5,11 +5,7 @@ const themeInitializationScript = `
 (function () {
   try {
     var storedTheme = localStorage.getItem("sist-color-theme");
-    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    var theme =
-      storedTheme === "dark" || (storedTheme !== "light" && prefersDark)
-        ? "dark"
-        : "light";
+    var theme = storedTheme === "dark" ? "dark" : "light";
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
   } catch (_) {}

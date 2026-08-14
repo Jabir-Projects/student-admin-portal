@@ -19,6 +19,7 @@ export type AuthorizedUser = {
 
 export type StaffShellUser = Omit<AuthorizedUser, "role"> & {
   role: "STAFF";
+  email: string;
   capabilities: readonly CapabilityValue[];
 };
 
@@ -97,6 +98,7 @@ export async function getStaffShellUserByClaims(
       status: true,
       sessionVersion: true,
       fullName: true,
+      email: true,
       capabilityAssignments: { select: { capability: true } },
     },
   });
@@ -122,6 +124,7 @@ export async function getStaffShellUserByClaims(
       status: "ACTIVE",
       sessionVersion: user.sessionVersion,
       fullName: user.fullName,
+      email: user.email,
       capabilities: user.capabilityAssignments.map(
         ({ capability }) => capability,
       ),

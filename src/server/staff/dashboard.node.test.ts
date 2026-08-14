@@ -107,6 +107,7 @@ describe("STAFF dashboard data contract", () => {
       ok: true,
       data: {
         fullName: "Sara Ali",
+        capabilities: [],
         capabilitySummary: { status: "available", assignedCount: 0 },
         pendingStudents: { status: "hidden" },
         requestCounts: { status: "hidden" },
@@ -220,6 +221,7 @@ describe("STAFF dashboard data contract", () => {
       data: {
         fullName: "Sara Ali",
         capabilitySummary: { status: "available", assignedCount: 1 },
+        capabilities: ["MANAGE_STUDENT_ACCOUNTS"],
         pendingStudents: { status: "empty", totalCount: 0, records: [] },
         requestCounts: { status: "hidden" },
       },

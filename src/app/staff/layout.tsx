@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { StaffShell } from "@/components/staff/staff-shell";
+import { getStaffIdentityLabel } from "@/features/staff/identity";
 import { getVisibleStaffNavigation } from "@/features/staff/navigation";
 import { requireStaffShellUser } from "@/server/auth/dal";
 import { db } from "@/server/db";
@@ -27,6 +28,7 @@ export default async function StaffLayout({
   return (
     <StaffShell
       fullName={fullName}
+      staffLabel={getStaffIdentityLabel(user.capabilities)}
       navigation={navigation}
       notificationPreview={notificationPreview}
     >

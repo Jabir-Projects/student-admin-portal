@@ -7,7 +7,7 @@ import {
   FilePlus2,
   FileText,
   LayoutDashboard,
-  Search,
+  Settings,
   UserRound,
 } from "lucide-react";
 
@@ -34,6 +34,7 @@ function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
     { href: "/student/documents", label: "My Documents", icon: FileText },
     { href: "/student/requests/new", label: "New Request", icon: FilePlus2 },
     { href: "/student/profile", label: "Profile", icon: UserRound },
+    { href: "/student/settings", label: "Settings", icon: Settings },
   ];
   return (
     <nav aria-label="Student navigation">
@@ -72,7 +73,7 @@ export function StudentShell({
       </aside>
 
       <header className="bg-header-surface border-border sticky top-0 z-30 border-b backdrop-blur">
-        <div className="grid min-h-20 grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 sm:px-6 xl:px-8">
+        <div className="flex min-h-20 items-center justify-between gap-3 px-4 py-3 sm:px-6 xl:px-8">
           <MobileNavigationDrawer
             branding={<StudentBranding />}
             closeLabel="Close student navigation"
@@ -85,20 +86,7 @@ export function StudentShell({
           <p className="text-sist-navy-dark hidden text-xl font-semibold lg:block">
             Dashboard
           </p>
-          <div className="relative col-span-3 row-start-2 lg:col-span-1 lg:row-start-1 lg:ml-5">
-            <Search
-              aria-hidden="true"
-              className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2"
-            />
-            <input
-              aria-label="Student portal search is not available yet"
-              className="border-input bg-background text-muted-foreground h-11 w-full rounded-lg border pr-4 pl-10 text-sm disabled:cursor-not-allowed disabled:opacity-100"
-              disabled
-              placeholder="Search will be available with student services"
-              type="search"
-            />
-          </div>
-          <div className="col-start-3 row-start-1 flex items-center justify-end gap-2">
+          <div className="ml-auto flex items-center justify-end gap-2">
             <Link
               aria-label="View notifications"
               className="border-border bg-background text-foreground hover:bg-muted inline-flex size-10 items-center justify-center rounded-lg border transition-colors"

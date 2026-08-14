@@ -5,9 +5,15 @@ import {
   UserRoundCheck,
   UsersRound,
 } from "lucide-react";
+import Link from "next/link";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ACADEMIC_YEARS } from "@/features/auth/constants";
+import {
+  getStaffIdentityLabel,
+  getStaffQuickActions,
+} from "@/features/staff/identity";
+import { Button } from "@/components/ui/button";
 import type { StaffDashboardData } from "@/server/staff/dashboard.node";
 
 const submittedAtFormatter = new Intl.DateTimeFormat("en-GB", {
@@ -136,6 +142,7 @@ export function StaffDashboard({ data }: { data: StaffDashboardData }) {
   const hasCapabilities = data.capabilitySummary.assignedCount > 0;
   const pendingIsVisible = data.pendingStudents.status !== "hidden";
   const requestCounts = data.requestCounts ?? { status: "hidden" as const };
+  const quickActions = getStaffQuickActions(data.capabilities);
 
   return (
     <div className="space-y-6">
@@ -175,7 +182,7 @@ export function StaffDashboard({ data }: { data: StaffDashboardData }) {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground text-sm leading-6">
-              Current database assignments for your active STAFF account.
+              Capabilities currently assigned to your account.
             </p>
           </CardContent>
         </Card>
@@ -203,6 +210,35 @@ export function StaffDashboard({ data }: { data: StaffDashboardData }) {
           </Card>
         ) : null}
       </section>
+
+      {quickActions.length > 0 ? (
+        <section aria-labelledby="quick-actions-heading">
+          <div className="mb-3">
+            <h2
+              className="text-sist-navy-dark text-xl font-semibold"
+              id="quick-actions-heading"
+            >
+              Quick actions
+            </h2>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Common tasks available to your{" "}
+              {getStaffIdentityLabel(data.capabilities)} account.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {quickActions.map((action) => (
+              <Button
+                asChild
+                className="justify-start"
+                key={action.href}
+                variant="outline"
+              >
+                <Link href={action.href}>{action.label}</Link>
+              </Button>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {requestCounts.status === "available" ? (
         <section aria-labelledby="request-counts-heading">
