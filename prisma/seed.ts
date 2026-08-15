@@ -18,6 +18,16 @@ const ids = {
   staffReviewer: "10000000-0000-4000-8000-000000000004",
   studentOne: "10000000-0000-4000-8000-000000000002",
   studentTwo: "10000000-0000-4000-8000-000000000003",
+  pendingStudent: "10000000-0000-4000-8000-000000000005",
+  disabledStudent: "10000000-0000-4000-8000-000000000006",
+  financeStaff: "10000000-0000-4000-8000-000000000007",
+  financeUploader: "10000000-0000-4000-8000-000000000008",
+  financeApprover: "10000000-0000-4000-8000-000000000009",
+  documentsStaff: "10000000-0000-4000-8000-000000000010",
+  registryUploader: "10000000-0000-4000-8000-000000000011",
+  registryApprover: "10000000-0000-4000-8000-000000000012",
+  auditStaff: "10000000-0000-4000-8000-000000000013",
+  zeroCapabilityStaff: "10000000-0000-4000-8000-000000000014",
   profileOne: "20000000-0000-4000-8000-000000000001",
   profileTwo: "20000000-0000-4000-8000-000000000002",
   categoryTranscript: "30000000-0000-4000-8000-000000000001",
@@ -71,107 +81,258 @@ async function reusablePasswordHash(
   return hashPassword(password);
 }
 
+type DemoUser = {
+  id: string;
+  email: string;
+  fullName: string;
+  role: UserRole;
+  status: AccountStatus;
+  preferredLanguage: PreferredLanguage;
+  capabilities: readonly Capability[];
+};
+
+async function reconcileDemoUser(
+  user: DemoUser,
+  password: string,
+): Promise<string> {
+  const existing = await prisma.user.findUnique({
+    where: { email: user.email },
+    select: { id: true },
+  });
+  const userId = existing?.id ?? user.id;
+  const passwordHash = await reusablePasswordHash(userId, password);
+
+  if (existing) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        fullName: user.fullName,
+        passwordHash,
+        role: user.role,
+        status: user.status,
+        preferredLanguage: user.preferredLanguage,
+      },
+    });
+  } else {
+    const conflictingId = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { email: true },
+    });
+    if (conflictingId) {
+      throw new Error("Development demo fixture identifier conflict.");
+    }
+    await prisma.user.create({
+      data: {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        passwordHash,
+        role: user.role,
+        status: user.status,
+        preferredLanguage: user.preferredLanguage,
+        createdAt: seededAt,
+      },
+    });
+  }
+
+  await prisma.userCapabilityAssignment.deleteMany({
+    where: { userId },
+  });
+  if (user.capabilities.length > 0) {
+    await prisma.userCapabilityAssignment.createMany({
+      data: user.capabilities.map((capability) => ({
+        userId,
+        capability,
+        grantedById: null,
+      })),
+    });
+  }
+
+  return userId;
+}
+
+async function reconcileStudentProfile(profile: {
+  id: string;
+  userId: string;
+  studentNumber: string;
+  program: string;
+  academicYear: AcademicYear;
+}): Promise<void> {
+  const existing = await prisma.studentProfile.findUnique({
+    where: { id: profile.id },
+    select: { userId: true },
+  });
+  if (existing && existing.userId !== profile.userId) {
+    throw new Error("Development student profile ownership conflict.");
+  }
+  await prisma.studentProfile.upsert({
+    where: { id: profile.id },
+    create: { ...profile, createdAt: seededAt },
+    update: profile,
+  });
+}
+
 async function seed(): Promise<void> {
-  const staffPassword = requireSeedPassword("SEED_STAFF_PASSWORD");
-  const staffReviewerPassword = requireSeedPassword(
-    "SEED_STAFF_REVIEWER_PASSWORD",
-  );
-  const studentOnePassword = requireSeedPassword("SEED_STUDENT_ONE_PASSWORD");
-  const studentTwoPassword = requireSeedPassword("SEED_STUDENT_TWO_PASSWORD");
-  const users = [
+  const demoPassword = requireSeedPassword("SEED_DEMO_PASSWORD");
+  const users: readonly DemoUser[] = [
     {
       id: ids.staff,
       email: "admin.dev@example.invalid",
       fullName: "Development Staff Manager",
-      passwordHash: await reusablePasswordHash(ids.staff, staffPassword),
       role: UserRole.STAFF,
       status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: Object.values(Capability),
     },
     {
       id: ids.staffReviewer,
       email: "reviewer.dev@example.invalid",
       fullName: "Development Staff Reviewer",
-      passwordHash: await reusablePasswordHash(
-        ids.staffReviewer,
-        staffReviewerPassword,
-      ),
       role: UserRole.STAFF,
       status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [
+        Capability.REGISTRY_IMPORT_APPROVE,
+        Capability.FINANCE_IMPORT_APPROVE,
+      ],
     },
     {
       id: ids.studentOne,
       email: "student.one.dev@example.invalid",
       fullName: "Development Student One",
-      passwordHash: await reusablePasswordHash(
-        ids.studentOne,
-        studentOnePassword,
-      ),
       role: UserRole.STUDENT,
       status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.FRENCH,
+      capabilities: [],
     },
     {
       id: ids.studentTwo,
       email: "student.two.dev@example.invalid",
       fullName: "Development Student Two",
-      passwordHash: await reusablePasswordHash(
-        ids.studentTwo,
-        studentTwoPassword,
-      ),
       role: UserRole.STUDENT,
       status: AccountStatus.ACTIVE,
       preferredLanguage: PreferredLanguage.ARABIC,
+      capabilities: [],
     },
-  ] as const;
+    {
+      id: ids.pendingStudent,
+      email: "student.pending.dev@example.invalid",
+      fullName: "Development Pending Student",
+      role: UserRole.STUDENT,
+      status: AccountStatus.PENDING_APPROVAL,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [],
+    },
+    {
+      id: ids.disabledStudent,
+      email: "student.disabled.dev@example.invalid",
+      fullName: "Development Disabled Student",
+      role: UserRole.STUDENT,
+      status: AccountStatus.DISABLED,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [],
+    },
+    {
+      id: ids.financeStaff,
+      email: "finance.staff.dev@example.invalid",
+      fullName: "Development Finance Staff",
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [
+        Capability.FINANCE_IMPORT_UPLOAD,
+        Capability.FINANCE_IMPORT_APPROVE,
+        Capability.VIEW_FINANCE,
+      ],
+    },
+    {
+      id: ids.financeUploader,
+      email: "finance.upload.dev@example.invalid",
+      fullName: "Development Finance Uploader",
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [Capability.FINANCE_IMPORT_UPLOAD],
+    },
+    {
+      id: ids.financeApprover,
+      email: "finance.approve.dev@example.invalid",
+      fullName: "Development Finance Approver",
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [
+        Capability.FINANCE_IMPORT_APPROVE,
+        Capability.VIEW_FINANCE,
+      ],
+    },
+    {
+      id: ids.documentsStaff,
+      email: "documents.staff.dev@example.invalid",
+      fullName: "Development Documents and Requests Staff",
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [
+        Capability.GENERATE_DOCUMENTS,
+        Capability.RELEASE_DOCUMENTS,
+        Capability.REVOKE_DOCUMENTS,
+      ],
+    },
+    {
+      id: ids.registryUploader,
+      email: "registry.upload.dev@example.invalid",
+      fullName: "Development Registry Uploader",
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [Capability.REGISTRY_IMPORT_UPLOAD],
+    },
+    {
+      id: ids.registryApprover,
+      email: "registry.approve.dev@example.invalid",
+      fullName: "Development Registry Approver",
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [Capability.REGISTRY_IMPORT_APPROVE],
+    },
+    {
+      id: ids.auditStaff,
+      email: "audit.staff.dev@example.invalid",
+      fullName: "Development Audit Staff",
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [Capability.VIEW_AUDIT_LOG],
+    },
+    {
+      id: ids.zeroCapabilityStaff,
+      email: "zero.staff.dev@example.invalid",
+      fullName: "Development Zero-Capability Staff",
+      role: UserRole.STAFF,
+      status: AccountStatus.ACTIVE,
+      preferredLanguage: PreferredLanguage.ENGLISH,
+      capabilities: [],
+    },
+  ];
 
+  const userIds = new Map<string, string>();
   for (const user of users) {
-    await prisma.user.upsert({
-      where: { id: user.id },
-      create: { ...user, createdAt: seededAt },
-      update: user,
-    });
-  }
-
-  for (const capability of Object.values(Capability)) {
-    await prisma.userCapabilityAssignment.upsert({
-      where: {
-        userId_capability: { userId: ids.staff, capability },
-      },
-      create: { userId: ids.staff, capability, grantedById: null },
-      update: {},
-    });
-  }
-
-  for (const capability of [
-    Capability.REGISTRY_IMPORT_APPROVE,
-    Capability.FINANCE_IMPORT_APPROVE,
-  ] as const) {
-    await prisma.userCapabilityAssignment.upsert({
-      where: {
-        userId_capability: { userId: ids.staffReviewer, capability },
-      },
-      create: {
-        userId: ids.staffReviewer,
-        capability,
-        grantedById: null,
-      },
-      update: {},
-    });
+    userIds.set(user.email, await reconcileDemoUser(user, demoPassword));
   }
 
   const profiles = [
     {
       id: ids.profileOne,
-      userId: ids.studentOne,
+      userId: userIds.get("student.one.dev@example.invalid")!,
       studentNumber: "DEV-STUDENT-001",
       program: "BAC+3 Software Engineering",
       academicYear: AcademicYear.YEAR_2,
     },
     {
       id: ids.profileTwo,
-      userId: ids.studentTwo,
+      userId: userIds.get("student.two.dev@example.invalid")!,
       studentNumber: "DEV-STUDENT-002",
       program: "BAC+5 Business Administration",
       academicYear: AcademicYear.YEAR_3,
@@ -179,11 +340,7 @@ async function seed(): Promise<void> {
   ] as const;
 
   for (const profile of profiles) {
-    await prisma.studentProfile.upsert({
-      where: { id: profile.id },
-      create: { ...profile, createdAt: seededAt },
-      update: profile,
-    });
+    await reconcileStudentProfile(profile);
   }
 
   const categories = [

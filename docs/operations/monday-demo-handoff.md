@@ -25,8 +25,8 @@ The Preview `onboarding@resend.dev` sender is a test sender only.
 
 Use a dedicated disposable local or approved isolated demo PostgreSQL database;
 never use Preview or Production data. Copy `.env.example` to ignored `.env.local`
-and provide local/approved database URLs, `AUTH_SECRET`, and four unique
-12+-character `SEED_*_PASSWORD` values outside Git.
+and provide local/approved database URLs, `AUTH_SECRET`, and one unique
+12+-character `SEED_DEMO_PASSWORD` value outside Git.
 
 With the non-Production target confirmed:
 
