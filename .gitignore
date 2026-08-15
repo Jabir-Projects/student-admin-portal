@@ -15,6 +15,9 @@
 /playwright-report
 /test-results
 
+# local browser tooling
+/.playwright-cli/
+
 # next.js
 /.next/
 /out/
@@ -41,6 +44,9 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# local preview maintenance
+/scripts/preview/activate-preview-demo-accounts.local.mjs
 
 # typescript
 *.tsbuildinfo
