@@ -20,7 +20,7 @@ export function NotificationBell({
       aria-label={
         hasUnread ? `Notifications — ${unreadLabel} unread` : "Notifications"
       }
-      className="border-border bg-background text-foreground hover:bg-muted relative inline-flex size-10 items-center justify-center rounded-lg border transition-colors"
+      className="border-border bg-background text-foreground hover:bg-muted relative inline-flex size-10 shrink-0 items-center justify-center rounded-lg border transition-colors"
       href={href}
       title={
         hasUnread ? `${unreadLabel} unread notifications` : "Notifications"

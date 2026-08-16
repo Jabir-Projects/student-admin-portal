@@ -40,7 +40,7 @@ export function AccountMenu({
           className="text-muted-foreground hidden size-4 transition-transform group-open:rotate-180 sm:block"
         />
       </summary>
-      <div className="bg-card absolute top-[calc(100%+0.5rem)] right-0 z-50 w-64 rounded-lg border p-2 shadow-xl">
+      <div className="bg-card absolute top-[calc(100%+0.5rem)] right-0 z-50 w-64 max-w-[calc(100vw-1.5rem)] rounded-lg border p-2 shadow-xl">
         <div className="border-border border-b px-3 py-2">
           <p className="truncate text-sm font-semibold">{fullName}</p>
           <p className="text-muted-foreground mt-0.5 text-xs">

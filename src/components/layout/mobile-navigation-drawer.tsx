@@ -103,11 +103,11 @@ export function MobileNavigationDrawer({
             ref={drawerRef}
             aria-label={drawerLabel}
             aria-modal="true"
-            className="bg-sidebar absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] flex-col overflow-hidden border-r p-5 shadow-2xl"
+            className="bg-sidebar absolute inset-y-0 left-0 flex w-[min(20rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-hidden border-r p-4 shadow-2xl sm:p-5"
             id={id}
             role="dialog"
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 items-start justify-between gap-3 sm:gap-4">
               {branding}
               <button
                 aria-label={closeLabel}

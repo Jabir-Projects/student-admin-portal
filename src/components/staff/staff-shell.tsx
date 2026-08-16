@@ -117,7 +117,7 @@ export function StaffShell({
   unreadNotificationCount,
 }: StaffShellProps) {
   return (
-    <div className="bg-background min-h-screen lg:pl-64">
+    <div className="bg-background min-h-screen min-w-0 lg:pl-64">
       <aside className="bg-staff-sidebar fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r px-5 py-6 lg:flex">
         <StaffBranding />
         <div className="mt-8 min-h-0 flex-1 overflow-y-auto">
@@ -129,13 +129,13 @@ export function StaffShell({
       </aside>
 
       <header className="bg-staff-topbar border-border sticky top-0 z-30 border-b backdrop-blur">
-        <div className="flex min-h-20 items-center justify-between gap-3 px-4 py-3 sm:px-6 xl:px-8">
+        <div className="flex min-h-20 min-w-0 items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6 xl:px-8">
           <MobileStaffNavigation
             branding={<StaffBranding />}
             items={navigation}
           />
           <PortalPageTitle portal="staff" />
-          <div className="ml-auto flex items-center justify-end gap-2">
+          <div className="ml-auto flex min-w-0 shrink-0 items-center justify-end gap-2">
             <NotificationBell
               href="/staff/notifications"
               unreadCount={unreadNotificationCount}
@@ -146,7 +146,7 @@ export function StaffShell({
         </div>
       </header>
 
-      <div className="grid gap-6 px-4 py-6 sm:px-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:px-8">
+      <div className="grid min-w-0 gap-5 px-3 py-5 sm:gap-6 sm:px-6 sm:py-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:px-8">
         <main className="min-w-0">{children}</main>
         <NotificationsPanel notifications={notificationPreview} />
       </div>

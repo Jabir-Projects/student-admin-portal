@@ -84,7 +84,7 @@ export function StudentShell({
   unreadNotificationCount: number;
 }) {
   return (
-    <div className="bg-background min-h-screen lg:pl-64">
+    <div className="bg-background min-h-screen min-w-0 lg:pl-64">
       <aside className="bg-sidebar fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r px-5 py-6 lg:flex">
         <StudentBranding />
         <div className="mt-8 min-h-0 flex-1 overflow-y-auto">
@@ -93,7 +93,7 @@ export function StudentShell({
       </aside>
 
       <header className="bg-header-surface border-border sticky top-0 z-30 border-b backdrop-blur">
-        <div className="flex min-h-20 items-center justify-between gap-3 px-4 py-3 sm:px-6 xl:px-8">
+        <div className="flex min-h-20 min-w-0 items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6 xl:px-8">
           <MobileNavigationDrawer
             branding={<StudentBranding />}
             closeLabel="Close student navigation"
@@ -104,7 +104,7 @@ export function StudentShell({
             {(close) => <StudentNavigation onNavigate={close} />}
           </MobileNavigationDrawer>
           <PortalPageTitle portal="student" />
-          <div className="ml-auto flex items-center justify-end gap-2">
+          <div className="ml-auto flex min-w-0 shrink-0 items-center justify-end gap-2">
             <NotificationBell
               href="/student/notifications"
               unreadCount={unreadNotificationCount}
@@ -115,7 +115,10 @@ export function StudentShell({
         </div>
       </header>
 
-      <main className="min-w-0 px-4 py-6 sm:px-6 xl:px-8" id="main-content">
+      <main
+        className="min-w-0 px-3 py-5 sm:px-6 sm:py-6 xl:px-8"
+        id="main-content"
+      >
         {children}
       </main>
     </div>
