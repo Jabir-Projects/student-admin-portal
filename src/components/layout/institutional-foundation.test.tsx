@@ -131,4 +131,27 @@ describe("student authenticated shell", () => {
     ).not.toBeInTheDocument();
     expect(opener).toHaveFocus();
   });
+
+  it("renders student navigation in the shared viewport-height drawer", async () => {
+    const user = userEvent.setup();
+    render(
+      <StudentShell fullName="SIST Test Student" unreadNotificationCount={0}>
+        <h1>Student dashboard</h1>
+      </StudentShell>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Open student navigation" }),
+    );
+
+    const drawer = screen.getByRole("dialog", {
+      name: "Student navigation drawer",
+    });
+    expect(drawer).toHaveClass("fixed", "h-dvh", "z-10", "bg-sidebar");
+    expect(
+      within(drawer).getByRole("navigation", { name: "Student navigation" }),
+    ).toBeInTheDocument();
+    expect(within(drawer).queryByRole("heading", { name: "Student dashboard" }))
+      .not.toBeInTheDocument();
+  });
 });

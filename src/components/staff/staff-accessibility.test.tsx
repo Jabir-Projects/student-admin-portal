@@ -83,6 +83,37 @@ describe("mobile STAFF navigation accessibility", () => {
     ).not.toBeInTheDocument();
     expect(opener).toHaveFocus();
   });
+
+  it("keeps the mobile navigation inside an opaque viewport-height drawer", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <p>Dashboard content outside the drawer</p>
+        <MobileStaffNavigation
+          branding={<span>SIST staff portal</span>}
+          items={navigation}
+        />
+      </>,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Open staff navigation" }),
+    );
+
+    const drawer = screen.getByRole("dialog", {
+      name: "Staff navigation drawer",
+    });
+    expect(drawer).toHaveClass("fixed", "h-dvh", "z-10", "bg-sidebar");
+    expect(within(drawer).getByRole("navigation", { name: "Staff navigation" }))
+      .toBeInTheDocument();
+    expect(within(drawer).queryByText("Dashboard content outside the drawer"))
+      .not.toBeInTheDocument();
+    expect(drawer.querySelector(".overflow-y-auto")).toHaveClass(
+      "min-h-0",
+      "flex-1",
+      "overscroll-contain",
+    );
+  });
 });
 
 describe("STAFF account menu accessibility", () => {

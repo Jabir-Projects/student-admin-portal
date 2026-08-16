@@ -95,7 +95,7 @@ export function MobileNavigationDrawer({
         <div className="fixed inset-0 z-50 lg:hidden">
           <button
             aria-label={closeLabel}
-            className="bg-sidebar-overlay absolute inset-0"
+            className="bg-sidebar-overlay fixed inset-0 z-0"
             onClick={close}
             type="button"
           />
@@ -103,11 +103,11 @@ export function MobileNavigationDrawer({
             ref={drawerRef}
             aria-label={drawerLabel}
             aria-modal="true"
-            className="bg-sidebar absolute inset-y-0 left-0 flex w-[min(20rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-hidden border-r p-4 shadow-2xl sm:p-5"
+            className="bg-sidebar fixed top-0 left-0 z-10 flex h-dvh w-[min(20rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-hidden border-r p-4 shadow-2xl sm:p-5"
             id={id}
             role="dialog"
           >
-            <div className="flex min-w-0 items-start justify-between gap-3 sm:gap-4">
+            <div className="flex shrink-0 min-w-0 items-start justify-between gap-3 sm:gap-4">
               {branding}
               <button
                 aria-label={closeLabel}
@@ -118,7 +118,7 @@ export function MobileNavigationDrawer({
                 <X aria-hidden="true" className="size-5" />
               </button>
             </div>
-            <div className="mt-7 min-h-0 flex-1 overflow-y-auto">
+            <div className="mt-7 min-h-0 flex-1 overflow-y-auto overscroll-contain">
               {children(close)}
             </div>
           </aside>
