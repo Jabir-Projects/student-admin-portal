@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ClipboardList,
-  Bell,
   FilePlus2,
   FileText,
   LayoutDashboard,
@@ -16,6 +15,7 @@ import { SistBrand } from "@/components/brand/sist-brand";
 import { AccountMenu } from "@/components/layout/account-menu";
 import { MobileNavigationDrawer } from "@/components/layout/mobile-navigation-drawer";
 import { PortalPageTitle } from "@/components/layout/portal-page-title";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/staff/theme-toggle";
 
 function StudentBranding() {
@@ -77,9 +77,11 @@ function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
 export function StudentShell({
   children,
   fullName,
+  unreadNotificationCount,
 }: {
   children: React.ReactNode;
   fullName: string;
+  unreadNotificationCount: number;
 }) {
   return (
     <div className="bg-background min-h-screen lg:pl-64">
@@ -103,14 +105,10 @@ export function StudentShell({
           </MobileNavigationDrawer>
           <PortalPageTitle portal="student" />
           <div className="ml-auto flex items-center justify-end gap-2">
-            <Link
-              aria-label="View notifications"
-              className="border-border bg-background text-foreground hover:bg-muted inline-flex size-10 items-center justify-center rounded-lg border transition-colors"
+            <NotificationBell
               href="/student/notifications"
-              title="Notifications"
-            >
-              <Bell aria-hidden="true" className="size-4.5" />
-            </Link>
+              unreadCount={unreadNotificationCount}
+            />
             <ThemeToggle />
             <AccountMenu fullName={fullName} roleLabel="STUDENT" />
           </div>

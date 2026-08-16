@@ -16,6 +16,7 @@ export async function markStaffNotificationReadAction(formData: FormData) {
     db,
   );
   revalidatePath("/staff/notifications");
+  revalidatePath("/staff", "layout");
 }
 export async function markAllStaffNotificationsReadAction() {
   await markAllOwnedNotificationsRead(
@@ -24,4 +25,5 @@ export async function markAllStaffNotificationsReadAction() {
     db,
   );
   revalidatePath("/staff/notifications");
+  revalidatePath("/staff", "layout");
 }

@@ -82,7 +82,7 @@ describe("shared system states", () => {
 describe("student authenticated shell", () => {
   it("links only implemented V2-5 routes and keeps sign out outside navigation", () => {
     render(
-      <StudentShell fullName="SIST Test Student">
+      <StudentShell fullName="SIST Test Student" unreadNotificationCount={0}>
         <h1>Student dashboard</h1>
       </StudentShell>,
     );
@@ -113,7 +113,7 @@ describe("student authenticated shell", () => {
   it("closes on Escape and restores opener focus", async () => {
     const user = userEvent.setup();
     render(
-      <StudentShell fullName="SIST Test Student">
+      <StudentShell fullName="SIST Test Student" unreadNotificationCount={0}>
         <h1>Student dashboard</h1>
       </StudentShell>,
     );

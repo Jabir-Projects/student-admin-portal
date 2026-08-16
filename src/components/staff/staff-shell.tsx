@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SistBrand } from "@/components/brand/sist-brand";
 import { AccountMenu as PortalAccountMenu } from "@/components/layout/account-menu";
 import { PortalPageTitle } from "@/components/layout/portal-page-title";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 import {
   DesktopStaffNavigation,
   MobileStaffNavigation,
@@ -22,6 +23,7 @@ type StaffShellProps = {
     readAt: Date | null;
     createdAt: Date;
   }[];
+  unreadNotificationCount: number;
 };
 
 function StaffBranding() {
@@ -112,6 +114,7 @@ export function StaffShell({
   staffLabel,
   navigation,
   notificationPreview,
+  unreadNotificationCount,
 }: StaffShellProps) {
   return (
     <div className="bg-background min-h-screen lg:pl-64">
@@ -133,14 +136,10 @@ export function StaffShell({
           />
           <PortalPageTitle portal="staff" />
           <div className="ml-auto flex items-center justify-end gap-2">
-            <Link
-              aria-label="Go to notifications panel"
-              className="border-border bg-background text-foreground hover:bg-muted inline-flex size-10 items-center justify-center rounded-lg border transition-colors"
+            <NotificationBell
               href="/staff/notifications"
-              title="Notifications"
-            >
-              <Bell aria-hidden="true" className="size-4.5" />
-            </Link>
+              unreadCount={unreadNotificationCount}
+            />
             <ThemeToggle />
             <AccountMenu fullName={fullName} staffLabel={staffLabel} />
           </div>

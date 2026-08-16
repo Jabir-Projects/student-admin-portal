@@ -17,6 +17,7 @@ export async function markStudentNotificationReadAction(formData: FormData) {
     db,
   );
   revalidatePath("/student/notifications");
+  revalidatePath("/student", "layout");
 }
 
 export async function markAllStudentNotificationsReadAction() {
@@ -26,4 +27,5 @@ export async function markAllStudentNotificationsReadAction() {
     db,
   );
   revalidatePath("/student/notifications");
+  revalidatePath("/student", "layout");
 }

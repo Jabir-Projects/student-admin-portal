@@ -13,6 +13,13 @@ import { authorizeStudentActor } from "@/server/student-portal/authorization.nod
 
 type PortalRole = "STUDENT" | "STAFF";
 
+export async function countUnreadNotificationsForUser(
+  userId: string,
+  database: PrismaClient,
+): Promise<number> {
+  return database.notification.count({ where: { userId, readAt: null } });
+}
+
 async function authorizeNotificationActor(
   claims: ActorSessionClaims,
   role: PortalRole,

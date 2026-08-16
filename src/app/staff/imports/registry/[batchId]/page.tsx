@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfirmActionDialog } from "@/components/ui/confirm-action-dialog";
 import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
