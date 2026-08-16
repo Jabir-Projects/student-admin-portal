@@ -2,7 +2,7 @@
 
 import { submitStudentRequestAction } from "@/app/student/requests/new/actions";
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
-import { Button } from "@/components/ui/button";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 
 const fieldClass =
   "bg-background border-input min-h-11 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring";
@@ -11,8 +11,7 @@ const submissionErrorMessages: Readonly<Record<string, string>> = {
   CATEGORY_UNAVAILABLE: "That request category is no longer available.",
   DISABLED_ACCOUNT:
     "Your session cannot submit this request. Sign in again or contact administration.",
-  DUPLICATE_OPEN_REQUEST:
-    "You already have an open request in this category.",
+  DUPLICATE_OPEN_REQUEST: "You already have an open request in this category.",
   INACTIVE_ACCOUNT:
     "Your session cannot submit this request. Sign in again or contact administration.",
   INVALID_INPUT: "Check the request fields and try again.",
@@ -40,7 +39,6 @@ export function RequestForm({
   selectedCategoryId?: string;
   result?: string;
 }) {
-  const pending = false;
   return (
     <form
       action={submitStudentRequestAction}
@@ -109,9 +107,9 @@ export function RequestForm({
           {getSubmissionErrorMessage(result)}
         </FeedbackBanner>
       ) : null}
-      <Button className="w-fit" type="submit">
-        {pending ? "Submitting…" : "Submit request"}
-      </Button>
+      <PendingSubmitButton className="w-fit" pendingLabel="Submitting…">
+        Submit request
+      </PendingSubmitButton>
     </form>
   );
 }

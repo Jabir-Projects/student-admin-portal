@@ -4,7 +4,7 @@ import { loginAction } from "@/app/login/actions";
 import { getSafeCallbackPath } from "@/auth.config";
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { AuthPanel, AuthShell } from "@/components/layout/auth-shell";
-import { Button } from "@/components/ui/button";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { getLoginPresentationMessage } from "@/features/auth/session-ux";
 
 const inputClass =
@@ -85,9 +85,9 @@ export default async function LoginPage({
                 {errorMessage}
               </FeedbackBanner>
             ) : null}
-            <Button className="w-full" type="submit">
+            <PendingSubmitButton className="w-full" pendingLabel="Signing in…">
               Sign in
-            </Button>
+            </PendingSubmitButton>
             <p className="text-muted-foreground text-center text-sm">
               Need a student account?{" "}
               <Link

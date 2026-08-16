@@ -6,9 +6,12 @@ import {
   revokeDocumentAction,
 } from "@/app/staff/documents/actions";
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
+import { SystemState } from "@/components/feedback/system-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmActionDialog } from "@/components/ui/confirm-action-dialog";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { formatEnumLabel } from "@/features/student-portal/schemas";
 import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
@@ -61,9 +64,11 @@ export default async function StaffDocumentsPage({
         </CardHeader>
         <CardContent className="space-y-3">
           {result.eligibleRequests.length === 0 ? (
-            <p className="text-muted-foreground">
-              No requests are ready for document generation.
-            </p>
+            <SystemState
+              description="This is normal until a request reaches the Ready status."
+              kind="empty"
+              title="No requests are ready for document generation"
+            />
           ) : (
             result.eligibleRequests.map((request) => (
               <div
@@ -83,7 +88,9 @@ export default async function StaffDocumentsPage({
                 {capabilities.has("GENERATE_DOCUMENTS") ? (
                   <form action={generateDocumentAction}>
                     <input name="requestId" type="hidden" value={request.id} />
-                    <Button type="submit">Generate PDF</Button>
+                    <PendingSubmitButton pendingLabel="Generating…">
+                      Generate PDF
+                    </PendingSubmitButton>
                   </form>
                 ) : null}
               </div>
@@ -97,9 +104,11 @@ export default async function StaffDocumentsPage({
         </CardHeader>
         <CardContent className="space-y-4">
           {result.artifacts.length === 0 ? (
-            <p className="text-muted-foreground">
-              No document artifacts have been generated.
-            </p>
+            <SystemState
+              description="Generated document versions will appear here for controlled release and revocation."
+              kind="empty"
+              title="No document versions yet"
+            />
           ) : (
             result.artifacts.map((artifact) => (
               <article className="rounded-lg border p-4" key={artifact.id}>
@@ -135,48 +144,63 @@ export default async function StaffDocumentsPage({
                   ) : null}
                   {artifact.status === "GENERATED" &&
                   capabilities.has("RELEASE_DOCUMENTS") ? (
-                    <form action={releaseDocumentAction}>
-                      <input
-                        name="artifactId"
-                        type="hidden"
-                        value={artifact.id}
-                      />
-                      <Button size="sm" type="submit">
-                        Release
-                      </Button>
-                    </form>
+                    <ConfirmActionDialog
+                      action={releaseDocumentAction}
+                      confirmLabel="Release document"
+                      description="The student will be able to download this document version after release."
+                      formFields={
+                        <input
+                          name="artifactId"
+                          type="hidden"
+                          value={artifact.id}
+                        />
+                      }
+                      pendingLabel="Releasing…"
+                      title="Release this document?"
+                      triggerLabel="Release"
+                      triggerSize="sm"
+                    />
                   ) : null}
                 </div>
                 {artifact.status === "RELEASED" &&
                 capabilities.has("REVOKE_DOCUMENTS") ? (
-                  <form
-                    action={revokeDocumentAction}
-                    className="mt-4 flex flex-col gap-2 sm:flex-row"
-                  >
-                    <input
-                      name="artifactId"
-                      type="hidden"
-                      value={artifact.id}
+                  <div className="mt-4">
+                    <ConfirmActionDialog
+                      action={revokeDocumentAction}
+                      confirmLabel="Revoke document"
+                      description="This immediately removes the student's access to this document version."
+                      formFields={
+                        <>
+                          <input
+                            name="artifactId"
+                            type="hidden"
+                            value={artifact.id}
+                          />
+                          <label
+                            className="grid gap-1.5"
+                            htmlFor={`reason-${artifact.id}`}
+                          >
+                            <span className="text-sm font-semibold">
+                              Revocation reason
+                            </span>
+                            <input
+                              className="border-input bg-background h-10 min-w-0 rounded-md border px-3"
+                              id={`reason-${artifact.id}`}
+                              maxLength={1000}
+                              minLength={3}
+                              name="reason"
+                              required
+                            />
+                          </label>
+                        </>
+                      }
+                      pendingLabel="Revoking…"
+                      title="Revoke this document?"
+                      triggerLabel="Revoke"
+                      triggerSize="sm"
+                      triggerVariant="destructive"
                     />
-                    <label
-                      className="sr-only"
-                      htmlFor={`reason-${artifact.id}`}
-                    >
-                      Revocation reason
-                    </label>
-                    <input
-                      className="border-input bg-background h-10 min-w-0 flex-1 rounded-md border px-3"
-                      id={`reason-${artifact.id}`}
-                      maxLength={1000}
-                      minLength={3}
-                      name="reason"
-                      placeholder="Internal revocation reason"
-                      required
-                    />
-                    <Button size="sm" type="submit" variant="destructive">
-                      Revoke
-                    </Button>
-                  </form>
+                  </div>
                 ) : null}
               </article>
             ))

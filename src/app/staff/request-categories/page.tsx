@@ -3,14 +3,12 @@ import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { listRequestCategories } from "@/server/administration/reads.node";
 import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
-import {
-  setCategoryActiveAction,
-  updateCategoryAction,
-} from "./actions";
+import { setCategoryActiveAction, updateCategoryAction } from "./actions";
 
 export default async function RequestCategoriesPage({
   searchParams,
@@ -107,9 +105,13 @@ export default async function RequestCategoriesPage({
                         name="description"
                       />
                     </label>
-                    <Button className="w-fit" type="submit" variant="outline">
+                    <PendingSubmitButton
+                      className="w-fit"
+                      pendingLabel="Saving…"
+                      variant="outline"
+                    >
                       Save changes
-                    </Button>
+                    </PendingSubmitButton>
                   </form>
                   <form
                     action={setCategoryActiveAction}
@@ -125,12 +127,14 @@ export default async function RequestCategoriesPage({
                       type="hidden"
                       value={category.isActive ? "false" : "true"}
                     />
-                    <Button
-                      type="submit"
+                    <PendingSubmitButton
+                      pendingLabel={
+                        category.isActive ? "Deactivating…" : "Activating…"
+                      }
                       variant={category.isActive ? "destructive" : "default"}
                     >
                       {category.isActive ? "Deactivate" : "Activate"}
-                    </Button>
+                    </PendingSubmitButton>
                   </form>
                 </CardContent>
               </Card>

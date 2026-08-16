@@ -5,6 +5,7 @@ import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
@@ -91,9 +92,9 @@ export default async function RegistryImportsPage({
                 Required headers: student_number, full_name, email, program,
                 academic_year. Optional status defaults to ACTIVE.
               </p>
-              <Button className="w-fit" type="submit">
+              <PendingSubmitButton className="w-fit" pendingLabel="Uploading…">
                 Upload and validate
-              </Button>
+              </PendingSubmitButton>
             </form>
           </CardContent>
         </Card>

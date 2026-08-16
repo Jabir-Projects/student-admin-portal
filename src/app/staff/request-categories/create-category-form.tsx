@@ -49,7 +49,7 @@ export function CreateCategoryForm() {
         />
       </label>
       <Button className="w-fit" disabled={isPending} type="submit">
-        Create category
+        {isPending ? "Creating…" : "Create category"}
       </Button>
     </form>
   );

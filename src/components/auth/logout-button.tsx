@@ -1,12 +1,16 @@
 import { logoutAction } from "@/app/logout/actions";
-import { Button } from "@/components/ui/button";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 
 export function LogoutButton() {
   return (
     <form action={logoutAction}>
-      <Button size="sm" type="submit" variant="outline">
+      <PendingSubmitButton
+        pendingLabel="Logging out…"
+        size="sm"
+        variant="outline"
+      >
         Sign out
-      </Button>
+      </PendingSubmitButton>
     </form>
   );
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
-import { Button } from "@/components/ui/button";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { ACADEMIC_YEARS, PROGRAMS } from "@/features/auth/constants";
 import { registrationSchema } from "@/features/auth/schemas";
 
@@ -159,7 +159,9 @@ export function RegistrationForm({ action, error }: RegistrationFormProps) {
         </FeedbackBanner>
       ) : null}
       <div className="flex items-center gap-4 sm:col-span-2">
-        <Button type="submit">Submit registration</Button>
+        <PendingSubmitButton pendingLabel="Registering…">
+          Submit registration
+        </PendingSubmitButton>
         <Link className="text-primary text-sm hover:underline" href="/login">
           Return to login
         </Link>

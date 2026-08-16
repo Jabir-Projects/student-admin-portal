@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
+import { ConfirmActionDialog } from "@/components/ui/confirm-action-dialog";
 import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
@@ -126,39 +127,46 @@ export default async function FinanceStudentPage({
                     <td className="px-3 py-2">{row.description || "—"}</td>
                     <td className="px-3 py-2">
                       {canReverse && row.entryType !== "REVERSAL" ? (
-                        <form
+                        <ConfirmActionDialog
                           action={reverseFinanceTransactionAction}
-                          className="grid gap-2"
-                        >
-                          <input
-                            name="studentId"
-                            type="hidden"
-                            value={studentId}
-                          />
-                          <input
-                            name="transactionId"
-                            type="hidden"
-                            value={row.id}
-                          />
-                          <label
-                            className="sr-only"
-                            htmlFor={`reason-${row.id}`}
-                          >
-                            Reversal reason
-                          </label>
-                          <input
-                            className="border-input bg-background min-h-9 rounded border px-2"
-                            id={`reason-${row.id}`}
-                            maxLength={1000}
-                            minLength={3}
-                            name="reason"
-                            placeholder="Reason"
-                            required
-                          />
-                          <Button size="sm" type="submit" variant="destructive">
-                            Reverse
-                          </Button>
-                        </form>
+                          confirmLabel="Reverse transaction"
+                          description="This creates an offsetting ledger entry and cannot be undone through this screen."
+                          formFields={
+                            <>
+                              <input
+                                name="studentId"
+                                type="hidden"
+                                value={studentId}
+                              />
+                              <input
+                                name="transactionId"
+                                type="hidden"
+                                value={row.id}
+                              />
+                              <label
+                                className="grid gap-1.5"
+                                htmlFor={`reason-${row.id}`}
+                              >
+                                <span className="text-sm font-semibold">
+                                  Reversal reason
+                                </span>
+                                <input
+                                  className="border-input bg-background min-h-9 rounded border px-2"
+                                  id={`reason-${row.id}`}
+                                  maxLength={1000}
+                                  minLength={3}
+                                  name="reason"
+                                  required
+                                />
+                              </label>
+                            </>
+                          }
+                          pendingLabel="Reversing…"
+                          title="Reverse this transaction?"
+                          triggerLabel="Reverse"
+                          triggerSize="sm"
+                          triggerVariant="destructive"
+                        />
                       ) : (
                         "—"
                       )}

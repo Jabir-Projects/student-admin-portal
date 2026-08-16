@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   ClipboardList,
   Bell,
@@ -14,6 +15,7 @@ import {
 import { SistBrand } from "@/components/brand/sist-brand";
 import { AccountMenu } from "@/components/layout/account-menu";
 import { MobileNavigationDrawer } from "@/components/layout/mobile-navigation-drawer";
+import { PortalPageTitle } from "@/components/layout/portal-page-title";
 import { ThemeToggle } from "@/components/staff/theme-toggle";
 
 function StudentBranding() {
@@ -28,6 +30,7 @@ function StudentBranding() {
 }
 
 function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
   const items = [
     { href: "/student", label: "Dashboard", icon: LayoutDashboard },
     { href: "/student/requests", label: "My Requests", icon: ClipboardList },
@@ -39,18 +42,33 @@ function StudentNavigation({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <nav aria-label="Student navigation">
       <ul className="space-y-1">
-        {items.map(({ href, icon: Icon, label }) => (
-          <li key={href}>
-            <Link
-              className="text-sidebar-foreground hover:bg-sidebar-active hover:text-sidebar-active-foreground flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium"
-              href={href}
-              onClick={onNavigate}
-            >
-              <Icon aria-hidden="true" className="size-5" />
-              {label}
-            </Link>
-          </li>
-        ))}
+        {items.map(({ href, icon: Icon, label }) => {
+          const isCurrent =
+            pathname === href ||
+            (href !== "/student" &&
+              pathname.startsWith(`${href}/`) &&
+              !(
+                href === "/student/requests" &&
+                pathname === "/student/requests/new"
+              ));
+          return (
+            <li key={href}>
+              <Link
+                aria-current={isCurrent ? "page" : undefined}
+                className={`flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-colors ${
+                  isCurrent
+                    ? "bg-sidebar-active text-sidebar-active-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-active hover:text-sidebar-active-foreground"
+                }`}
+                href={href}
+                onClick={onNavigate}
+              >
+                <Icon aria-hidden="true" className="size-5" />
+                {label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
@@ -83,9 +101,7 @@ export function StudentShell({
           >
             {(close) => <StudentNavigation onNavigate={close} />}
           </MobileNavigationDrawer>
-          <p className="text-sist-navy-dark hidden text-xl font-semibold lg:block">
-            Dashboard
-          </p>
+          <PortalPageTitle portal="student" />
           <div className="ml-auto flex items-center justify-end gap-2">
             <Link
               aria-label="View notifications"

@@ -5,6 +5,8 @@ import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmActionDialog } from "@/components/ui/confirm-action-dialog";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
@@ -127,7 +129,9 @@ export default async function RegistryImportBatchPage({
       {canSubmit ? (
         <form action={submitRegistryImportAction}>
           <input name="batchId" type="hidden" value={batch.id} />
-          <Button type="submit">Submit for approval</Button>
+          <PendingSubmitButton pendingLabel="Submitting…">
+            Submit for approval
+          </PendingSubmitButton>
         </form>
       ) : null}
       {canReview ? (
@@ -136,26 +140,47 @@ export default async function RegistryImportBatchPage({
             <CardTitle>Independent review</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-5 lg:grid-cols-2">
-            <form action={approveRegistryImportAction}>
-              <input name="batchId" type="hidden" value={batch.id} />
-              <Button type="submit">Approve complete batch</Button>
-            </form>
-            <form action={rejectRegistryImportAction} className="grid gap-3">
-              <input name="batchId" type="hidden" value={batch.id} />
-              <label className="grid gap-1.5">
-                <span className="text-sm font-semibold">Rejection reason</span>
-                <textarea
-                  className="border-input bg-background min-h-24 rounded-md border p-3"
-                  maxLength={500}
-                  minLength={3}
-                  name="reason"
-                  required
-                />
-              </label>
-              <Button className="w-fit" type="submit" variant="destructive">
-                Reject batch
-              </Button>
-            </form>
+            <ConfirmActionDialog
+              action={approveRegistryImportAction}
+              confirmLabel="Approve complete batch"
+              description="All valid rows will be applied as one controlled batch."
+              formFields={
+                <input name="batchId" type="hidden" value={batch.id} />
+              }
+              pendingLabel="Approving…"
+              title="Approve this registry batch?"
+              triggerLabel="Approve complete batch"
+            />
+            <ConfirmActionDialog
+              action={rejectRegistryImportAction}
+              confirmLabel="Reject batch"
+              description="This batch will not be applied. Provide the reason for the audit record."
+              formFields={
+                <>
+                  <input name="batchId" type="hidden" value={batch.id} />
+                  <label
+                    className="grid gap-1.5"
+                    htmlFor={`reason-${batch.id}`}
+                  >
+                    <span className="text-sm font-semibold">
+                      Rejection reason
+                    </span>
+                    <textarea
+                      className="border-input bg-background min-h-24 rounded-md border p-3"
+                      id={`reason-${batch.id}`}
+                      maxLength={500}
+                      minLength={3}
+                      name="reason"
+                      required
+                    />
+                  </label>
+                </>
+              }
+              pendingLabel="Rejecting…"
+              title="Reject this registry batch?"
+              triggerLabel="Reject batch"
+              triggerVariant="destructive"
+            />
           </CardContent>
         </Card>
       ) : null}

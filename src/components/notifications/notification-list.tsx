@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 
 type NotificationItem = {
   id: string;
@@ -50,9 +51,13 @@ export function NotificationList({
           </p>
         </div>
         <form action={markAllAction}>
-          <Button disabled={unread === 0} type="submit" variant="outline">
+          <PendingSubmitButton
+            disabled={unread === 0}
+            pendingLabel="Marking all…"
+            variant="outline"
+          >
             Mark all as read
-          </Button>
+          </PendingSubmitButton>
         </form>
       </header>
 
@@ -105,9 +110,9 @@ export function NotificationList({
                         type="hidden"
                         value={notification.id}
                       />
-                      <Button size="sm" type="submit">
+                      <PendingSubmitButton pendingLabel="Marking…" size="sm">
                         Mark read
-                      </Button>
+                      </PendingSubmitButton>
                     </form>
                   )}
                 </div>

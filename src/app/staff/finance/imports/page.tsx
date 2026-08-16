@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { getActorSessionClaims } from "@/server/auth/capabilities";
@@ -54,9 +55,9 @@ export default async function FinanceImportsPage({
                   type="file"
                 />
               </label>
-              <Button className="w-fit" type="submit">
+              <PendingSubmitButton className="w-fit" pendingLabel="Uploading…">
                 Upload and validate
-              </Button>
+              </PendingSubmitButton>
             </form>
           </CardContent>
         </Card>
@@ -97,7 +98,8 @@ export default async function FinanceImportsPage({
           </div>
         ) : (
           <FeedbackBanner tone="info">
-            No finance import batches are available.
+            No finance import batches are available yet. Upload a validated CSV
+            file when you are ready to begin a controlled import.
           </FeedbackBanner>
         )}
       </section>

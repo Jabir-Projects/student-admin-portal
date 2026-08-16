@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { SistBrand } from "@/components/brand/sist-brand";
 import { AccountMenu as PortalAccountMenu } from "@/components/layout/account-menu";
+import { PortalPageTitle } from "@/components/layout/portal-page-title";
 import {
   DesktopStaffNavigation,
   MobileStaffNavigation,
@@ -130,9 +131,7 @@ export function StaffShell({
             branding={<StaffBranding />}
             items={navigation}
           />
-          <p className="text-sist-navy-dark hidden text-xl font-semibold lg:block">
-            Dashboard
-          </p>
+          <PortalPageTitle portal="staff" />
           <div className="ml-auto flex items-center justify-end gap-2">
             <Link
               aria-label="Go to notifications panel"

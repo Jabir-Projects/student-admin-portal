@@ -1,7 +1,68 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SystemState } from "@/components/feedback/system-state";
 import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
 import { db } from "@/server/db";
 import { readStudentFinance } from "@/server/finance/reads.node";
 
-export default async function StudentFinancePage() { const result = await readStudentFinance(await getActorSessionClaims(), db); if (!result.ok) redirectForAuthorizationFailure(result.reason); const label = result.balanceMinor > BigInt(0) ? "Amount owed" : result.balanceMinor < BigInt(0) ? "Credit balance" : "Settled"; return <div className="space-y-6"><header><p className="text-sist-olive-dark text-sm font-semibold">Finance</p><h1 className="text-sist-navy-dark mt-1 text-3xl font-semibold">My finance statement</h1></header><Card><CardHeader><CardTitle>{label}</CardTitle></CardHeader><CardContent><p className="text-2xl font-semibold">{result.balanceMinor.toString()} MAD minor units</p><a className="mt-4 inline-flex min-h-11 items-center rounded-md border px-3" href="/api/student/finance/statement">Download CSV statement</a></CardContent></Card><section aria-labelledby="transactions"><h2 className="text-xl font-semibold" id="transactions">Posted transactions</h2>{result.transactions.length ? <ul className="mt-3 space-y-2">{result.transactions.map((row, index) => <li className="rounded-md border p-3" key={`${row.postedAt.toISOString()}-${index}`}>{row.entryType} · {row.amountMinor.toString()} · {row.billingPeriod} · {row.sourceReference}</li>)}</ul> : <p className="mt-3" role="status">No posted finance transactions are available.</p>}</section></div>; }
+export default async function StudentFinancePage() {
+  const result = await readStudentFinance(await getActorSessionClaims(), db);
+  if (!result.ok) redirectForAuthorizationFailure(result.reason);
+  const label =
+    result.balanceMinor > BigInt(0)
+      ? "Amount owed"
+      : result.balanceMinor < BigInt(0)
+        ? "Credit balance"
+        : "Settled";
+  return (
+    <div className="space-y-6">
+      <header>
+        <p className="text-sist-olive-dark text-sm font-semibold">Finance</p>
+        <h1 className="text-sist-navy-dark mt-1 text-3xl font-semibold">
+          My finance statement
+        </h1>
+      </header>
+      <Card>
+        <CardHeader>
+          <CardTitle>{label}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-2xl font-semibold">
+            {result.balanceMinor.toString()} MAD minor units
+          </p>
+          <a
+            className="mt-4 inline-flex min-h-11 items-center rounded-md border px-3"
+            href="/api/student/finance/statement"
+          >
+            Download CSV statement
+          </a>
+        </CardContent>
+      </Card>
+      <section aria-labelledby="transactions">
+        <h2 className="text-xl font-semibold" id="transactions">
+          Posted transactions
+        </h2>
+        {result.transactions.length ? (
+          <ul className="mt-3 space-y-2">
+            {result.transactions.map((row, index) => (
+              <li
+                className="rounded-md border p-3"
+                key={`${row.postedAt.toISOString()}-${index}`}
+              >
+                {row.entryType} · {row.amountMinor.toString()} ·{" "}
+                {row.billingPeriod} · {row.sourceReference}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <SystemState
+            className="mt-3"
+            description="This is normal when no finance entries have been posted to your account."
+            kind="empty"
+            title="No posted transactions"
+          />
+        )}
+      </section>
+    </div>
+  );
+}

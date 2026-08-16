@@ -1,6 +1,7 @@
 import { ChevronDown, LogOut } from "lucide-react";
 
 import { logoutAction } from "@/app/logout/actions";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 
 function getInitials(fullName: string): string {
   const parts = fullName.split(/\s+/u).filter(Boolean);
@@ -47,13 +48,14 @@ export function AccountMenu({
           </p>
         </div>
         <form action={logoutAction} className="mt-2">
-          <button
-            className="hover:bg-muted flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors"
-            type="submit"
+          <PendingSubmitButton
+            className="hover:bg-muted flex w-full justify-start rounded-md px-3 py-2 text-left"
+            pendingLabel="Logging out…"
+            variant="ghost"
           >
             <LogOut aria-hidden="true" className="size-4" />
             Sign out
-          </button>
+          </PendingSubmitButton>
         </form>
       </div>
     </details>

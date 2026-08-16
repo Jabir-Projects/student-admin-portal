@@ -5,6 +5,8 @@ import { FeedbackBanner } from "@/components/feedback/feedback-banner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmActionDialog } from "@/components/ui/confirm-action-dialog";
+import { PendingSubmitButton } from "@/components/ui/pending-submit-button";
 import { formatEnumLabel } from "@/features/student-portal/schemas";
 import { REQUEST_TRANSITIONS } from "@/server/administration/mutations.node";
 import { getStaffRequestDetails } from "@/server/administration/reads.node";
@@ -155,7 +157,9 @@ export default async function StaffRequestDetailsPage({
                         type="hidden"
                         value={request.id}
                       />
-                      <Button type="submit">Generate PDF</Button>
+                      <PendingSubmitButton pendingLabel="Generating…">
+                        Generate PDF
+                      </PendingSubmitButton>
                     </form>
                   ) : null}
                   <Button asChild variant="outline">
@@ -173,57 +177,72 @@ export default async function StaffRequestDetailsPage({
                 <CardTitle>Process request</CardTitle>
               </CardHeader>
               <CardContent>
-                <form action={transitionRequestAction} className="grid gap-4">
-                  <input name="requestId" type="hidden" value={request.id} />
-                  <label className="grid gap-1.5">
-                    <span className="text-sm font-semibold">Next status</span>
-                    <select
-                      className="border-input bg-background h-10 rounded-md border px-3"
-                      name="targetStatus"
-                      required
-                    >
-                      {nextStatuses.map((status) => (
-                        <option key={status} value={status}>
-                          {formatEnumLabel(status)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="grid gap-1.5">
-                    <span className="text-sm font-semibold">
-                      Rejection reason{" "}
-                      <span className="text-muted-foreground font-normal">
-                        (required when rejecting)
-                      </span>
-                    </span>
-                    <textarea
-                      className="border-input bg-background min-h-24 rounded-md border p-3"
-                      maxLength={1000}
-                      name="rejectionReason"
-                    />
-                  </label>
-                  <label className="grid gap-1.5">
-                    <span className="text-sm font-semibold">Internal note</span>
-                    <textarea
-                      className="border-input bg-background min-h-24 rounded-md border p-3"
-                      maxLength={2000}
-                      name="internalNote"
-                    />
-                  </label>
-                  <label className="grid gap-1.5">
-                    <span className="text-sm font-semibold">
-                      Public student message
-                    </span>
-                    <textarea
-                      className="border-input bg-background min-h-24 rounded-md border p-3"
-                      maxLength={1000}
-                      name="publicMessage"
-                    />
-                  </label>
-                  <Button className="w-fit" type="submit">
-                    Update status
-                  </Button>
-                </form>
+                <ConfirmActionDialog
+                  action={transitionRequestAction}
+                  confirmLabel="Update request"
+                  description="Review the selected status and messages before applying this request transition."
+                  formFields={
+                    <div className="grid gap-4">
+                      <input
+                        name="requestId"
+                        type="hidden"
+                        value={request.id}
+                      />
+                      <label className="grid gap-1.5">
+                        <span className="text-sm font-semibold">
+                          Next status
+                        </span>
+                        <select
+                          className="border-input bg-background h-10 rounded-md border px-3"
+                          name="targetStatus"
+                          required
+                        >
+                          {nextStatuses.map((status) => (
+                            <option key={status} value={status}>
+                              {formatEnumLabel(status)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="grid gap-1.5">
+                        <span className="text-sm font-semibold">
+                          Rejection reason{" "}
+                          <span className="text-muted-foreground font-normal">
+                            (required when rejecting)
+                          </span>
+                        </span>
+                        <textarea
+                          className="border-input bg-background min-h-24 rounded-md border p-3"
+                          maxLength={1000}
+                          name="rejectionReason"
+                        />
+                      </label>
+                      <label className="grid gap-1.5">
+                        <span className="text-sm font-semibold">
+                          Internal note
+                        </span>
+                        <textarea
+                          className="border-input bg-background min-h-24 rounded-md border p-3"
+                          maxLength={2000}
+                          name="internalNote"
+                        />
+                      </label>
+                      <label className="grid gap-1.5">
+                        <span className="text-sm font-semibold">
+                          Public student message
+                        </span>
+                        <textarea
+                          className="border-input bg-background min-h-24 rounded-md border p-3"
+                          maxLength={1000}
+                          name="publicMessage"
+                        />
+                      </label>
+                    </div>
+                  }
+                  pendingLabel="Updating…"
+                  title="Update this request?"
+                  triggerLabel="Update status"
+                />
               </CardContent>
             </Card>
           ) : (
@@ -257,9 +276,9 @@ export default async function StaffRequestDetailsPage({
                     required
                   />
                 </label>
-                <Button className="w-fit" type="submit">
+                <PendingSubmitButton className="w-fit" pendingLabel="Adding…">
                   Add message
-                </Button>
+                </PendingSubmitButton>
               </form>
             </CardContent>
           </Card>

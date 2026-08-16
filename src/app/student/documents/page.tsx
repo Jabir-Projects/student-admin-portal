@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SystemState } from "@/components/feedback/system-state";
 import { formatEnumLabel } from "@/features/student-portal/schemas";
 import { getActorSessionClaims } from "@/server/auth/capabilities";
 import { redirectForAuthorizationFailure } from "@/server/auth/session-routing";
@@ -35,11 +36,15 @@ export default async function StudentDocumentsPage({
       </header>
       <div className="grid gap-4 md:grid-cols-2">
         {result.artifacts.length === 0 ? (
-          <Card className="md:col-span-2">
-            <CardContent className="text-muted-foreground pt-6">
-              No digital documents are available.
-            </CardContent>
-          </Card>
+          <div className="md:col-span-2">
+            <SystemState
+              actionHref="/student/requests"
+              actionLabel="View my requests"
+              description="Released digital documents will appear here when they are ready."
+              kind="empty"
+              title="No digital documents yet"
+            />
+          </div>
         ) : (
           result.artifacts.map((artifact) => (
             <Card key={artifact.id}>
